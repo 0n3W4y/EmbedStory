@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	
+	<meta title="EmbedStory" package="com.sample.sampleproject" version="1.0.0" company="HellGames Studio" />
+	<app main="Main" path="Export" file="SampleProject" />
+	
+	<source path="Source" />
+	
+	<haxelib name="openfl" />
+	
+	<assets path="Assets" rename="assets" />
+
+	<window width="1920" height="1080" background="#000000" fps="60" />
+	
+</project>

@@ -1,0 +1,51 @@
+{
+    "earth":{
+        "movementRatio": 100,
+        "isWalkable": 1,
+        "canPlaceObjects": 1,
+        "canPlayerStand": 1,
+        "graphics": { "image0": "", "image1": "" }
+    },
+
+    "water":{
+        "movementRatio": 0,
+        "isWalkable": 0,
+        "canPlaceObjects": 1,
+        "canPlayerStand": 1
+    },
+
+    "rock":{
+        "movementRatio": 100,
+        "isWalkable": 1,
+        "canPlaceObjects": 1,
+        "canPlayerStand": 1
+    },
+
+    "sandstone":{
+        "movementRatio": 100,
+        "isWalkable": 1,
+        "canPlaceObjects": 1,
+        "canPlayerStand": 1
+    },
+
+    "shallow":{
+        "movementRatio": 75,
+        "isWalkable": 1,
+        "canPlaceObjects": 1,
+        "canPlayerStand": 1
+    },
+
+    "dryGround":{
+        "movementRatio": 100,
+        "isWalkable": 1,
+        "canPlaceObjects": 1,
+        "canPlayerStand": 1
+    },
+
+    "dirt":{
+        "movementRatio": 85,
+        "isWalkable": 1,
+        "canPlaceObjects": 1,
+        "canPlayerStand": 1
+    }
+}

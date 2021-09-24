@@ -1,0 +1,11 @@
+{
+    "grass":{
+        "movementRatio": 100,
+        "graphics": { "grass0": "url", "grass1": "url", "grass2": "url", "grass3": "url", "grass4": "url" }
+    },
+
+    "dirt":{
+        "movementRatio": 70,
+        "graphics": {}
+    }
+}
