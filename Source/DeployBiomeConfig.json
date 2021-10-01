@@ -1,0 +1,65 @@
+{
+    "100":{
+        "name": "desert"
+
+    },
+
+    "101":{
+        "name": "forest"
+
+    },
+
+    "102":{
+        "name": "plain",
+        "mainGroundType": "earth",
+        "additionalGroundType": { "dirt": 5, "rock": 5 },
+        "mainFloorType": { "grass": 80 },
+        "additionalFloorType": { "rockRoad": 5 },
+        "river": { 
+            "river": 15,
+            "riverWidthMax": 8,
+            "riverWidthMin": 2,
+            "riverOffset": 1,
+            "riverWidthOffset": 1,
+            "riverType": null,
+            "riverGroundType": "water"
+        },
+        "lake": { 
+            "lakeRock": 25,
+            "amount": 3,
+            "widthMax": 20,
+            "widthMin": 10,
+            "heightMax": 20,
+            "heightMin": 10,
+            "offset": 3,
+            "widthOffset": 2,
+            "groundType": "water"
+        },
+        "rocks": {
+            "lakeRock": 35,
+            "amount": 2,
+            "widthMax": 40,
+            "widthMin":30,
+            "heightMax":40,
+            "heightMin":30,
+            "offset":1,
+            "widthOffset":2,
+            "groundType": "rock"
+        },
+        "resources": {}
+
+    },
+
+    "103":{
+        "name": "rocky"
+    },
+
+    "104":{
+        "name": "tropics"
+    },
+    
+    "105":{
+        "name": "winter"
+    }
+
+}

@@ -1,0 +1,44 @@
+{
+    "300":{
+        "id": 300,
+        "name": "nothing"
+    },
+
+    "301":{
+        "id": 301,
+        "name": "grass",
+        "isWalkable": 1,
+        "canPlaceObjects": 1,
+        "canCharacterStand": 1,
+        "graphics": { "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }
+    },
+
+    "302":{
+        "id": 302,
+        "name": "sand",
+        "isWalkable": 1,
+        "canPlaceObjects": 1,
+        "canCharacterStand": 1,
+        "graphics":{ "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }
+    },
+
+    "303":{
+        "id": 303,
+        "name": "woodenFloor",
+        "movementRatio": 115,
+        "isWalkable": 1,
+        "canPlaceObjects": 1,
+        "canCharacterStand": 1,
+        "graphics":{ "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }
+    },
+
+    "304":{
+        "id": 304,
+        "name": "rockRoad",
+        "movementRatio": 120,
+        "isWalkable": 1,
+        "canPlaceObjects": 1,
+        "canCharacterStand": 1,
+        "graphics":{ "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }
+    }
+}

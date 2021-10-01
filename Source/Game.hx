@@ -10,12 +10,14 @@ class Game {
     public var fps:Int;
     public var width:Int;
     public var height:Int;
+    public var tileSize:Int;
 
     public var mainSprite:Sprite;
     public var sceneSprite:Sprite;
     public var uiSprite:Sprite;
 
     public var deploy:Deploy;
+    public var sceneSystem:SceneSystem;
 
     public var gameStart:Float;
     public var onPause:Bool;
@@ -27,11 +29,12 @@ class Game {
 	private var _doubleDelta:Float;
 
 
-    public function new( width:Int, height:Int, fps:Int, mainSprite:Sprite ):Void {
+    public function new( width:Int, height:Int, fps:Int, mainSprite:Sprite, tileSize:Int ):Void {
         this.fps = fps;
         this.width = width;
         this.height = height;
         this.mainSprite = mainSprite;
+        this.tileSize = tileSize;
 
         this.onPause = false;
         this._lastTime = 0;
@@ -120,18 +123,31 @@ class Game {
         
         var config:DeployConfig = this._parseData();
         this.deploy = new Deploy( this, config );
+        this.sceneSystem = new SceneSystem( this, spriteForScenes );
 
-        //var tileMap = new TileMap( { Height: 200, Width: 200, Biome: "plain", TileSize:64 , Parent: null });
+        /*
+        var Height:Int;
+        var Width:Int;
+        var Biome:String;
+        var TileSize:Int;
+        var DeployID:BiomeDeployID;
+        var TileMapID:TileMapID;
+        var Name:String;
+        */
+        var config:TileMap.TileMapConfig = { Height: 200, Width: 200, Biome: "plain", TileSize:64, DeployID: BiomeDeployID( 102 ), TileMapID: null, Name: "Green plain" };
+        var scene:Scene = this.sceneSystem.createScene( 401 );
+        //scene.generateTileMap( config );
     }
 
     private function _parseData():DeployConfig
     {
-        var biomeConfig:Dynamic = ConfigJSON.json( "Source/BiomeConfig.json" );
-        var floorTypeConfig:Dynamic = ConfigJSON.json( "Source/FloorTypeConfig.json" );
-        var groundTypeConfig:Dynamic = ConfigJSON.json( "Source/GroundTypeConfig.json" );
+        var biomeConfig:Dynamic = ConfigJSON.json( "Source/DeployBiomeConfig.json" );
+        var floorTypeConfig:Dynamic = ConfigJSON.json( "Source/DeployFloorTypeConfig.json" );
+        var groundTypeConfig:Dynamic = ConfigJSON.json( "Source/DeployGroundTypeConfig.json" );
+        var sceneConfig:Dynamic = ConfigJSON.json( "Source/DeploySceneConfig.json" );
         
 
-        return { BiomeConfig: biomeConfig, GroundTypeConfig: groundTypeConfig, FloorTypeConfig: floorTypeConfig };
+        return { BiomeConfig: biomeConfig, GroundTypeConfig: groundTypeConfig, FloorTypeConfig: floorTypeConfig, SceneConfig:sceneConfig };
     }
 
 }

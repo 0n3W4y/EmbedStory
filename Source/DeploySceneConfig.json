@@ -1,0 +1,9 @@
+{
+    "400":{
+        "sceneType": "globalMapScene"
+    },
+
+    "401":{
+        "sceneType": "battleScene"
+    }
+}

@@ -7,6 +7,14 @@ enum TileID
 	TileID( _:Int );
 }
 
+enum FloorTypeDeployID{
+    FloorTypeDeployID( _:Int );
+}
+
+enum GroundTypeDeployID{
+    GroundTypeDeployID( _:Int );
+}
+
 typedef TileConfig = {
     var ID:TileID;
     var GridX:Int;
@@ -17,14 +25,16 @@ typedef TileConfig = {
     var IsWalkable:Int;
     var MovementRatio:Int;
     var CanPlaceObjects:Int;
-    var CanPlayerStand:Int;
+    var CanCharacterStand:Int;
     var Index:Int;
 }
 
 class Tile {
     public var tileSize:Int;
-    public var groundType:String; // earth, water, rock, sandstone, shallow, dryGround;
+    public var groundType:String; // earth, water, rock, sandstone, shallow, dirt, dryEarth;
+    public var groundTypeGraphicsIndex:Int;
     public var floorType:String; // grass, rockroad, woodenfloor, sand;
+    public var floorTypeGraphicIndex:Int;
     public var gridX:Int;
     public var gridY:Int;
     public var graphicsX:Int;
@@ -33,7 +43,7 @@ class Tile {
     public var movementRatio:Int;
     public var isWalkable:Int;
     public var canPlaceObjects:Int;
-    public var canPlayerStand:Int;
+    public var canCharacterStand:Int;
 
     public var tileGroundSprite:Sprite;
     public var tileFloorSprite:Sprite;
@@ -42,6 +52,8 @@ class Tile {
     private var _init:Bool;
     private var _postInit:Bool;
     private var _index:Int;
+    private var _groundTypeDeployID:GroundTypeDeployID;
+    private var _floorTypeDeployID:FloorTypeDeployID;
 
     public function new( params:TileConfig ):Void {
         this.gridX = params.GridX;
@@ -53,7 +65,8 @@ class Tile {
         this.movementRatio = params.MovementRatio;
         this._id = params.ID;
         this._index = params.Index;
-        this.canPlaceObjects = 1;
+        this.canPlaceObjects = params.CanPlaceObjects;
+        this.canCharacterStand = params.CanCharacterStand;
 
         this._init = false;
         this._postInit = false;
@@ -95,6 +108,12 @@ class Tile {
         if( this.movementRatio == null )
             throw '$errMsg Movement ratio = null';
 
+        if( this.canPlaceObjects == null )
+            throw '$errMsg Can Place objects = null';
+
+        if( this.canCharacterStand == null )
+            throw '$errMsg can player stand = null';
+
         this._init = true;
     }
 
@@ -117,5 +136,37 @@ class Tile {
     public function getIndex():Int{
         return this._index;
     }
+
+    public function changeFloorType( params:Dynamic ):Void{
+        var deployID:Int = Reflect.getProperty( params, "id" );
+        this._floorTypeDeployID = FloorTypeDeployID( deployID );
+        this.floorType = Reflect.getProperty( params, "name" );
+
+        if( this.floorType == "nothing" ){
+            return;
+        }        
+        this._updateFields( params );
+    }
+
+    public function updateGroundType( params:Dynamic ):Void{
+        this.groundType = Reflect.getProperty( params, "name" );
+        var deployID:Int = Reflect.getProperty( params, "id" );
+        this._groundTypeDeployID = GroundTypeDeployID( deployID );
+        this._updateFields( params );
+    }
+
+    private function _updateFields( params:Dynamic ):Void{
+        for( key in Reflect.fields( params )){
+            switch( key ){
+                case "movementRatio": this.movementRatio = Reflect.getProperty( params, key );
+                case "isWalkable": this.isWalkable = Reflect.getProperty( params, key );
+                case "canPlaceObjects": this.canPlaceObjects = Reflect.getProperty( params, key );
+                case "canPlayerStand": this.canCharacterStand = Reflect.getProperty( params, key );
+                default: {};
+            }
+        }
+    }
+
+
 
 }
