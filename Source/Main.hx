@@ -7,11 +7,10 @@ class Main extends Sprite {
 	public var screenHeight:Int = 1080;
 	public var gameFps:Int = 60;
 	public var game:Game;
-	public var tileSize:Int = 64;
 
 	public function new()
 	{
 		super();
-		this.game = new Game( screenWidth, screenHeight, gameFps, this, tileSize );
+		this.game = new Game( screenWidth, screenHeight, gameFps, this );
 	}
 }

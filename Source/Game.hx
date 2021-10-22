@@ -10,7 +10,6 @@ class Game {
     public var fps:Int;
     public var width:Int;
     public var height:Int;
-    public var tileSize:Int;
 
     public var mainSprite:Sprite;
     public var sceneSprite:Sprite;
@@ -29,12 +28,11 @@ class Game {
 	private var _doubleDelta:Float;
 
 
-    public function new( width:Int, height:Int, fps:Int, mainSprite:Sprite, tileSize:Int ):Void {
+    public function new( width:Int, height:Int, fps:Int, mainSprite:Sprite ):Void {
         this.fps = fps;
         this.width = width;
         this.height = height;
         this.mainSprite = mainSprite;
-        this.tileSize = tileSize;
 
         this.onPause = false;
         this._lastTime = 0;

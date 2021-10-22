@@ -143,9 +143,16 @@ class Tile {
         this.floorType = Reflect.getProperty( params, "name" );
 
         if( this.floorType == "nothing" ){
+            throw 'Error in Tile.changeFloorType. Floor type is "nothing", use "changeFloorTypeToNothing()"';
             return;
         }        
         this._updateFields( params );
+    }
+
+    public function changeFloorTypeToNothing( params:Dynamic ):Void{
+        this._floorTypeDeployID = FloorTypeDeployID( 300 );
+        this.floorType = "nothing";
+        this._updateFields( params ); // params is config groundType;
     }
 
     public function updateGroundType( params:Dynamic ):Void{

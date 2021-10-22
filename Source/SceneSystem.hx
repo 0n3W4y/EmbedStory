@@ -1,5 +1,7 @@
 package;
 
+import TileMap.TileMapConfig;
+import TileMap.BiomeDeployID;
 import openfl.display.Sprite;
 import Scene;
 
@@ -19,9 +21,16 @@ class SceneSystem {
     }
 
     public function createScene( sceneDeploy:Int ):Scene{
-        var newSceneDeployID:SceneDeployID = SceneDeployID( sceneDeploy );
         var newSceneId:SceneID = this._generateSceneId();
-        var newSceneSprite = new Sprite();
+        var newSceneDeployID:SceneDeployID = SceneDeployID( sceneDeploy );
+
+        var scene:Scene = null;
+
+        switch( sceneDeploy ){
+            case 401: scene = this._createBattleScene( newSceneId, newSceneDeployID );
+            default: throw 'Error in SceneSystem.createScene. No scene with deploy ID: $sceneDeploy .';
+        }
+        
         //var sceneName:String = "Green plane";
         var sceneDeployConfig:Dynamic = this._parent.deploy.sceneConfig[ newSceneDeployID ];
         trace( sceneDeployConfig );
@@ -47,6 +56,27 @@ class SceneSystem {
 
     public function getParent():Game{
         return this._parent;
+    }
+
+    private function _createBattleScene( sceneID: SceneID, sceneDeployID:SceneDeployID ):Scene{
+        var sceneDeployConfig:Dynamic = this._parent.deploy.sceneConfig[ sceneDeployID ];
+        var newSceneSprite = new Sprite();
+        var sceneType:String = Reflect.getProperty( sceneDeployConfig, "sceneType" );
+
+        var sceneConfig:SceneConfig = {
+            ID: sceneID,
+            SceneName: "Green plain",
+            SceneType: sceneType,
+            DeployID: sceneDeployID,
+            SceneSprite: newSceneSprite
+        }
+
+        var scene:Scene = new Scene( this, sceneConfig );
+        var tileMap:Int = Reflect.getProperty( sceneDeployConfig, "tileMap" );
+        if( tileMap == 1 ){
+            scene.generateTileMap();
+        }
+        return scene;
     }
 
     private function _generateSceneId():SceneID{

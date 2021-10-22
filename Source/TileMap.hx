@@ -153,7 +153,7 @@ class TileMap{
 
         var tileFloorTypeDeployId:FloorTypeDeployID = this._deploy.getFloorTypeDeployID( floorType );
         var floorTileConfig:Dynamic = this._deploy.floorTypeConfig[ tileFloorTypeDeployId ];
-        tile.changeFloorType( floorType, floorTileConfig );
+        tile.changeFloorType( floorTileConfig );
 
         //TODO: check for object on tile and update tile fields;
     }
@@ -161,6 +161,10 @@ class TileMap{
     public function getTileById( tileId:TileID ):Tile{
         var tile:Tile = this._findTile( tileId );
         return tile;
+    }
+
+    public function gettileMpaID():TileMapID{
+        return this._tileMapID;
     }
 
     private function _generateRiverConfig():RiverConfig{
@@ -341,7 +345,7 @@ class TileMap{
             
             var randomNum:Int = Math.floor( Math.random()* 100 ); // 0 - 99;
             if( randomNum <= floorTypePercentage ){
-                tile.changeFloorType( floorType, floorTypeConfig );
+                tile.changeFloorType( floorTypeConfig );
             }else{
                 tile.floorType = "nothing";
             }
@@ -380,7 +384,7 @@ class TileMap{
 
             var additionalFloorTypeDeployID:FloorTypeDeployID = this._deploy.getFloorTypeDeployID( floorType );
             var additionalFloorTypeConfig:Dynamic = this._deploy.floorTypeConfig[ additionalFloorTypeDeployID ];
-            tile.changeFloorType( floorType, additionalFloorTypeConfig );
+            tile.changeFloorType( additionalFloorTypeConfig );
         }
     }
 

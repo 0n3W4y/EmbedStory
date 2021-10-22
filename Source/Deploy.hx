@@ -28,7 +28,7 @@ class Deploy{
         //this.groundTypeConfig = params.GroundTypeConfig;
         //this.biomeConfig = params.BiomeConfig;
 
-        this.floorTypeConfig = new Map<FloorTypeDeployID,Dynamic>();
+        this.floorTypeConfig = new Map<FloorTypeDeployID, Dynamic>();
 		for( key in Reflect.fields( params.FloorTypeConfig )){
 			var intKey:Int = Std.parseInt( key );
 			this.floorTypeConfig[ FloorTypeDeployID( intKey )] = Reflect.getProperty( params.FloorTypeConfig, key );
@@ -90,6 +90,18 @@ class Deploy{
         }
 
         throw 'Error in Deploy.getSceneDeployID. No ID for scene type: $sceneType ';
+        return null;
+    }
+
+    public function getBiomeDeployID( biomeType:String ):BiomeDeployID{
+        for( key in this.biomeConfig.keys() ){
+            var value:Map<String, Dynamic> = this.biomeConfig[ key ];
+            var biomeTypeInConfig:String = value[ "biomeType "];
+            if( biomeType == biomeTypeInConfig )
+                return key;
+        }
+
+        throw 'Error in Deploy.getBiomeDeployID. No ID for biome type: $biomeType ';
         return null;
     }
 }
