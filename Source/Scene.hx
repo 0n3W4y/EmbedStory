@@ -22,10 +22,10 @@ typedef SceneConfig = {
 
 class Scene {
     public var tileMapStorage:Array<TileMap>;
-    public var objectStorage:Array<Entity>;
-    public var stuffStorage:Array<Stuff>;
+    public var objectStorage:Array<EntityObject>;
+    public var stuffStorage:Array<EntityStuff>;
     public var effectStorage:Array<Effect>;
-    public var characterStorage:Array<Character>;
+    public var characterStorage:Array<EntityCharacter>;
 
     public var groundTileMapGraphics:Sprite;
     public var floorTileMapGraphics:Sprite;
