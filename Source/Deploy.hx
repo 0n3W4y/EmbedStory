@@ -60,7 +60,7 @@ class Deploy{
     public function getFloorTypeDeployID( name:String ):FloorTypeDeployID{
         for( key in this.floorTypeConfig.keys() ){
             var value:Map<String, Dynamic> = this.floorTypeConfig[ key ];
-            var floorTypeName:String = value[ "name" ];
+            var floorTypeName:String = Reflect.getProperty( value, "name" );
             if( name == floorTypeName )
                 return key;
         }
@@ -72,7 +72,7 @@ class Deploy{
     public function getGroundTypeDeployID( name:String ):GroundTypeDeployID{
         for( key in this.groundTypeConfig.keys() ){
             var value:Map<String, Dynamic> = this.groundTypeConfig[ key ];
-            var groundTypeName:String = value[ "name" ];
+            var groundTypeName:String = Reflect.getProperty( value, "name" );
             if( name == groundTypeName )
                 return key;
         }
@@ -83,8 +83,8 @@ class Deploy{
 
     public function getSceneDeployID( sceneType:String ):SceneDeployID{
         for( key in this.sceneConfig.keys() ){
-            var value:Map<String, Dynamic> = this.sceneConfig[ key ];
-            var sceneTypeInConfig:String = value[ "sceneType "];
+            var value:Dynamic = this.sceneConfig[ key ];
+            var sceneTypeInConfig:String = Reflect.getProperty( value, "sceneType" );
             if( sceneType == sceneTypeInConfig )
                 return key;
         }
@@ -95,8 +95,8 @@ class Deploy{
 
     public function getBiomeDeployID( biomeType:String ):BiomeDeployID{
         for( key in this.biomeConfig.keys() ){
-            var value:Map<String, Dynamic> = this.biomeConfig[ key ];
-            var biomeTypeInConfig:String = value[ "biomeType "];
+            var value:Dynamic = this.biomeConfig[ key ];
+            var biomeTypeInConfig:String = Reflect.getProperty( value, "biomeType" );
             if( biomeType == biomeTypeInConfig )
                 return key;
         }

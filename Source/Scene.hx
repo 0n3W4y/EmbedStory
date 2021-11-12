@@ -4,7 +4,7 @@ import haxe.EnumTools;
 import TileMap;
 import openfl.display.Sprite;
 
-enum SceneID {
+enum SceneID{
     SceneID( _:Int );
 }
 
@@ -22,10 +22,10 @@ typedef SceneConfig = {
 
 class Scene {
     public var tileMapStorage:Array<TileMap>;
-    public var objectStorage:Array<EntityObject>;
-    public var stuffStorage:Array<EntityStuff>;
+    public var objectStorage:Array<Entity>;
+    public var stuffStorage:Array<Entity>;
     public var effectStorage:Array<Effect>;
-    public var characterStorage:Array<EntityCharacter>;
+    public var characterStorage:Array<Entity>;
 
     public var groundTileMapGraphics:Sprite;
     public var floorTileMapGraphics:Sprite;
@@ -48,6 +48,7 @@ class Scene {
         this._sceneId = params.ID;        
         this.sceneName = params.SceneName;
         this.sceneType = params.SceneType;
+        this._sceneDeployID = params.DeployID;
 
         this.tileMapStorage = new Array<TileMap>();
         this._tileID = 0;
@@ -68,7 +69,7 @@ class Scene {
     public function getTileMapWithID( tileMapID:TileMapID ):TileMap{
         for( i in 0...this.tileMapStorage.length ){
             var tileMap:TileMap = this.tileMapStorage[ i ];
-            if( EnumValueTools.equals( tileMap.gettileMpaID(), tileMapID ))
+            if( EnumValueTools.equals( tileMap.getTileMpaID(), tileMapID ))
                 return tileMap;
         }
 
@@ -79,11 +80,12 @@ class Scene {
     public function generateTileMap():Void{
         var id:TileMapID = this._generateTileMapID();
         var sceneDeployConfig:Dynamic = this._parent.getParent().deploy.sceneConfig[ this._sceneDeployID ];
-        var biome:String = Reflect.getProperty( sceneDeployConfig, "biome" );
+        var biome:String = Reflect.getProperty( sceneDeployConfig, "tileMapBiome" );
         var height:Int = Reflect.getProperty( sceneDeployConfig, "height" );
         var width:Int = Reflect.getProperty( sceneDeployConfig, "width" );
         var tileSize:Int = Reflect.getProperty( sceneDeployConfig, "tileSize" );
         var biomeDeployID:BiomeDeployID = this._parent.getParent().deploy.getBiomeDeployID( biome );
+
         var tileMapConfig:TileMapConfig = {
             Height: height,
             Width: width,
@@ -91,9 +93,10 @@ class Scene {
             TileSize: tileSize,
             DeployID: biomeDeployID,
             TileMapID: id,
-            Name: null
+            Name: "TEST"
         }
         var tileMap:TileMap = new TileMap( this, tileMapConfig );
+        tileMap.init();
         tileMap.generateMap();
 
         this.tileMapStorage.push( tileMap );

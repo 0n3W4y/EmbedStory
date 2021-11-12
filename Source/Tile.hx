@@ -25,6 +25,7 @@ typedef TileConfig = {
     var IsWalkable:Int;
     var MovementRatio:Int;
     var CanPlaceObjects:Int;
+    var CanPlaceStaff:Int;
     var CanCharacterStand:Int;
     var Index:Int;
 }
@@ -43,6 +44,7 @@ class Tile {
     public var movementRatio:Int;
     public var isWalkable:Int;
     public var canPlaceObjects:Int;
+    public var canPlaceStaff:Int;
     public var canCharacterStand:Int;
 
     public var tileGroundSprite:Sprite;
@@ -66,6 +68,7 @@ class Tile {
         this._id = params.ID;
         this._index = params.Index;
         this.canPlaceObjects = params.CanPlaceObjects;
+        this.canPlaceStaff = params.CanPlaceStaff;
         this.canCharacterStand = params.CanCharacterStand;
 
         this._init = false;
@@ -112,7 +115,10 @@ class Tile {
             throw '$errMsg Can Place objects = null';
 
         if( this.canCharacterStand == null )
-            throw '$errMsg can player stand = null';
+            throw '$errMsg Can player stand = null';
+
+        if( this.canPlaceStaff == null )
+            throw '$errMsg Can place staff is null';
 
         this._init = true;
     }

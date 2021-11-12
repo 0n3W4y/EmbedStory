@@ -8,9 +8,14 @@ enum EntityID{
 
 class Entity{
 
+    public var entityName:String;
     public var entityType:String;
+    public var entitySubType:String;
     public var tileID:Int;
     public var tileMapID:Int;
+
+    public var age:AgeSystem;
+    public var name:NameSystem;   
     
 
     private var _ID:EntityID;
@@ -19,8 +24,8 @@ class Entity{
         
     }
 
-    public function update( time:Float ):Void{
-
+    public function update( time:Int ):Void{
+        
     }
 
     public function getId():EntityID{

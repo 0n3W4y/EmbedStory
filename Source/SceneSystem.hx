@@ -47,7 +47,7 @@ class SceneSystem {
         this.sceneStorage.push( scene );
         return scene;
     */
-    return null;
+        return scene;
     }
 
     public function deleteScene( scene:Scene ):Void{
@@ -81,7 +81,8 @@ class SceneSystem {
 
     private function _generateSceneId():SceneID{
         this._sceneId++;
-        return SceneID( this._sceneId );
+        var newSceneID:SceneID = SceneID( this._sceneId );
+        return newSceneID;
     }
 
 }

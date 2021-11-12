@@ -15,8 +15,11 @@ class Game {
     public var sceneSprite:Sprite;
     public var uiSprite:Sprite;
 
+    public var stage:Stage;
     public var deploy:Deploy;
     public var sceneSystem:SceneSystem;
+    public var gameTimeSystem:GameTimeSystem;
+    public var eventSystem:EventSystem;
 
     public var gameStart:Float;
     public var onPause:Bool;
@@ -24,8 +27,8 @@ class Game {
 
     private var _currentTime:Float;
 	private var _lastTime:Float;
-	private var _delta:Float;
-	private var _doubleDelta:Float;
+	private var _delta:Int;
+	private var _doubleDelta:Int;
 
 
     public function new( width:Int, height:Int, fps:Int, mainSprite:Sprite ):Void {
@@ -89,7 +92,7 @@ class Game {
     private function _tick():Void
     {
         this._currentTime = Date.now().getTime();
-        var delta:Float = this._currentTime - this._lastTime;
+        var delta:Int = Std.int( this._currentTime - this._lastTime );
 
         if ( delta >= this._delta ){
             if( delta >= this._doubleDelta ){
@@ -101,9 +104,10 @@ class Game {
         this._sUpdate(); // special update; обновление дейсвтий мыши на графические объкты.
     }
 
-    private function _update( delta:Float ):Void {
+    private function _update( time:Int ):Void {
         if( !onPause ) {
-
+            this.gameTimeSystem.update( time );
+            this.eventSystem.update( time );
         }
     }
 
@@ -113,6 +117,8 @@ class Game {
 
     private function _preStartGame():Void{
 
+        this.gameTimeSystem = new GameTimeSystem( this );
+        this.stage = new Stage( this );
         var spriteForScenes:Sprite = new Sprite();
         var spriteForUI:Sprite = new Sprite();
 
@@ -123,16 +129,7 @@ class Game {
         this.deploy = new Deploy( this, config );
         this.sceneSystem = new SceneSystem( this, spriteForScenes );
 
-        /*
-        var Height:Int;
-        var Width:Int;
-        var Biome:String;
-        var TileSize:Int;
-        var DeployID:BiomeDeployID;
-        var TileMapID:TileMapID;
-        var Name:String;
-        */
-        var config:TileMap.TileMapConfig = { Height: 200, Width: 200, Biome: "plain", TileSize:64, DeployID: BiomeDeployID( 102 ), TileMapID: null, Name: "Green plain" };
+
         var scene:Scene = this.sceneSystem.createScene( 401 );
         //scene.generateTileMap( config );
     }

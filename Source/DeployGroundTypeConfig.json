@@ -5,6 +5,7 @@
         "movementRatio": 100,
         "isWalkable": 1,
         "canPlaceObjects": 1,
+        "canPlaceStaff": 1,
         "canCharacterStand": 1,
         "graphics": []
     },
@@ -15,7 +16,8 @@
         "movementRatio": 0,
         "isWalkable": 0,
         "canPlaceObjects": 1,
-        "canCharacterStand": 1,
+        "canPlaceStaff": 0,
+        "canCharacterStand": 0,
         "graphics": []
     },
 
@@ -25,6 +27,7 @@
         "movementRatio": 100,
         "isWalkable": 1,
         "canPlaceObjects": 1,
+        "canPlaceStaff": 1,
         "canCharacterStand": 1,
         "graphics": []
     },
@@ -35,6 +38,7 @@
         "movementRatio": 100,
         "isWalkable": 1,
         "canPlaceObjects": 1,
+        "canPlaceStaff": 1,
         "canCharacterStand": 1,
         "graphics": []
     },
@@ -45,6 +49,7 @@
         "movementRatio": 75,
         "isWalkable": 1,
         "canPlaceObjects": 1,
+        "canPlaceStaff": 1,
         "canCharacterStand": 1,
         "graphics": []
     },
@@ -55,6 +60,18 @@
         "movementRatio": 100,
         "isWalkable": 1,
         "canPlaceObjects": 1,
+        "canPlaceStaff": 1,
+        "canCharacterStand": 1,
+        "graphics": []
+    },
+
+    "206":{
+        "id": 206,
+        "name": "dirt",
+        "movementRatio": 90,
+        "isWalkable": 1,
+        "canPlaceObjects": 1,
+        "canPlaceStaff": 1,
         "canCharacterStand": 1,
         "graphics": []
     }

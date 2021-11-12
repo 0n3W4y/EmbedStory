@@ -1,16 +1,19 @@
 {
     "100":{
-        "name": "desert"
+        "name": "desert",
+        "biomeType": "desert"
 
     },
 
     "101":{
-        "name": "forest"
+        "name": "forest",
+        "biomeType": "forest"
 
     },
 
     "102":{
         "name": "plain",
+        "biomeType": "plain",
         "mainGroundType": "earth",
         "additionalGroundType": { "dirt": 5, "rock": 5 },
         "mainFloorType": { "grass": 80 },
@@ -35,7 +38,7 @@
             "widthOffset": 2,
             "groundType": "water"
         },
-        "rocks": {
+        "rock": {
             "lakeRock": 35,
             "amount": 2,
             "widthMax": 40,
@@ -51,15 +54,18 @@
     },
 
     "103":{
-        "name": "rocky"
+        "name": "rocky",
+        "biomeType": "rocky"
     },
 
     "104":{
-        "name": "tropics"
+        "name": "tropics",
+        "biomeType": "tropics"
     },
     
     "105":{
-        "name": "winter"
+        "name": "winter",
+        "biomeType": "winter"
     }
 
 }

@@ -2,6 +2,8 @@ package;
 
 import Tile;
 import Deploy;
+import haxe.EnumTools;
+
 
 enum TileMapID{
     TileMapID( _:Int );
@@ -71,6 +73,7 @@ class TileMap{
     private var _deploy:Deploy;
     private var _biomeDeployID:BiomeDeployID;
     private var _tileMapID:TileMapID;
+    private var _totalTiles:Int;
 
     public function new( parent:Scene, params:TileMapConfig ):Void {
         this.height = params.Height;
@@ -80,6 +83,7 @@ class TileMap{
         this.name = params.Name;
         this._tileMapID = params.TileMapID;
         this._biomeDeployID = params.DeployID;
+        this._totalTiles = this.height * this.width;
         
         this._tileID = 0;
         this._parent = parent;
@@ -88,6 +92,7 @@ class TileMap{
         this._postInit = false;
 
         this.tileStorage = new Array<Tile>();
+        this._deploy = this._parent.getParent().getParent().deploy;
     }
 
     public function init():Void{
@@ -117,7 +122,9 @@ class TileMap{
         if( this.name == null )
             throw '$errMsg Name is null';
 
-        this._deploy = this._parent.getParent().getParent().deploy;
+        if( this._deploy == null )
+            throw '$errMsg Deploy is null';
+
         this._init = true;
 
     }
@@ -163,7 +170,7 @@ class TileMap{
         return tile;
     }
 
-    public function gettileMpaID():TileMapID{
+    public function getTileMpaID():TileMapID{
         return this._tileMapID;
     }
 
@@ -271,7 +278,7 @@ class TileMap{
             for( j in 0...this.width ){
                 var newId:TileID= this._generateTileID();                
                 var groundTileDeployID:GroundTypeDeployID = this._deploy.getGroundTypeDeployID( mainGroundType );
-                var groundTileConfig:Map<String, Dynamic> = this._deploy.groundTypeConfig[ groundTileDeployID ];
+                var groundTileConfig:Dynamic = this._deploy.groundTypeConfig[ groundTileDeployID ];
 
                 var tileConfig:TileConfig = {
                     ID: newId,
@@ -280,10 +287,11 @@ class TileMap{
                     TileSize: this.tileSize,
                     GroundType: mainGroundType,
                     FloorType: null,
-                    IsWalkable: groundTileConfig[ "isWalkable" ],
-                    MovementRatio: groundTileConfig[ "movementRatio" ],
-                    CanPlaceObjects: groundTileConfig[ "canPlaceObjects" ],
-                    CanCharacterStand: groundTileConfig[ "canCharactertand" ],
+                    IsWalkable: Reflect.getProperty( groundTileConfig, "isWalkable" ),
+                    MovementRatio: Reflect.getProperty( groundTileConfig, "movementRatio" ),
+                    CanPlaceObjects: Reflect.getProperty( groundTileConfig, "canPlaceObjects" ),
+                    CanPlaceStaff: Reflect.getProperty( groundTileConfig, "canPlaceStaff" ),
+                    CanCharacterStand: Reflect.getProperty( groundTileConfig, "canCharactertand" ),
                     Index: i * this.height + j
                 }
 
@@ -425,6 +433,8 @@ class TileMap{
                 riverPoint += Math.floor( -riverOffset + Math.random()* ( riverOffset*2 + 1 )); // offset on coord Y -1, 0, +1;
                 for( j in 0...currentRiverWidth ){
                     var index:Int = ( riverPoint + j ) * this.height + i;
+                    if( this._totalTiles < index )
+                        break; // защита от выхода за пределы карты
                     var tile:Tile = this.tileStorage[ index ];
                     tile.groundType = riverGroundType;
                     tile.isWalkable = 0;
@@ -439,7 +449,7 @@ class TileMap{
 
     private function _generateLakeRock( params:LakeRockConfig ):Void{
         var groundTileDeployID:GroundTypeDeployID = this._deploy.getGroundTypeDeployID( params.GroundType );
-        var groundTileConfig:Map<String, Dynamic> = this._deploy.groundTypeConfig[ groundTileDeployID ];
+        var groundTileConfig:Dynamic = this._deploy.groundTypeConfig[ groundTileDeployID ];
         if( params.LakeRock ){
             var amount:Int = params.Amount;
             var widthMax:Int = params.WidthMax;
@@ -460,6 +470,9 @@ class TileMap{
                     lakeWidthAverage += Math.floor( -widthOffset + Math.random()*( widthOffset*2 +1 ));
                     for( k in 0...lakeWidthAverage ){
                         var index:Int = ( lakePointTop + j ) * this.height + lakePointLeft + k;
+                        if( this._totalTiles < index )
+                            break; // защита от выхода за пределы карты.
+
                         var lakeTile:Tile = this.tileStorage[ index ];
                         lakeTile.updateGroundType( groundTileConfig );
                     }
@@ -534,19 +547,22 @@ class TileMap{
         }
     }
 */
+
     private function _findTile( tileId:TileID ):Tile{
         var tile:Tile = null;
         for( i in 0...this.tileStorage.length ){
             tile = this.tileStorage[ i ];
-            if( haxe.EnumTools.EnumValueTools.equals( tileId, tile.getId() ))
+            if( EnumValueTools.equals( tileId, tile.getId() ))
                 return tile;
         }
 
         throw 'Error in TileMap._findTile. No tile found in storage with TileID: $tileId .';
         return null;
     }
+
     private function _generateTileID():TileID {
         this._tileID++;
         return TileID( this._tileID );
     }
+
 }
