@@ -118,6 +118,7 @@ class Game {
     private function _preStartGame():Void{
 
         this.gameTimeSystem = new GameTimeSystem( this );
+        this.eventSystem = new EventSystem( this );
         this.stage = new Stage( this );
         var spriteForScenes:Sprite = new Sprite();
         var spriteForUI:Sprite = new Sprite();
@@ -131,7 +132,7 @@ class Game {
 
 
         var scene:Scene = this.sceneSystem.createScene( 401 );
-        //scene.generateTileMap( config );
+        trace( scene.tileMapStorage[ 0 ].tileStorage );
     }
 
     private function _parseData():DeployConfig

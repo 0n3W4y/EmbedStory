@@ -1,8 +1,11 @@
 package;
 
 class EntitySystem{
-    public function new():Void{
 
+    private var _parent:Game;
+
+    public function new( parent:Game ):Void{
+        this._parent = parent;
     }
 
     public function createEntity():Entity{

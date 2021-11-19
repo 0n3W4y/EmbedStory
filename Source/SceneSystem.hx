@@ -30,23 +30,8 @@ class SceneSystem {
             case 401: scene = this._createBattleScene( newSceneId, newSceneDeployID );
             default: throw 'Error in SceneSystem.createScene. No scene with deploy ID: $sceneDeploy .';
         }
-        
-        //var sceneName:String = "Green plane";
-        var sceneDeployConfig:Dynamic = this._parent.deploy.sceneConfig[ newSceneDeployID ];
-        trace( sceneDeployConfig );
-    /*    var sceneType:String = sceneDeployConfig[ "sceneType" ];
-        var sceneConfig:SceneConfig = {
-            ID: newSceneId,
-            SceneName: null,
-            SceneType: sceneType,
-            DeployID: sceneDeployID,
-            SceneSprite: newSceneSprite
-        }
 
-        var scene:Scene = new Scene( this, sceneConfig );
         this.sceneStorage.push( scene );
-        return scene;
-    */
         return scene;
     }
 

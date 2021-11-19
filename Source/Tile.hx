@@ -28,6 +28,8 @@ typedef TileConfig = {
     var CanPlaceStaff:Int;
     var CanCharacterStand:Int;
     var Index:Int;
+    var FloorDeployID: FloorTypeDeployID;
+    var GroundDeployID: GroundTypeDeployID;
 }
 
 class Tile {
@@ -70,10 +72,11 @@ class Tile {
         this.canPlaceObjects = params.CanPlaceObjects;
         this.canPlaceStaff = params.CanPlaceStaff;
         this.canCharacterStand = params.CanCharacterStand;
+        this._floorTypeDeployID = params.FloorDeployID;
+        this._groundTypeDeployID = params.GroundDeployID;
 
         this._init = false;
-        this._postInit = false;
-        
+        this._postInit = false;        
 
         this.calculateGraphicsPosition();
     }
@@ -85,40 +88,46 @@ class Tile {
             trace( 'Tile already inited' );
 
         if( this.gridX == null )
-            throw '$errMsg GridX = null';
+            throw '$errMsg GridX is null';
 
         if( this.gridY == null )
-            throw '$errMsg GridY = null';
+            throw '$errMsg GridY is null';
 
         if( this.tileSize == null )
-            throw '$errMsg Tile Size = null';
+            throw '$errMsg Tile Size is null';
 
         if( this.groundType == null )
-            throw '$errMsg Ground type = null';
+            throw '$errMsg Ground type is null';
 
         if( this.isWalkable == null )
-            throw '$errMsg Is walkable = null';
+            throw '$errMsg Is walkable is null';
 
         if( this.floorType == null )
-            throw '$errMsg Floor type = null';
+            throw '$errMsg Floor type is null';
 
         if( this.graphicsX == null )
-            throw '$errMsg Graphics X = null';
+            throw '$errMsg Graphics X is null';
 
         if( this.graphicsY == null )
-            throw '$errMsg Graphics Y = null';
+            throw '$errMsg Graphics Y is null';
 
         if( this.movementRatio == null )
-            throw '$errMsg Movement ratio = null';
+            throw '$errMsg Movement ratio is null';
 
         if( this.canPlaceObjects == null )
-            throw '$errMsg Can Place objects = null';
+            throw '$errMsg Can Place objects is null';
 
         if( this.canCharacterStand == null )
-            throw '$errMsg Can player stand = null';
+            throw '$errMsg Can player stand is null';
 
         if( this.canPlaceStaff == null )
             throw '$errMsg Can place staff is null';
+
+        if( this._floorTypeDeployID == null )
+            throw '$errMsg Floor type deploy ID is null';
+
+        if( this._groundTypeDeployID == null )
+            throw '$errMsg Ground type deploy ID is null';
 
         this._init = true;
     }
@@ -148,17 +157,10 @@ class Tile {
         this._floorTypeDeployID = FloorTypeDeployID( deployID );
         this.floorType = Reflect.getProperty( params, "name" );
 
-        if( this.floorType == "nothing" ){
-            throw 'Error in Tile.changeFloorType. Floor type is "nothing", use "changeFloorTypeToNothing()"';
-            return;
-        }        
-        this._updateFields( params );
-    }
+        if( this.floorType == "nothing" )
+            this._floorTypeDeployID = FloorTypeDeployID( 300 );
 
-    public function changeFloorTypeToNothing( params:Dynamic ):Void{
-        this._floorTypeDeployID = FloorTypeDeployID( 300 );
-        this.floorType = "nothing";
-        this._updateFields( params ); // params is config groundType;
+        this._updateFields( params );
     }
 
     public function updateGroundType( params:Dynamic ):Void{
@@ -175,6 +177,7 @@ class Tile {
                 case "isWalkable": this.isWalkable = Reflect.getProperty( params, key );
                 case "canPlaceObjects": this.canPlaceObjects = Reflect.getProperty( params, key );
                 case "canPlayerStand": this.canCharacterStand = Reflect.getProperty( params, key );
+                case "canPlaceStaff": this.canPlaceStaff = Reflect.getProperty( params, key );
                 default: {};
             }
         }

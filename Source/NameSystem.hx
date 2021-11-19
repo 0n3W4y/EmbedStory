@@ -1,6 +1,5 @@
 package;
 
-import js.html.svg.StringList;
 
 typedef NameSystemConfig = {
     var Name:String;
