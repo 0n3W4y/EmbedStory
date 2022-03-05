@@ -11,10 +11,11 @@ class GameTimeSystem{
 
     public static var TickTimeline:Int = 1000; // отсечка по подсчету времени по тикам
     public static var MinuteTimeline:Int = 60;
-    public static var HoureTimeline:Int = 24;
+    public static var HourTimeline:Int = 24;
     public static var DayTimeline:Int = 30;
     public static var MonthTimeline:Int = 12;
     //public static var Seasons:Array<String> = [ "summer", "autumn", "winter", "spring" ];
+    //public var timeMultiplier = 1; // Множитель времени.
 
     private var _parent:Game;
     private var _currenTickTime:Int;
@@ -38,7 +39,7 @@ class GameTimeSystem{
             this.currentHour++;
             this._parent.stage.hourUp();
             this.currentMinute = 0;
-            if( this.currentHour >= HoureTimeline ){
+            if( this.currentHour >= HourTimeline ){
                 this.currentDay++;
                 this.currentHour = 0;
                 if( this.currentDay > DayTimeline ){

@@ -20,7 +20,7 @@ class NameSystem{
     }
 
     public function init():Void{
-        var msg:String = 'Error in NameSystem.init. ';
+        var msg:String = 'Error in NameSystem.init.';
 
         if( this._parent == null )
             throw '$msg Parent is null';

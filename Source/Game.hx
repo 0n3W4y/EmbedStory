@@ -112,7 +112,7 @@ class Game {
     }
 
     private function _sUpdate():Void {
-
+        //Специальный апдетй дл яанимации ( к примеру )
     }
 
     private function _preStartGame():Void{
@@ -132,7 +132,7 @@ class Game {
 
 
         var scene:Scene = this.sceneSystem.createScene( 401 );
-        trace( scene.tileMapStorage[ 0 ].tileStorage );
+        this.sceneSystem.changeSceneTo( scene );
     }
 
     private function _parseData():DeployConfig

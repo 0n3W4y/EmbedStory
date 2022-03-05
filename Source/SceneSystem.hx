@@ -39,6 +39,16 @@ class SceneSystem {
 
     }
 
+    public function changeSceneTo( scene:Scene ):Void{
+        var sceneType:String = scene.sceneType;
+        switch( sceneType ){
+            case "globalMap":{};
+            case "dungeonMap": {};
+            case "groundMap": {};
+            default: throw 'Error in SceneSystem.changeSceneTo. There is no scene type "$sceneType" in switch/case!';
+        }
+    }
+
     public function getParent():Game{
         return this._parent;
     }

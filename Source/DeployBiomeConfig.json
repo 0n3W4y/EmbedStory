@@ -19,16 +19,16 @@
         "mainFloorType": { "grass": 80 },
         "additionalFloorType": { "rockRoad": 5 },
         "river": { 
-            "river": 15,
-            "riverWidthMax": 8,
-            "riverWidthMin": 2,
-            "riverOffset": 1,
-            "riverWidthOffset": 1,
-            "riverType": null,
-            "riverGroundType": "water"
+            "emerging": 15,
+            "widthMax": 8,
+            "widthMin": 2,
+            "offset": 1,
+            "widthOffset": 1,
+            "type": null,
+            "groundType": "water"
         },
-        "lake": { 
-            "lakeRock": 25,
+        "lake": {
+            "emerging":15,
             "amount": 3,
             "widthMax": 20,
             "widthMin": 10,
@@ -39,14 +39,14 @@
             "groundType": "water"
         },
         "rock": {
-            "lakeRock": 35,
+            "emerging":80,
             "amount": 2,
             "widthMax": 40,
-            "widthMin":30,
-            "heightMax":40,
-            "heightMin":30,
-            "offset":1,
-            "widthOffset":2,
+            "widthMin": 30,
+            "heightMax": 40,
+            "heightMin": 30,
+            "offset": 1,
+            "widthOffset": 2,
             "groundType": "rock"
         },
         "resources": {}

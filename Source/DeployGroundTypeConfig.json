@@ -13,9 +13,9 @@
     "201":{
         "id": 201,
         "name": "water",
-        "movementRatio": 0,
-        "isWalkable": 0,
-        "canPlaceObjects": 1,
+        "movementRatio": 25,
+        "isWalkable": 1,
+        "canPlaceObjects": 0,
         "canPlaceStaff": 0,
         "canCharacterStand": 0,
         "graphics": []

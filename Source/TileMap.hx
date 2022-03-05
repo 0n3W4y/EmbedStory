@@ -31,13 +31,13 @@ typedef TileMapGeneratedConfig = {
 }
 
 typedef RiverConfig = {
-    var River:Bool;
-    var RiverWidthMax:Int;
-    var RiverWidthMin:Int;
-    var RiverOffset:Int;
-    var RiverWidthOffset:Int;
+    var Emerging:Bool;
+    var WidthMax:Int;
+    var WidthMin:Int;
+    var Offset:Int;
+    var WidthOffset:Int;
     var RiverType:String;
-    var RiverGroundType:String;
+    var GroundType:String;
 }
 
 typedef LakeRockConfig = {
@@ -145,9 +145,9 @@ class TileMap{
         var resourceConfig:ResourcesConfig = this._generateResourceConfig();
 
         this._fillTileMap();
+        this._generateRiver( riverConfig );
         this._generateLakeRock( lakeConfig );
         this._generateLakeRock( rockConfig );
-        this._generateRiver( riverConfig );
         this._generateResources( resourceConfig );
 
     }
@@ -178,22 +178,22 @@ class TileMap{
         var biomeParams:Dynamic = this._deploy.biomeConfig[ this._biomeDeployID ];
         var params:Dynamic = Reflect.getProperty( biomeParams, "river" );
         var riverConfig:RiverConfig = {
-            River: null,
-            RiverWidthMax: params.riverWidthMax,
-            RiverWidthMin: params.riverWidthMin,
-            RiverOffset:  params.riverOffset,
-            RiverWidthOffset:  params.riverWidthOffset,
+            Emerging: null,
+            WidthMax: params.riverWidthMax,
+            WidthMin: params.riverWidthMin,
+            Offset:  params.riverOffset,
+            WidthOffset:  params.riverWidthOffset,
             RiverType:  null,
-            RiverGroundType: params.riverGroundType
+            GroundType: params.riverGroundType
         }
-        var riverPercentage:Int = params.river;
+        var riverPercentage:Int = params.emerging;
         
-        var randomNumForRiver:Int = Math.floor( Math.random()*( 100 )); // 0- 99 ;
+        var randomNumForRiver:Int = Math.floor( Math.random()*( 100 )); // 0 - 99 ;
         var randomNumForRiverType:Int = Math.floor( Math.random()*( 2 )); // 0 - 1;
         
 
         if( randomNumForRiver <= riverPercentage ) // use 0 -> riverPercentage;
-            riverConfig.River = true;
+            riverConfig.Emerging = true;
         
         if( randomNumForRiverType == 0 )
             riverConfig.RiverType = "h"; // horizontal;
@@ -216,12 +216,12 @@ class TileMap{
             GroundType: params.groundType
         };
 
-        var lakePercentage:Int = params.lake;
+        var lakeEmerging:Int = params.emegring;
 
-        var randomNumForLake:Int = Math.floor( Math.random()*( 100 )); // 0 - 99;
+        var randomNumForLakeEmerging:Int = Math.floor( Math.random()*( 100 )); // 0 - 99;
         var randomNumForLakeAmount:Int = Math.floor( 1 + Math.random()*( params.lakeAmount ));
 
-        if( randomNumForLake <= lakePercentage )
+        if( randomNumForLakeEmerging <= lakeEmerging )
             lakeConfig.Emerging = true;
 
         lakeConfig.Amount = randomNumForLakeAmount;
@@ -266,7 +266,7 @@ class TileMap{
 
         this._fillTileMapWithMainGroundTypeTiles(); // заполняем тайлмап тайлами из освноного биома
         this._fillTileMapWithAdditionalGroundTypeTiles(); // добавляем пятна;
-        this._fillTileMapWithMainFloorType(); // покрываем 1 слой.
+        this._fillTileMapWithMainFloorType(); // покрываем первый слой.
         this._fillTileMapWithAdditionalFloorType(); // покарываем первый слой дополнительно.
   
     }
@@ -352,10 +352,7 @@ class TileMap{
         var configForNothingFloorType:Dynamic = this._deploy.floorTypeConfig[ FloorTypeDeployID(300) ];
 
         for( i in 0...this.tileStorage.length ){
-            var tile:Tile = this.tileStorage[ i ];
-            if ( tile.groundType == "rock" || tile.groundType == "water" || tile.groundType == "sandstone" )
-                tile.changeFloorType( configForNothingFloorType );
-            
+            var tile:Tile = this.tileStorage[ i ];            
             var randomNum:Int = Math.floor( Math.random()* 100 ); // 0 - 99;
             if( randomNum <= floorTypePercentage ){
                 tile.changeFloorType( floorTypeConfig );
@@ -401,51 +398,53 @@ class TileMap{
 
     private function _generateRiver( params:RiverConfig ):Void{
         //generate river;
-        if( params.River ){
-            var riverWidthMax:Int = params.RiverWidthMax;
-            var riverWidthMin:Int = params.RiverWidthMin;
-            var riverOffset:Int = params.RiverOffset;
+        if( params.Emerging ){
+            var riverWidthMax:Int = params.WidthMax;
+            var riverWidthMin:Int = params.WidthMin;
+            var riverOffset:Int = params.Offset;
             var riverType:String = params.RiverType;
-            var riverGroundType:String = params.RiverGroundType;
-            var riverWidthOffsetMax = params.RiverWidthOffset; // -1, 0, +1;
+            var riverGroundType:String = params.GroundType;
+            var riverWidthOffsetMax = params.WidthOffset; // -1, 0, +1;
 
             var currentRiverWidth:Int = Math.floor( riverWidthMin + Math.random() * ( riverWidthMax - riverWidthMin + 1 ));
-            var safeZoneForRiver:Int = 10;
 
             //horizontal river
             var tileMapHeight = this.height;
             var tileMapWidth = this.width;
             if( riverType == "h" ){
-                tileMapHeight = this.width;
-                tileMapWidth = this.height;
-            }
+                //TODO
+            }else{
+                var storeIndex:Bool = false;
+                var indexesOfMinHeightOfRiver:Array<Int> = [];
+                var riverPoint:Int = Math.floor( currentRiverWidth + riverOffset + Math.random()* ( tileMapWidth - currentRiverWidth - riverOffset + 1 ));
 
-            var storeIndex:Bool = false;
-            var indexesOfMinHeightOfRiver:Array<Int> = [];
-            var riverPoint:Int = Math.floor( currentRiverWidth + safeZoneForRiver + Math.random()* ( tileMapWidth - currentRiverWidth - safeZoneForRiver  + 1 ));
-
-            for( i in 0...tileMapHeight ){
-                currentRiverWidth += Math.floor( -riverWidthOffsetMax + Math.random()*( riverWidthOffsetMax*2 + 1 ));
-                if( currentRiverWidth > riverWidthMax )
-                    currentRiverWidth = riverWidthMax;
-                else if( currentRiverWidth <= riverWidthMin ){
-                    currentRiverWidth = riverWidthMin;
-                    storeIndex = true;
-                }                        
-
-                riverPoint += Math.floor( -riverOffset + Math.random()* ( riverOffset*2 + 1 )); // offset on coord Y -1, 0, +1;
-                for( j in 0...currentRiverWidth ){
-                    var index:Int = ( riverPoint + j ) * this.height + i;
-                    if( this._totalTiles < index )
-                        break; // защита от выхода за пределы карты
-                    var tile:Tile = this.tileStorage[ index ];
-                    tile.groundType = riverGroundType;
-                    tile.isWalkable = 0;
-                    if( storeIndex ){
-                        indexesOfMinHeightOfRiver.push( index );
-                        storeIndex = false;
+                for( i in 0...tileMapHeight ){
+                    currentRiverWidth += Math.floor( -riverWidthOffsetMax + Math.random()*( riverWidthOffsetMax*2 + 1 ));
+                    if( currentRiverWidth > riverWidthMax )
+                        currentRiverWidth = riverWidthMax;
+                    else if( currentRiverWidth <= riverWidthMin ){
+                        currentRiverWidth = riverWidthMin;
+                        storeIndex = true;
                     }                        
-                }                
+
+                    riverPoint += Math.floor( -riverOffset + Math.random()* ( riverOffset*2 + 1 )); // offset on coord x -1, 0, +1;
+                    for( j in 0...currentRiverWidth ){
+                        var index:Int = ( riverPoint + j ) + tileMapHeight * i;
+                        if( this._totalTiles < index )
+                            break; // защита от выхода за пределы максимального значения тайлов
+
+                        if( tileMapHeight * i < index || tileMapHeight * (i+1) > index )
+                            continue; // защита от выхода за пределы карты
+
+                        var tile:Tile = this.tileStorage[ index ];
+                        tile.groundType = riverGroundType;
+                        tile.isWalkable = 0;
+                        if( storeIndex ){
+                            indexesOfMinHeightOfRiver.push( index );
+                            storeIndex = false;
+                        }                        
+                    }                
+                }
             }
         }
     }
@@ -473,11 +472,12 @@ class TileMap{
                     lakeWidthAverage += Math.floor( -widthOffset + Math.random()*( widthOffset*2 +1 ));
                     for( k in 0...lakeWidthAverage ){
                         var index:Int = ( lakePointTop + j ) * this.height + lakePointLeft + k;
-                        if( this._totalTiles <= index )
+                        if( this._totalTiles < index || index < 0 )
                             break; // защита от выхода за пределы карты.
 
-                        var lakeTile:Tile = this.tileStorage[ index ];
-                        lakeTile.updateGroundType( groundTileConfig );
+                        var tile:Tile = this.tileStorage[ index ];
+                        tile.updateGroundType( groundTileConfig );
+                        this._createEnvironment( tile );
                     }
                 }
             }
@@ -518,6 +518,10 @@ class TileMap{
         }
         throw 'Error in TileMap._generateFloorType. Floor type is null for Ground Type: $groundType and Params: $params';
         return null;
+    }
+
+    private function _createEnvironment( tile:Tile ):Void{
+
     }
 /*
     private function _generateFloorTypeForEarthTiles():Void{
