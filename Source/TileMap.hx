@@ -398,6 +398,8 @@ class TileMap{
 
     private function _generateRiver( params:RiverConfig ):Void{
         //generate river;
+        var groundTileDeployID:GroundTypeDeployID = this._deploy.getGroundTypeDeployID( params.GroundType );
+        var groundTileConfig:Dynamic = this._deploy.groundTypeConfig[ groundTileDeployID ];
         if( params.Emerging ){
             var riverWidthMax:Int = params.WidthMax;
             var riverWidthMin:Int = params.WidthMin;
@@ -414,18 +416,14 @@ class TileMap{
             if( riverType == "h" ){
                 //TODO
             }else{
-                var storeIndex:Bool = false;
-                var indexesOfMinHeightOfRiver:Array<Int> = [];
                 var riverPoint:Int = Math.floor( currentRiverWidth + riverOffset + Math.random()* ( tileMapWidth - currentRiverWidth - riverOffset + 1 ));
 
                 for( i in 0...tileMapHeight ){
                     currentRiverWidth += Math.floor( -riverWidthOffsetMax + Math.random()*( riverWidthOffsetMax*2 + 1 ));
                     if( currentRiverWidth > riverWidthMax )
                         currentRiverWidth = riverWidthMax;
-                    else if( currentRiverWidth <= riverWidthMin ){
+                    else if( currentRiverWidth < riverWidthMin )
                         currentRiverWidth = riverWidthMin;
-                        storeIndex = true;
-                    }                        
 
                     riverPoint += Math.floor( -riverOffset + Math.random()* ( riverOffset*2 + 1 )); // offset on coord x -1, 0, +1;
                     for( j in 0...currentRiverWidth ){
@@ -437,12 +435,8 @@ class TileMap{
                             continue; // защита от выхода за пределы карты
 
                         var tile:Tile = this.tileStorage[ index ];
-                        tile.groundType = riverGroundType;
-                        tile.isWalkable = 0;
-                        if( storeIndex ){
-                            indexesOfMinHeightOfRiver.push( index );
-                            storeIndex = false;
-                        }                        
+                        tile.updateGroundType( groundTileConfig );
+                        this._createEnvironment( tile );                  
                     }                
                 }
             }
@@ -521,7 +515,8 @@ class TileMap{
     }
 
     private function _createEnvironment( tile:Tile ):Void{
-
+        var currentBiome:String = this.biome;
+        var tileGrondType:String = tile.groundType;
     }
 /*
     private function _generateFloorTypeForEarthTiles():Void{
