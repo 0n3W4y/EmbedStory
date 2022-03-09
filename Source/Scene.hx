@@ -35,7 +35,7 @@ class Scene {
     public var effectGraphics:Sprite;
 
     public var sceneName:String;
-    public var sceneType:String; // globalMap, groundMap, dungeonMap,
+    public var sceneType:String; // globalMap, battle;
     public var sceneGraphics:Sprite;
 
     private var _sceneId:SceneID;

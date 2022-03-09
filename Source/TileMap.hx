@@ -63,7 +63,6 @@ class TileMap{
     public var tileStorage:Array<Tile>;
     public var biome:String;
     public var name:String;
-    //public var type:String; // ground and underground;
 
 
     private var _tileID:Int;
@@ -139,25 +138,37 @@ class TileMap{
     }
 
     public function generateMap():Void {
-        var riverConfig:RiverConfig = this._generateRiverConfig();
-        var lakeConfig:LakeRockConfig = this._generateLakeConfig();
-        var rockConfig:LakeRockConfig = this._generateRockConfig();
-        var resourceConfig:ResourcesConfig = this._generateResourceConfig();
+        //TODO: 
+        //изменить json настройку биома в "liquids": "river1": {... liquidType: "river" ... }
+        // убрать создание конфига снизу, влепить его в создании самой реки, найти значение из reflect.fields() и найти liquidType: "river", создать реку или реки.
+        // тоже самое сделать и для других.
+        //var riverConfig:RiverConfig = this._generateRiverConfig();
+        //var lakeConfig:LakeRockConfig = this._generateLakeConfig();
+        //var rockConfig:LakeRockConfig = this._generateRockConfig();
+        //var resourceConfig:ResourcesConfig = this._generateResourceConfig();
 
         this._fillTileMap();
-        this._generateRiver( riverConfig );
+        this._generateLiquids();
         this._generateLakeRock( lakeConfig );
         this._generateLakeRock( rockConfig );
+        this._generateRiver( riverConfig );
         this._generateResources( resourceConfig );
+
+        //generateGroundLayer();
+        //generateFloorLayer();
+        //this.generateObjectsLayer(); // rocks, trees, bushes, stones, logs, etc;
 
     }
 
     public function changeFloorTypeForTile( tileId:TileID, floorType:String ):Void{
-        var tile:Tile = this._findTile( tileId );
+        var tile:Tile = this._findTileByTileId( tileId );
+        if( tile.canPlaceFloor == 0 )
+            throw 'Error in TileMap.changeFloorTypeForTile. Tile with id "$tileId" not support change floor.';
+        /*
         var tileGroundTypeDeployId:GroundTypeDeployID = this._deploy.getGroundTypeDeployID( tile.groundType );
         var groundTileConfig:Dynamic = this._deploy.groundTypeConfig[ tileGroundTypeDeployId ];
-        tile.updateGroundType( groundTileConfig );
-
+        tile.changeGroundType( groundTileConfig );
+        */
         var tileFloorTypeDeployId:FloorTypeDeployID = this._deploy.getFloorTypeDeployID( floorType );
         var floorTileConfig:Dynamic = this._deploy.floorTypeConfig[ tileFloorTypeDeployId ];
         tile.changeFloorType( floorTileConfig );
@@ -165,13 +176,18 @@ class TileMap{
         //TODO: check for object on tile and update tile fields;
     }
 
-    public function getTileById( tileId:TileID ):Tile{
-        var tile:Tile = this._findTile( tileId );
+    public function getTileByTileId( tileId:TileID ):Tile{
+        var tile:Tile = this._findTileByTileId( tileId );
         return tile;
     }
 
     public function getTileMpaID():TileMapID{
         return this._tileMapID;
+    }
+
+    private function _generateLiquids():Void{
+        var biomeConfig:Dynamic = this._deploy.biomeConfig[ this._biomeDeployID ];
+        var liquidsConfig:Dynamic = Reflect.getProperty( biomeConfig, "liquids" ); //{ river:{}, lake:{} };
     }
 
     private function _generateRiverConfig():RiverConfig{
@@ -290,6 +306,7 @@ class TileMap{
                     FloorDeployID: FloorTypeDeployID( 300 ), // deployId of floor type 'nothing';
                     GroundDeployID: groundTileDeployID,
                     IsWalkable: Reflect.getProperty( groundTileConfig, "isWalkable" ),
+                    CanPlaceFloor: Reflect.getProperty( groundTileConfig, "canPlaceloor" ),
                     MovementRatio: Reflect.getProperty( groundTileConfig, "movementRatio" ),
                     CanPlaceObjects: Reflect.getProperty( groundTileConfig, "canPlaceObjects" ),
                     CanPlaceStaff: Reflect.getProperty( groundTileConfig, "canPlaceStaff" ),
@@ -342,6 +359,7 @@ class TileMap{
     }
 
     private function _fillTileMapWithMainFloorType():Void{
+        // функция работает только в условии. что в maniFloorType всего 1 ключ.
         var biomeConfig:Dynamic = this._deploy.biomeConfig[ this._biomeDeployID ];
         var mainFloorTypeConfig:Dynamic = Reflect.getProperty( biomeConfig, "mainFloorType" );
         var floorType:String = Reflect.fields( mainFloorTypeConfig)[ 0 ];
@@ -379,7 +397,7 @@ class TileMap{
             for( key in Reflect.fields( additionalFloorTypeConfig )){
                 var keyValue:Int = Reflect.getProperty( additionalFloorTypeConfig, key );
                 summ += keyValue;
-                if( lastSumm >= randmonNum && summ < randmonNum ){
+                if( lastSumm <= randmonNum && randmonNum < summ ){
                     floorType = key;
                     break;
                 }else{
@@ -435,8 +453,7 @@ class TileMap{
                             continue; // защита от выхода за пределы карты
 
                         var tile:Tile = this.tileStorage[ index ];
-                        tile.updateGroundType( groundTileConfig );
-                        this._createEnvironment( tile );                  
+                        tile.changeGroundType( groundTileConfig );                  
                     }                
                 }
             }
@@ -470,7 +487,7 @@ class TileMap{
                             break; // защита от выхода за пределы карты.
 
                         var tile:Tile = this.tileStorage[ index ];
-                        tile.updateGroundType( groundTileConfig );
+                        tile.changeGroundType( groundTileConfig );
                         this._createEnvironment( tile );
                     }
                 }
@@ -481,6 +498,7 @@ class TileMap{
     private function _generateResources( params:ResourcesConfig ):Void{
 
     }
+/*
     private function _generateGroundType( params:Dynamic ):String{
         var randomNum:Int = Math.floor( Math.random()* 100 ); // 0 - 99;
         var summ:Int = 0;
@@ -513,10 +531,43 @@ class TileMap{
         throw 'Error in TileMap._generateFloorType. Floor type is null for Ground Type: $groundType and Params: $params';
         return null;
     }
-
+*/
     private function _createEnvironment( tile:Tile ):Void{
-        var currentBiome:String = this.biome;
-        var tileGrondType:String = tile.groundType;
+        //var currentBiome:String = this.biome;
+        var tileGroundType:String = tile.groundType; // rock, sandrock
+        var newTileConfig:Dynamic = null;
+        
+        switch( tileGroundType ){
+            case "water": newTileConfig = this._deploy.groundTypeConfig[ GroundTypeDeployID( 204 )];
+            case "rock": newTileConfig = this._deploy.groundTypeConfig[ GroundTypeDeployID( 202 )];
+            case "sandstone": newTileConfig = this._deploy.groundTypeConfig[ GroundTypeDeployID( 203 )];
+            default: throw 'Error in TileMap._createEnvironment. "$tileGroundType" is not correct';
+        }
+
+        var y:Int = tile.gridY;
+        var height:Int = this.height;
+        var leftTopIndex:Int = ( y - 1 ) * height - 1;
+        var topIndex:Int = ( y - 1 ) * height;
+        var rightTopIndex:Int = ( y - 1 ) * height + 1;
+        var leftIndex:Int = tile.getIndex() - 1;
+        var rightIndex:Int = tile.getIndex() + 1;
+        var leftBottomIndex:Int = ( y + 1 ) * height - 1;
+        var bottomIndex = ( y + 1 ) * height;
+        var rightBottomIndex = ( y + 1 ) * height + 1;
+        
+        var indexArray:Array<Int> = [ leftTopIndex, topIndex, rightTopIndex, leftIndex, rightIndex, leftBottomIndex, bottomIndex, rightBottomIndex ];
+        
+        for( i in 0...indexArray.length ){
+            if( i < 0 || i >= this._totalTiles ) // защита от выхода за пределы карты
+                continue;
+
+            var tile:Tile = this.tileStorage[ i ];
+            var tileGroundType:String = tile.groundType;
+            if( tileGroundType == tileGroundType )
+                continue;
+            
+            tile.changeGroundType( newTileConfig );
+        }
     }
 /*
     private function _generateFloorTypeForEarthTiles():Void{
@@ -550,7 +601,7 @@ class TileMap{
     }
 */
 
-    private function _findTile( tileId:TileID ):Tile{
+    private function _findTileByTileId( tileId:TileID ):Tile{
         var tile:Tile = null;
         for( i in 0...this.tileStorage.length ){
             tile = this.tileStorage[ i ];

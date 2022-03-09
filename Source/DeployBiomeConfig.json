@@ -12,43 +12,53 @@
     },
 
     "102":{
-        "name": "plain",
+        "name": "meadow",
         "biomeType": "plain",
         "mainGroundType": "earth",
-        "additionalGroundType": { "dirt": 5, "rock": 5 },
+        "additionalGroundType": { "dirt": 10, "rock": 5 },
         "mainFloorType": { "grass": 80 },
         "additionalFloorType": { "rockRoad": 5 },
-        "river": { 
-            "emerging": 15,
-            "widthMax": 8,
-            "widthMin": 2,
-            "offset": 1,
-            "widthOffset": 1,
-            "type": null,
-            "groundType": "water"
+        "liquids": {
+            "river": { 
+                "river1":{
+                    "emerging": 10,
+                    "widthMax": 8,
+                    "widthMin": 2,
+                    "offset": 1,
+                    "widthOffset": 1,
+                    "type": null,
+                    "groundType": "water"
+                }                
+            },
+            "lake": {
+                "lake1":{
+                    "emerging":15,
+                    "amount": 3,
+                    "widthMax": 20,
+                    "widthMin": 10,
+                    "heightMax": 20,
+                    "heightMin": 10,
+                    "offset": 3,
+                    "widthOffset": 2,
+                    "groundType": "water"
+                }                
+            }
         },
-        "lake": {
-            "emerging":15,
-            "amount": 3,
-            "widthMax": 20,
-            "widthMin": 10,
-            "heightMax": 20,
-            "heightMin": 10,
-            "offset": 3,
-            "widthOffset": 2,
-            "groundType": "water"
-        },
-        "rock": {
-            "emerging":80,
-            "amount": 2,
-            "widthMax": 40,
-            "widthMin": 30,
-            "heightMax": 40,
-            "heightMin": 30,
-            "offset": 1,
-            "widthOffset": 2,
-            "groundType": "rock"
-        },
+        "solids":{
+            "rock": {
+                "rock1": {
+                    "emerging":50,
+                    "amount": 2,
+                    "widthMax": 20,
+                    "widthMin": 5,
+                    "heightMax": 20,
+                    "heightMin": 5,
+                    "offset": 1,
+                    "widthOffset": 2,
+                    "groundType": "rock"
+                }                
+            }
+        }, 
         "resources": {}
 
     },

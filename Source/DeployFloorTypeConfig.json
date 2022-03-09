@@ -1,13 +1,18 @@
 {
     "300":{
         "id": 300,
-        "name": "nothing"
+        "name": "nothing",
+        "isWalkable": 1,
+        "canPlaceFloor": 1,
+        "canPlaceObjects": 1,
+        "canCharacterStand": 1        
     },
 
     "301":{
         "id": 301,
         "name": "grass",
         "isWalkable": 1,
+        "canPlaceFloor": 1,
         "canPlaceObjects": 1,
         "canCharacterStand": 1,
         "graphics": { "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }
@@ -17,6 +22,7 @@
         "id": 302,
         "name": "sand",
         "isWalkable": 1,
+        "canPlaceFloor": 1,
         "canPlaceObjects": 1,
         "canCharacterStand": 1,
         "graphics":{ "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }
@@ -27,6 +33,7 @@
         "name": "woodenFloor",
         "movementRatio": 115,
         "isWalkable": 1,
+        "canPlaceFloor": 0,
         "canPlaceObjects": 1,
         "canCharacterStand": 1,
         "graphics":{ "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }
@@ -37,6 +44,7 @@
         "name": "rockRoad",
         "movementRatio": 120,
         "isWalkable": 1,
+        "canPlaceFloor": 0,
         "canPlaceObjects": 1,
         "canCharacterStand": 1,
         "graphics":{ "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }

@@ -24,6 +24,7 @@ typedef TileConfig = {
     var FloorType:String;
     var IsWalkable:Int;
     var MovementRatio:Int;
+    var CanPlaceFloor:Int;
     var CanPlaceObjects:Int;
     var CanPlaceStaff:Int;
     var CanCharacterStand:Int;
@@ -40,11 +41,12 @@ class Tile {
     public var floorTypeGraphicIndex:Int;
     public var gridX:Int;
     public var gridY:Int;
-    public var graphicsX:Int;
-    public var graphicsY:Int;
+    public var graphX:Int;
+    public var graphY:Int;
 
     public var movementRatio:Int;
     public var isWalkable:Int;
+    public var canPlaceFloor:Int;
     public var canPlaceObjects:Int;
     public var canPlaceStaff:Int;
     public var canCharacterStand:Int;
@@ -69,6 +71,7 @@ class Tile {
         this.movementRatio = params.MovementRatio;
         this._id = params.ID;
         this._index = params.Index;
+        this.canPlaceFloor = params.CanPlaceFloor;
         this.canPlaceObjects = params.CanPlaceObjects;
         this.canPlaceStaff = params.CanPlaceStaff;
         this.canCharacterStand = params.CanCharacterStand;
@@ -105,10 +108,10 @@ class Tile {
         if( this.floorType == null )
             throw '$errMsg Floor type is null';
 
-        if( this.graphicsX == null )
+        if( this.graphX == null )
             throw '$errMsg Graphics X is null';
 
-        if( this.graphicsY == null )
+        if( this.graphY == null )
             throw '$errMsg Graphics Y is null';
 
         if( this.movementRatio == null )
@@ -140,8 +143,8 @@ class Tile {
     }
 
     public function calculateGraphicsPosition():Void {
-        this.graphicsX = tileSize * this.gridX;
-        this.graphicsY = tileSize * this.gridY;
+        this.graphX = tileSize * this.gridX;
+        this.graphY = tileSize * this.gridY;
     }
 
     public function getId():TileID {
@@ -153,17 +156,13 @@ class Tile {
     }
 
     public function changeFloorType( params:Dynamic ):Void{
+        this.floorType = Reflect.getProperty( params, "name" );
         var deployID:Int = Reflect.getProperty( params, "id" );
         this._floorTypeDeployID = FloorTypeDeployID( deployID );
-        this.floorType = Reflect.getProperty( params, "name" );
-
-        if( this.floorType == "nothing" )
-            this._floorTypeDeployID = FloorTypeDeployID( 300 );
-
         this._updateFields( params );
     }
 
-    public function updateGroundType( params:Dynamic ):Void{
+    public function changeGroundType( params:Dynamic ):Void{
         this.groundType = Reflect.getProperty( params, "name" );
         var deployID:Int = Reflect.getProperty( params, "id" );
         this._groundTypeDeployID = GroundTypeDeployID( deployID );
@@ -175,10 +174,11 @@ class Tile {
             switch( key ){
                 case "movementRatio": this.movementRatio = Reflect.getProperty( params, key );
                 case "isWalkable": this.isWalkable = Reflect.getProperty( params, key );
+                case "canPlaceFloor": this.canPlaceFloor = Reflect.getProperty( params, key );
                 case "canPlaceObjects": this.canPlaceObjects = Reflect.getProperty( params, key );
                 case "canPlayerStand": this.canCharacterStand = Reflect.getProperty( params, key );
                 case "canPlaceStaff": this.canPlaceStaff = Reflect.getProperty( params, key );
-                default: {};
+                default: throw 'Error in Tile._updateFields. "$key" not found.';
             }
         }
     }
