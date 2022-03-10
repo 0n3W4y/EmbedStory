@@ -138,26 +138,10 @@ class TileMap{
     }
 
     public function generateMap():Void {
-        //TODO: 
-        //изменить json настройку биома в "liquids": "river1": {... liquidType: "river" ... }
-        // убрать создание конфига снизу, влепить его в создании самой реки, найти значение из reflect.fields() и найти liquidType: "river", создать реку или реки.
-        // тоже самое сделать и для других.
-        //var riverConfig:RiverConfig = this._generateRiverConfig();
-        //var lakeConfig:LakeRockConfig = this._generateLakeConfig();
-        //var rockConfig:LakeRockConfig = this._generateRockConfig();
-        //var resourceConfig:ResourcesConfig = this._generateResourceConfig();
 
-        this._fillTileMap();
-        this._generateLiquids();
-        this._generateLakeRock( lakeConfig );
-        this._generateLakeRock( rockConfig );
-        this._generateRiver( riverConfig );
-        this._generateResources( resourceConfig );
-
-        //generateGroundLayer();
-        //generateFloorLayer();
-        //this.generateObjectsLayer(); // rocks, trees, bushes, stones, logs, etc;
-
+        this._generateGroundLayer();
+        this._generateFloorLayer();
+        this._generateObjectsLayer(); // rocks, trees, bushes, stones, logs, etc;
     }
 
     public function changeFloorTypeForTile( tileId:TileID, floorType:String ):Void{
@@ -185,28 +169,78 @@ class TileMap{
         return this._tileMapID;
     }
 
+
+
+
+
+
+    private function _generateGroundLayer():Void{
+        this._prepareTileMap();
+        this._generateLiquids();
+        this._generateSolids();
+    }
+
+    private function _generateFloorLayer():Void{
+        this._fillTileMapWithMainFloorType(); // покрываем первый слой.
+        this._fillTileMapWithAdditionalFloorType(); // покарываем первый слой дополнительно.
+    }
+
+    private function _generateObjectsLayer():Void{
+
+    }
+
     private function _generateLiquids():Void{
         var biomeConfig:Dynamic = this._deploy.biomeConfig[ this._biomeDeployID ];
         var liquidsConfig:Dynamic = Reflect.getProperty( biomeConfig, "liquids" ); //{ river:{}, lake:{} };
+        for( key in Reflect.fields( liquidsConfig )){
+            switch( key ){
+                case "river": this._prepareForGenerateRiver( Reflect.getProperty( liquidsConfig, key ));
+                case "lake": this._prepareForGenerateLake( Reflect.getProperty( liquidsConfig, key ));
+                default: throw 'Error in TileMap._generateLiquids. Wrong key "$key".';
+            }
+        }
     }
 
-    private function _generateRiverConfig():RiverConfig{
-        var biomeParams:Dynamic = this._deploy.biomeConfig[ this._biomeDeployID ];
-        var params:Dynamic = Reflect.getProperty( biomeParams, "river" );
+    private function _generateSolids():Void{
+
+    }
+
+    private function _prepareForGenerateRiver( params:Dynamic ):Void{
+        for( key in Reflect.fields( params )){
+            var config:Dynamic = Reflect.getProperty( params, key );
+            var generatedConfig:RiverConfig = this._generateRiverConfig( config );
+
+
+        }
+    }
+
+    private function _prepareForGenerateLake( params:Dynamic ):Void{
+        for( key in Reflect.fields( params )){
+            var config:Dynamic = Reflect.getProperty( params, key );
+            var generatedConfig:LakeRockConfig = this._generateLakeConfig( config );
+
+
+        }
+    }
+
+    private function _prepareForGenerateSolid( params:Dynamic ):Void{
+
+    }
+
+    private function _generateRiverConfig( params:Dynamic ):RiverConfig{
         var riverConfig:RiverConfig = {
             Emerging: null,
             WidthMax: params.riverWidthMax,
             WidthMin: params.riverWidthMin,
-            Offset:  params.riverOffset,
-            WidthOffset:  params.riverWidthOffset,
-            RiverType:  null,
+            Offset: params.riverOffset,
+            WidthOffset: params.riverWidthOffset,
+            RiverType: null,
             GroundType: params.riverGroundType
         }
         var riverPercentage:Int = params.emerging;
         
         var randomNumForRiver:Int = Math.floor( Math.random()*( 100 )); // 0 - 99 ;
-        var randomNumForRiverType:Int = Math.floor( Math.random()*( 2 )); // 0 - 1;
-        
+        var randomNumForRiverType:Int = Math.floor( Math.random()*( 2 )); // 0 - 1;        
 
         if( randomNumForRiver <= riverPercentage ) // use 0 -> riverPercentage;
             riverConfig.Emerging = true;
@@ -217,11 +251,9 @@ class TileMap{
         return riverConfig;
     }
 
-    private function _generateLakeConfig():LakeRockConfig{
-        var biomeParams:Dynamic = this._deploy.biomeConfig[ this._biomeDeployID ];
-        var params:Dynamic = Reflect.getProperty( biomeParams, "lake" );
+    private function _generateLakeConfig( params:Dynamic ):LakeRockConfig{
         var lakeConfig:LakeRockConfig = {    
-            Emerging: null, // появление
+            Emerging: null, // пявление
             Amount: null,
             WidthMax: params.widthMax,
             WidthMin: params.widthMin,
@@ -278,13 +310,9 @@ class TileMap{
         return resoureceConfig;
     }
 
-    private function _fillTileMap():Void {
-
+    private function _prepareTileMap():Void{
         this._fillTileMapWithMainGroundTypeTiles(); // заполняем тайлмап тайлами из освноного биома
         this._fillTileMapWithAdditionalGroundTypeTiles(); // добавляем пятна;
-        this._fillTileMapWithMainFloorType(); // покрываем первый слой.
-        this._fillTileMapWithAdditionalFloorType(); // покарываем первый слой дополнительно.
-  
     }
 
     private function _fillTileMapWithMainGroundTypeTiles():Void{
@@ -307,6 +335,7 @@ class TileMap{
                     GroundDeployID: groundTileDeployID,
                     IsWalkable: Reflect.getProperty( groundTileConfig, "isWalkable" ),
                     CanPlaceFloor: Reflect.getProperty( groundTileConfig, "canPlaceloor" ),
+                    CanRemoveFloor: Reflect.getProperty( groundTileConfig, "canRemoveFloor" ),
                     MovementRatio: Reflect.getProperty( groundTileConfig, "movementRatio" ),
                     CanPlaceObjects: Reflect.getProperty( groundTileConfig, "canPlaceObjects" ),
                     CanPlaceStaff: Reflect.getProperty( groundTileConfig, "canPlaceStaff" ),
@@ -370,7 +399,12 @@ class TileMap{
         var configForNothingFloorType:Dynamic = this._deploy.floorTypeConfig[ FloorTypeDeployID(300) ];
 
         for( i in 0...this.tileStorage.length ){
-            var tile:Tile = this.tileStorage[ i ];            
+            var tile:Tile = this.tileStorage[ i ];
+            if ( tile.groundType == "rock" || tile.groundType == "water" || tile.groundType == "sandstone" ){
+                tile.changeFloorType( configForNothingFloorType );
+                continue;
+            }
+
             var randomNum:Int = Math.floor( Math.random()* 100 ); // 0 - 99;
             if( randomNum <= floorTypePercentage ){
                 tile.changeFloorType( floorTypeConfig );
@@ -495,9 +529,6 @@ class TileMap{
         }        
     }
 
-    private function _generateResources( params:ResourcesConfig ):Void{
-
-    }
 /*
     private function _generateGroundType( params:Dynamic ):String{
         var randomNum:Int = Math.floor( Math.random()* 100 ); // 0 - 99;
@@ -533,7 +564,6 @@ class TileMap{
     }
 */
     private function _createEnvironment( tile:Tile ):Void{
-        //var currentBiome:String = this.biome;
         var tileGroundType:String = tile.groundType; // rock, sandrock
         var newTileConfig:Dynamic = null;
         

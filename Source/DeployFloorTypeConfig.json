@@ -1,52 +1,48 @@
 {
     "300":{
         "id": 300,
-        "name": "nothing",
-        "isWalkable": 1,
-        "canPlaceFloor": 1,
-        "canPlaceObjects": 1,
-        "canCharacterStand": 1        
+        "name": "nothing"       
     },
 
     "301":{
         "id": 301,
         "name": "grass",
-        "isWalkable": 1,
-        "canPlaceFloor": 1,
-        "canPlaceObjects": 1,
-        "canCharacterStand": 1,
         "graphics": { "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }
     },
 
     "302":{
         "id": 302,
         "name": "sand",
-        "isWalkable": 1,
-        "canPlaceFloor": 1,
-        "canPlaceObjects": 1,
-        "canCharacterStand": 1,
+        "movementratio": 60,
         "graphics":{ "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }
     },
 
     "303":{
         "id": 303,
-        "name": "woodenFloor",
-        "movementRatio": 115,
-        "isWalkable": 1,
-        "canPlaceFloor": 0,
-        "canPlaceObjects": 1,
-        "canCharacterStand": 1,
+        "name": "stones",
         "graphics":{ "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }
     },
 
     "304":{
         "id": 304,
+        "name": "snow",
+        "movementratio": 60,
+        "graphics":{ "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }
+    },
+
+    "320":{
+        "id": 320,
+        "name": "woodenFloor",
+        "movementRatio": 115,
+        "canPlaceFloor": 0,
+        "graphics":{ "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }
+    },
+
+    "321":{
+        "id": 321,
         "name": "rockRoad",
         "movementRatio": 120,
-        "isWalkable": 1,
         "canPlaceFloor": 0,
-        "canPlaceObjects": 1,
-        "canCharacterStand": 1,
         "graphics":{ "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }
     }
 }

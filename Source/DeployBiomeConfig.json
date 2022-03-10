@@ -16,7 +16,7 @@
         "biomeType": "plain",
         "mainGroundType": "earth",
         "additionalGroundType": { "dirt": 10, "rock": 5 },
-        "mainFloorType": { "grass": 80 },
+        "mainFloorType": { "grass": 80, "stones": 10 },
         "additionalFloorType": { "rockRoad": 5 },
         "liquids": {
             "river": { 

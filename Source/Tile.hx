@@ -25,6 +25,7 @@ typedef TileConfig = {
     var IsWalkable:Int;
     var MovementRatio:Int;
     var CanPlaceFloor:Int;
+    var CanRemoveFloor:Int;
     var CanPlaceObjects:Int;
     var CanPlaceStaff:Int;
     var CanCharacterStand:Int;
@@ -47,6 +48,7 @@ class Tile {
     public var movementRatio:Int;
     public var isWalkable:Int;
     public var canPlaceFloor:Int;
+    public var canRemoveFloor:Int;
     public var canPlaceObjects:Int;
     public var canPlaceStaff:Int;
     public var canCharacterStand:Int;
@@ -72,6 +74,7 @@ class Tile {
         this._id = params.ID;
         this._index = params.Index;
         this.canPlaceFloor = params.CanPlaceFloor;
+        this.canRemoveFloor = params.CanRemoveFloor;
         this.canPlaceObjects = params.CanPlaceObjects;
         this.canPlaceStaff = params.CanPlaceStaff;
         this.canCharacterStand = params.CanCharacterStand;
@@ -116,6 +119,12 @@ class Tile {
 
         if( this.movementRatio == null )
             throw '$errMsg Movement ratio is null';
+
+        if( this.canPlaceFloor == null )
+            throw '$errMsg can place floor is null';
+
+        if( this.canRemoveFloor == null )
+            throw '$errMsg can remove floor is null'; 
 
         if( this.canPlaceObjects == null )
             throw '$errMsg Can Place objects is null';
@@ -175,6 +184,7 @@ class Tile {
                 case "movementRatio": this.movementRatio = Reflect.getProperty( params, key );
                 case "isWalkable": this.isWalkable = Reflect.getProperty( params, key );
                 case "canPlaceFloor": this.canPlaceFloor = Reflect.getProperty( params, key );
+                case "canRemoveFloor": this.canRemoveFloor = Reflect.getProperty( params, key );
                 case "canPlaceObjects": this.canPlaceObjects = Reflect.getProperty( params, key );
                 case "canPlayerStand": this.canCharacterStand = Reflect.getProperty( params, key );
                 case "canPlaceStaff": this.canPlaceStaff = Reflect.getProperty( params, key );
