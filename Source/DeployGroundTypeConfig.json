@@ -88,5 +88,31 @@
         "canPlaceStaff": 1,
         "canCharacterStand": 1,
         "graphics": []
+    },
+
+    "207":{
+        "id": 207,
+        "name": "rockEnvironment",
+        "movementRatio": 100,
+        "isWalkable": 1,
+        "canPlaceFloor": 1,
+        "canRemoveFloor": 1,
+        "canPlaceObjects": 1,
+        "canPlaceStaff": 1,
+        "canCharacterStand": 1,
+        "graphics": []
+    },
+
+    "208":{
+        "id": 208,
+        "name": "sandstoneEnvironment",
+        "movementRatio": 100,
+        "isWalkable": 1,
+        "canPlaceFloor": 1,
+        "canRemoveFloor": 1,
+        "canPlaceObjects": 1,
+        "canPlaceStaff": 1,
+        "canCharacterStand": 1,
+        "graphics": []
     }
 }

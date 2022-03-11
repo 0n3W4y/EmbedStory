@@ -148,16 +148,12 @@ class TileMap{
         var tile:Tile = this._findTileByTileId( tileId );
         if( tile.canPlaceFloor == 0 )
             throw 'Error in TileMap.changeFloorTypeForTile. Tile with id "$tileId" not support change floor.';
-        /*
-        var tileGroundTypeDeployId:GroundTypeDeployID = this._deploy.getGroundTypeDeployID( tile.groundType );
-        var groundTileConfig:Dynamic = this._deploy.groundTypeConfig[ tileGroundTypeDeployId ];
-        tile.changeGroundType( groundTileConfig );
-        */
+
         var tileFloorTypeDeployId:FloorTypeDeployID = this._deploy.getFloorTypeDeployID( floorType );
         var floorTileConfig:Dynamic = this._deploy.floorTypeConfig[ tileFloorTypeDeployId ];
         tile.changeFloorType( floorTileConfig );
 
-        //TODO: check for object on tile and update tile fields;
+        //TODO: check for object on tile ;
     }
 
     public function getTileByTileId( tileId:TileID ):Tile{
@@ -209,22 +205,24 @@ class TileMap{
         for( key in Reflect.fields( params )){
             var config:Dynamic = Reflect.getProperty( params, key );
             var generatedConfig:RiverConfig = this._generateRiverConfig( config );
-
-
+            this._generateRiver( generatedConfig );
         }
     }
 
     private function _prepareForGenerateLake( params:Dynamic ):Void{
         for( key in Reflect.fields( params )){
             var config:Dynamic = Reflect.getProperty( params, key );
-            var generatedConfig:LakeRockConfig = this._generateLakeConfig( config );
-
-
+            var generatedConfig:LakeRockConfig = this._generateLakeRockConfig( config );
+            this._generateLakeRock( generatedConfig );
         }
     }
 
     private function _prepareForGenerateSolid( params:Dynamic ):Void{
-
+        for( key in Reflect.fields( params )){
+            var config:Dynamic = Reflect.getProperty( params, key );
+            var generatedConfig:LakeRockConfig = this._generateLakeRockConfig( config );
+            this._generateLakeRock( generatedConfig );
+        }
     }
 
     private function _generateRiverConfig( params:Dynamic ):RiverConfig{
@@ -251,8 +249,8 @@ class TileMap{
         return riverConfig;
     }
 
-    private function _generateLakeConfig( params:Dynamic ):LakeRockConfig{
-        var lakeConfig:LakeRockConfig = {    
+    private function _generateLakeRockConfig( params:Dynamic ):LakeRockConfig{
+        var config:LakeRockConfig = {    
             Emerging: null, // пявление
             Amount: null,
             WidthMax: params.widthMax,
@@ -264,43 +262,16 @@ class TileMap{
             GroundType: params.groundType
         };
 
-        var lakeEmerging:Int = params.emegring;
+        var emerging:Int = params.emegring;
 
-        var randomNumForLakeEmerging:Int = Math.floor( Math.random()*( 100 )); // 0 - 99;
-        var randomNumForLakeAmount:Int = Math.floor( 1 + Math.random()*( params.lakeAmount ));
+        var randomNumForEmerging:Int = Math.floor( Math.random()*( 100 )); // 0 - 99;
+        var randomNumForAmount:Int = Math.floor( 1 + Math.random()*( params.amount ));
 
-        if( randomNumForLakeEmerging <= lakeEmerging )
-            lakeConfig.Emerging = true;
+        if( randomNumForEmerging <= emerging )
+            config.Emerging = true;
 
-        lakeConfig.Amount = randomNumForLakeAmount;
-        return lakeConfig;
-    }
-
-    private function _generateRockConfig():LakeRockConfig{
-        var biomeParams:Dynamic = this._deploy.biomeConfig[ this._biomeDeployID ];
-        var params:Dynamic = Reflect.getProperty( biomeParams, "rock" );
-        var rockConfig:LakeRockConfig = {
-            Emerging: null,
-            Amount: null,
-            WidthMax: params.widthMax,
-            WidthMin: params.widthMin,
-            HeightMax: params.heightMax,
-            HeightMin: params.heightMin,
-            Offset: params.offset,
-            WidthOffset: params.widthOffset,
-            GroundType: params.groundType
-        };
-
-        var rockPercentage:Int = params.rock;
-
-        var randomNumForRock:Int =  Math.floor( Math.random()*( 100 )); // 0 - 99;
-        var randomNumForRockAmount:Int = Math.floor( 1 + Math.random()*( params.rockAmount ));
-
-        if( randomNumForRock <= rockPercentage )
-            rockConfig.Emerging = true;
-
-        rockConfig.Amount = randomNumForRockAmount;
-        return rockConfig;
+        config.Amount = randomNumForAmount;
+        return config;
     }
 
     private function _generateResourceConfig():ResourcesConfig{
@@ -563,40 +534,44 @@ class TileMap{
         return null;
     }
 */
+
     private function _createEnvironment( tile:Tile ):Void{
         var tileGroundType:String = tile.groundType; // rock, sandrock
         var newTileConfig:Dynamic = null;
         
         switch( tileGroundType ){
-            case "water": newTileConfig = this._deploy.groundTypeConfig[ GroundTypeDeployID( 204 )];
-            case "rock": newTileConfig = this._deploy.groundTypeConfig[ GroundTypeDeployID( 202 )];
-            case "sandstone": newTileConfig = this._deploy.groundTypeConfig[ GroundTypeDeployID( 203 )];
+            case "water": newTileConfig = this._deploy.groundTypeConfig[ GroundTypeDeployID( 204 )]; // shallow
+            case "rock": newTileConfig = this._deploy.groundTypeConfig[ GroundTypeDeployID( 207 )]; // rockEnvironment
+            case "sandstone": newTileConfig = this._deploy.groundTypeConfig[ GroundTypeDeployID( 208 )]; // sandstoneEnvironment
             default: throw 'Error in TileMap._createEnvironment. "$tileGroundType" is not correct';
         }
 
-        var y:Int = tile.gridY;
-        var height:Int = this.height;
-        var leftTopIndex:Int = ( y - 1 ) * height - 1;
-        var topIndex:Int = ( y - 1 ) * height;
-        var rightTopIndex:Int = ( y - 1 ) * height + 1;
-        var leftIndex:Int = tile.getIndex() - 1;
-        var rightIndex:Int = tile.getIndex() + 1;
-        var leftBottomIndex:Int = ( y + 1 ) * height - 1;
-        var bottomIndex = ( y + 1 ) * height;
-        var rightBottomIndex = ( y + 1 ) * height + 1;
-        
-        var indexArray:Array<Int> = [ leftTopIndex, topIndex, rightTopIndex, leftIndex, rightIndex, leftBottomIndex, bottomIndex, rightBottomIndex ];
-        
-        for( i in 0...indexArray.length ){
-            if( i < 0 || i >= this._totalTiles ) // защита от выхода за пределы карты
-                continue;
+        //рандомно выбираем "подложку" 0 - 1 - 2 по умолчанию
+        var number:Int = 2; // радиус распространения подложки.
+        var randomNumber:Int = Math.floor(Math.random()*( number + 1 ));
+       
 
-            var tile:Tile = this.tileStorage[ i ];
-            var tileGroundType:String = tile.groundType;
-            if( tileGroundType == tileGroundType )
-                continue;
-            
-            tile.changeGroundType( newTileConfig );
+        var y:Int = tile.gridY;
+        var x:Int = tile.gridX;
+        var height:Int = this.height;        
+        var gridMultiplier:Int = randomNumber * 2 + 1;
+
+        for( i in 0...gridMultiplier ){
+            var index:Int = ( y - randomNumber + i ) * height + ( x - randomNumber );
+            for( j in 0...gridMultiplier ){
+                if( index < 0 || index >= this._totalTiles ) // защита от значений не принадлежащих текущей карты
+                    continue; 
+
+                var indexTileGroundType = tile.groundType;
+                if( indexTileGroundType == "water" || indexTileGroundType == "rock" || indexTileGroundType == "sandstone" ){ // защита от перезаписи существующих тайлов
+                    index++;
+                    continue;
+                }
+
+                var tile:Tile = this.tileStorage[ index ];
+                tile.changeGroundType( newTileConfig );
+                index++;
+            }
         }
     }
 /*

@@ -8,7 +8,7 @@ class EntitySystem{
         this._parent = parent;
     }
 
-    public function createEntity():Entity{
+    public function createEntity( name:String ):Entity{
         return null;
     }
 }
