@@ -1,10 +1,10 @@
 {
     "400":{
-        "sceneType": "globalMapScene"
+        "sceneType": "globalMap"
     },
 
     "401":{
-        "sceneType": "battleScene",
+        "sceneType": "groundMap",
         "tileMap": 1,
         "tileMapBiome": "plain",
         "height": 200,

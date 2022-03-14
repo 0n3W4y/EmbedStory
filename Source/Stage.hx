@@ -8,7 +8,4 @@ class Stage{
         this._parent = parent;
     }
 
-    public function hourUp():Void{
-        //TODO: update all entities on sceneSystem;
-    }
 }

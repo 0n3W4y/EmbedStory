@@ -37,7 +37,6 @@ class GameTimeSystem{
         this.currentMinute++;
         if( this.currentMinute >= MinuteTimeline ){
             this.currentHour++;
-            this._parent.stage.hourUp();
             this.currentMinute = 0;
             if( this.currentHour >= HourTimeline ){
                 this.currentDay++;
@@ -80,4 +79,5 @@ class GameTimeSystem{
         value = this.currentYear + '.' + this.currentMonth + '.' + this.currentDay;
         return value;
     }
+
 }

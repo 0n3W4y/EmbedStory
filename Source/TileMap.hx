@@ -182,7 +182,7 @@ class TileMap{
     }
 
     private function _generateObjectsLayer():Void{
-
+        this._createRockObjects();
     }
 
     private function _generateLiquids():Void{
@@ -534,6 +534,9 @@ class TileMap{
         return null;
     }
 */
+    private function _createRockObjects():Void{
+        
+    }
 
     private function _createEnvironment( tile:Tile ):Void{
         var tileGroundType:String = tile.groundType; // rock, sandrock

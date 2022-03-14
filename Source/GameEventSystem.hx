@@ -1,6 +1,6 @@
 package;
 
-class EventSystem{
+class GameEventSystem{
 
     private var _parent:Game;
 

@@ -1,11 +1,11 @@
 package;
 
-typedef AgeSystemConfig = {
+typedef EntityAgeSystemConfig = {
     var Hour:Int;
     var Phases:Array<Int>;
 }
 
-class AgeSystem{
+class EntityAgeSystem{
 
     public var currentYear:Int;
     public var currentMonth:Int;
@@ -19,7 +19,7 @@ class AgeSystem{
     private var _phases:Array<Int>; // Индекс обозначает фазу, значение обозначает количество часов для этой фазы
     private var _isPhaseLast:Bool;
 
-    public function new( parent:Entity, params:AgeSystemConfig ):Void{
+    public function new( parent:Entity, params:EntityAgeSystemConfig ):Void{
         this._parent = parent;
         this.currentHour = params.Hour;
         this._phases = params.Phases;

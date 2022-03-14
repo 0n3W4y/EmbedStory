@@ -19,7 +19,7 @@ class Game {
     public var deploy:Deploy;
     public var sceneSystem:SceneSystem;
     public var gameTimeSystem:GameTimeSystem;
-    public var eventSystem:EventSystem;
+    public var gameEventSystem:GameEventSystem;
 
     public var gameStart:Float;
     public var onPause:Bool;
@@ -107,7 +107,7 @@ class Game {
     private function _update( time:Int ):Void {
         if( !onPause ) {
             this.gameTimeSystem.update( time );
-            this.eventSystem.update( time );
+            this.gameEventSystem.update( time );
         }
     }
 
@@ -118,7 +118,7 @@ class Game {
     private function _preStartGame():Void{
 
         this.gameTimeSystem = new GameTimeSystem( this );
-        this.eventSystem = new EventSystem( this );
+        this.gameEventSystem = new GameEventSystem( this );
         this.stage = new Stage( this );
         var spriteForScenes:Sprite = new Sprite();
         var spriteForUI:Sprite = new Sprite();

@@ -14,8 +14,9 @@ class Entity{
     public var tileID:Int;
     public var tileMapID:Int;
 
-    public var age:AgeSystem;
-    public var name:NameSystem;   
+    public var age:EntityAgeSystem;
+    //public var name:EntityNameSystem;
+    public var HealthPoints:EntityHealthPointsSystem;
     
 
     private var _ID:EntityID;
@@ -25,7 +26,8 @@ class Entity{
     }
 
     public function update( time:Int ):Void{
-        
+        if( age != null )
+            age.update( time );
     }
 
     public function getId():EntityID{
