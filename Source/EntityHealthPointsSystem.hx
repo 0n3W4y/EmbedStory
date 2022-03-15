@@ -5,42 +5,75 @@ enum HealthPoint{
 }
 
 typedef Head = {
-    var LeftEye:Eye;
-    var RightEye:Eye;
-    var HeadNose:Nose;
-    var HeadMouth:Mouth;
+    var LeftEye:BodyPart;
+    var RightEye:BodyPart;
+    var HeadNose:BodyPart;
+    var HeadMouth:BodyPart;
+    var Brain:BodyPart;
 }
 
-typedef LeftArm = {
-
+typedef LeftHand = {
+    var LeftArm:BodyPart;
+    var LeftWrist:BodyPart;
 }
 
-typedef RightArm = {
-
+typedef RightHand = {
+    var RightArm:BodyPart;
+    var RightWrist:BodyPart;
 }
 
-typedef Eye = {
+typedef LeftLeg = {
+    var LeftFoot:BodyPart;
+    var leftSole:BodyPart;
+}
+
+typedef RightLeg = {
+    var RightFoot:BodyPart;
+    var RightSole:BodyPart;
+}
+
+typedef Body = {
+    var LeftLung:BodyPart;
+    var RightLung:BodyPart;
+    var Heart:BodyPart;
+}
+
+typedef BodyPart = {
     var HP:HealthPoint;
+    var currentHP:HealthPoint;
     var Type:String;
-}
-
-typedef Mouth = {
-    var HP:HealthPoint;
-    var Type:String;
-}
-
-typedef Nose = {
-    var HP:HealthPoint;
-    var Type:String;
+    var Status:String;
 }
 
 class EntityHealthPointsSystem{
 
-    public var totalHp:Int;
+    public var totalHp:HealthPoint;
+    public var currentTotalHP:HealthPoint;
 
-    public var head:Int;
+    public var head:Head;
+    public var leftHand:LeftHand;
+    public var rightHand:RightHand;
+    public var body:Body;
+    public var leftLeg:LeftLeg;
+    public var rightLeg:RightLeg;
 
     public function new():Void{
+
+    }
+
+    public function init():Void{
+        
+    }
+
+    public function postInit():Void{
+
+    }
+
+    public function updateTotalHP():Void{
+        var headLeftEye:Int = switch (this.head.LeftEye.HP ){case HealthPoint(v): v;};
+    }
+
+    public function updateCurrentTotalHP():Void{
 
     }
 }
