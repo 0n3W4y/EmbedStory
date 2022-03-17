@@ -1,5 +1,7 @@
 package;
 
+import Entity.EntityID;
+
 typedef EntityHealthPointsSystemConfig = {
     var Parent:Entity;
 }
@@ -70,13 +72,21 @@ class EntityHealthPointsSystem{
     }
 
     public function init():Void{
-        var errMsg:String = 'Error in EntityHealthPointsSystem.init. ';
+        var entityName:String = this._parent.entityName;
+        var entityType:String = this._parent.entityType;
+        var entitySubType:String = this._parent.entitySubType;
+        var entityID:EntityID = this._parent.getId();
+        var errMsg:String = 'Error in EntityHealthPointsSystem.init. "$entityName" "$entityType" "$entitySubType" "$entityID". ';
         if( torso == null )
             throw '$errMsg Torso is null!';
     }
 
     public function postInit():Void{
-        var errMsg:String = 'Error in EntityHealthPointsSystem.postInit. ';
+        var entityName:String = this._parent.entityName;
+        var entityType:String = this._parent.entityType;
+        var entitySubType:String = this._parent.entitySubType;
+        var entityID:EntityID = this._parent.getId();
+        var errMsg:String = 'Error in EntityHealthPointsSystem.postInit. "$entityName" "$entityType" "$entitySubType" "$entityID". ';
         if( torso == null )
             throw '$errMsg Torso is null!';
     }
@@ -180,38 +190,120 @@ class EntityHealthPointsSystem{
     }
 
     public function takeDamageTo( place:String, value:Int ):Void{
+        var entityName:String = this._parent.entityName;
+        var entityType:String = this._parent.entityType;
+        var entitySubType:String = this._parent.entitySubType;
+        var entityID:EntityID = this._parent.getId();
+        var container:BodyPart = null;
+        var msg:String = 'Error in EntityHealthPointSystem.takeDamageTo. "$entityName" "$entityType" "$entitySubType" "$entityID".';
         switch( place ){
-            case "head": this._takeDamageToHead( value );
+            case "head": {
+                if( this.head == null ) 
+                    throw '$msg head does not exist'; 
+        
+                if( this.head.Head.Status == "disrupted" )
+                    throw '$msg head already disrupted';
+
+                container = this.head.Head;
+                this._takeDamageTo( container, value );
+            }
             case "leftEye": {};
-            case "torso": this._takeDamageToTorso( value );
-            default: throw 'Error in EntityHealthPointsSystem.takeDamageTo. There is no "$place" in.';
+            case "rightEye": {};
+            case "nose": {};
+            case "mouth": {};
+            case "brain": {};
+            case "leftArm": {};
+            case "leftWrist": {};
+            case "rightArm": {};
+            case "rightWrist": {};
+            case "leftFoot": {};
+            case "leftSole": {};
+            case "rightFoot": {};
+            case "rightSole": {};
+            case "torso": {
+                if( this.torso == null ) 
+                    throw '$msg torso does not exist'; 
+        
+                if( this.torso.Torso.Status == "disrupted" )
+                    throw '$msg torso already disrupted';
+
+                container = this.torso.Torso;
+                this._takeDamageTo( container, value );
+            };
+            case "leftLung": {};
+            case "rightLung": {};
+            case "heart": {};
+            default: throw '$msg. There is no "$place" in.';
         }
+
+        //updatePassiveSkills();
     }
 
     
 
-
-    private function _takeDamageToHead ( value:Int ):Void{
-        var msg:String = 'Error in EntityHealthPointSystem.takeDamageTo. ';
-        if( this.head == null ) 
-            throw '$msg head does not exist'; 
-        
-        if( this.head.Head == null ) 
-            throw '$msg head.Head does not exist';
-
-        if( this.head.Head.Status == "disrupted" )
-            throw '$msg head already disrupted';
-
-
-        var currentHP:Int = switch( this.head.Head.currentHP ){ case HealthPoint(v): v; };
-        var hp:Int = switch( this.head.Head.HP ){ case HealthPoint(v): v; };
+    private function _takeDamageTo( place:BodyPart, value:Int ):Void{
+        var currentHP:Int = switch( place.currentHP ){ case HealthPoint(v): v; };
+        var hp:Int = switch( place.HP ){ case HealthPoint(v): v; };
         var delta:Int = currentHP - value;
+        var halfHP:Int = Math.round( hp / 2 );
+        var fifteenPercentHP:Int = Math.round( hp*0.15 );// 15% - status broken;        
 
-        var halfHP:Int = Math.round( hp/2 );
+        if( delta < halfHP && delta > fifteenPercentHP ){
+            place.currentHP = HealthPoint( delta );
+            place.Status = "damaged";
+        }else if( delta < fifteenPercentHP && delta > 0 ){
+            place.currentHP = HealthPoint( delta );
+            place.Status = "broken";
+        }else if( delta <= 0 ){
+            place.currentHP = HealthPoint( 0 );
+            place.Status = "disrupted";
+            if( this._checkForDeath() )
+                //Запустить процесс смерти.
 
+            this._checkBodyPartsDependense();
+        }else{
+            place.currentHP = HealthPoint( delta );
+        }
     }
 
-    private function _takeDamageToTorso( value:Int ):Void{
+    private function _checkBodyPartsDependense():Void{
+        if( this.leftHand != null ){
+            if( this.leftHand.Arm.Status == "disrupted" && this.leftHand.Wrist.Status != "disrupted" )
+                this.leftHand.Wrist.Status = "disrupted";
+        }
 
+        if( this.rightHand != null ){
+            if( this.rightHand.Arm.Status == "disrupted" && this.rightHand.Wrist.Status != "disrupted" )
+                this.rightHand.Wrist.Status = "disrupted";
+        }
+
+        if( this.leftLeg != null ){
+            if( this.leftLeg.Foot.Status == "disrupted" && this.leftLeg.Sole.Status != "disrupted" )
+                this.leftLeg.Sole.Status = "disrupted";
+        }
+
+        if( this.rightLeg != null ){
+            if( this.rightLeg.Foot.Status == "disrupted" && this.rightLeg.Sole.Status != "disrupted" )
+                this.rightLeg.Sole.Status = "disrupted";
+        }
+    }
+
+    private function _checkForDeath():Bool{
+        if( this.torso.Heart.Status == "disrupted")
+            return true;
+
+        if( this.torso.Torso.Status == "disrupted" )
+            return true;
+
+        if( this.torso.LeftLung.Status == "disrupted" && this.torso.RightLung.Status == "disrupted" )
+            return true;
+
+        if( this.head.Head.Status == "disrupted" )
+            return true;
+
+        if( this.head.Brain.Status == "disrupted" )
+            return true;
+
+        return false;
     }
 }
