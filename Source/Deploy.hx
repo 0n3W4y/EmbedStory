@@ -4,6 +4,8 @@ import Scene.SceneDeployID;
 import Tile.FloorTypeDeployID;
 import Tile.GroundTypeDeployID;
 import TileMap.BiomeDeployID;
+import EntitySystem.EntityDeployID;
+
 
 
 typedef DeployConfig = {
@@ -11,6 +13,7 @@ typedef DeployConfig = {
     var BiomeConfig:Dynamic;
     var GroundTypeConfig:Dynamic;
     var SceneConfig:Dynamic;
+    var EntityConfig:Dynamic;
 }
 
 class Deploy{
@@ -19,14 +22,12 @@ class Deploy{
     public var groundTypeConfig:Map<GroundTypeDeployID, Dynamic>;
     public var biomeConfig:Map<BiomeDeployID, Dynamic>;
     public var sceneConfig:Map<SceneDeployID, Dynamic>;
+    public var entityConfig:Map<EntityDeployID, Dynamic>;
 
     private var _parent:Game;
 
     public function new( parent:Game, params:DeployConfig ):Void{
         this._parent = parent;
-        //this.floorTypeConfig = params.FloorTypeConfig;
-        //this.groundTypeConfig = params.GroundTypeConfig;
-        //this.biomeConfig = params.BiomeConfig;
 
         this.floorTypeConfig = new Map<FloorTypeDeployID, Dynamic>();
 		for( key in Reflect.fields( params.FloorTypeConfig )){
@@ -50,6 +51,12 @@ class Deploy{
         for( key in Reflect.fields( params.SceneConfig )){
             var intKey:Int = Std.parseInt( key );
             this.sceneConfig[ SceneDeployID( intKey )] = Reflect.getProperty( params.SceneConfig, key );
+        }
+
+        this.entityConfig = new Map<EntityDeployID, Dynamic>();
+        for( key in Reflect.fields( params.EntityConfig )){
+            var intKey:Int = Std.parseInt( key );
+            this.entityConfig[ EntityDeployID( intKey )] = Reflect.getProperty( params.EntityConfig, key );
         }
     }
 

@@ -1,5 +1,7 @@
 package;
 
+import EntitySystem.EntityDeployID;
+
 
 enum EntityID{
     EntityID( _:Int );
@@ -13,6 +15,7 @@ class Entity{
     public var entitySubType:String;
     public var tileID:Int;
     public var tileMapID:Int;
+    public var entityDeployID:EntityDeployID;
 
     public var age:EntityAgeSystem;
     //public var name:EntityNameSystem;

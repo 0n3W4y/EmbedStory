@@ -141,9 +141,10 @@ class Game {
         var floorTypeConfig:Dynamic = ConfigJSON.json( "Source/DeployFloorTypeConfig.json" );
         var groundTypeConfig:Dynamic = ConfigJSON.json( "Source/DeployGroundTypeConfig.json" );
         var sceneConfig:Dynamic = ConfigJSON.json( "Source/DeploySceneConfig.json" );
+        var entityConfig:Dynamic = ConfigJSON.json( "Source/deployEntity.json" );
         
 
-        return { BiomeConfig: biomeConfig, GroundTypeConfig: groundTypeConfig, FloorTypeConfig: floorTypeConfig, SceneConfig:sceneConfig };
+        return { BiomeConfig: biomeConfig, GroundTypeConfig: groundTypeConfig, FloorTypeConfig: floorTypeConfig, SceneConfig: sceneConfig, EntityConfig: entityConfig};
     }
 
 }

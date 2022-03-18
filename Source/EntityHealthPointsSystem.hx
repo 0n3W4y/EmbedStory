@@ -4,6 +4,12 @@ import Entity.EntityID;
 
 typedef EntityHealthPointsSystemConfig = {
     var Parent:Entity;
+    var Torso:Dynamic;
+    var Head:Dynamic;
+    var LeftLeg:Dynamic;
+    var RightLeg:Dynamic;
+    var LeftHand:Dynamic;
+    var RightHand:Dynamic;
 }
 
 enum HealthPoint{
@@ -69,26 +75,38 @@ class EntityHealthPointsSystem{
 
     public function new( params:EntityHealthPointsSystemConfig ):Void{
         this._parent = params.Parent;
+        if( params.Head != null )
+            this._configure( "head", params.Head );
+
+        if( params.Torso != null )
+            this._configure( "torso", params.Torso );
+
+        if( params.LeftHand != null )
+            this._configure( "leftHand", params.LeftHand );
+
+        if( params.RightHand != null )
+            this._configure( "rightHand", params.RightHand );
+
+        if( params.LeftLeg != null )
+            this._configure( "leftLeg", params.LeftLeg );
+
+        if( params.RightLeg != null )
+            this._configure( "rightLeg", params.RightLeg );
+
     }
 
     public function init():Void{
-        var entityName:String = this._parent.entityName;
-        var entityType:String = this._parent.entityType;
-        var entitySubType:String = this._parent.entitySubType;
-        var entityID:EntityID = this._parent.getId();
-        var errMsg:String = 'Error in EntityHealthPointsSystem.init. "$entityName" "$entityType" "$entitySubType" "$entityID". ';
+       var msg:String = this._errMsg();
+       msg = '$msg + in init. ';
         if( torso == null )
-            throw '$errMsg Torso is null!';
+            throw '$msg Torso is null!';
     }
 
     public function postInit():Void{
-        var entityName:String = this._parent.entityName;
-        var entityType:String = this._parent.entityType;
-        var entitySubType:String = this._parent.entitySubType;
-        var entityID:EntityID = this._parent.getId();
-        var errMsg:String = 'Error in EntityHealthPointsSystem.postInit. "$entityName" "$entityType" "$entitySubType" "$entityID". ';
+        var msg:String = this._errMsg();
+        msg = '$msg in postInit. ';
         if( torso == null )
-            throw '$errMsg Torso is null!';
+            throw '$msg Torso is null!';
     }
 
     public function updateTotalHP():Void{
@@ -153,28 +171,28 @@ class EntityHealthPointsSystem{
         }
 
         var leftHandHP:Int = 0;
-        if( this.leftHand == null ){
+        if( this.leftHand != null ){
             var leftHandArmHP:Int = switch( this.leftHand.Arm.currentHP ){ case HealthPoint( v ): v; };
             var leftHandWristHP:Int = switch( this.leftHand.Wrist.currentHP ){ case HealthPoint( v ): v; };
             leftHandHP = leftHandArmHP + leftHandWristHP;
         }
 
         var rightHandHP:Int = 0;
-        if( this.rightHand == null ){
+        if( this.rightHand != null ){
             var rightHandArmHP:Int = switch( this.rightHand.Arm.currentHP ){ case HealthPoint( v ): v; };
             var rightHandWristHP:Int = switch( this.rightHand.Wrist.currentHP ){ case HealthPoint( v ): v; };
             rightHandHP = rightHandArmHP + rightHandWristHP;
         }
 
         var leftLegHP:Int = 0;
-        if( this.leftLeg == null ){
+        if( this.leftLeg != null ){
             var leftLegFootHP:Int = switch( this.leftLeg.Foot.currentHP ){ case HealthPoint( v ): v; };
             var leftLegSoleHP:Int = switch( this.leftLeg.Sole.currentHP ){ case HealthPoint( v ): v; };
             leftLegHP = leftLegFootHP + leftLegSoleHP;
         }
 
         var rightLegHP:Int = 0;
-        if( this.rightLeg == null ){
+        if( this.rightLeg != null ){
             var rightLegFootHP:Int = switch( this.rightLeg.Foot.currentHP ){ case HealthPoint( v ): v; };
             var rightLegSoleHP:Int = switch( this.rightLeg.Sole.currentHP ){ case HealthPoint( v ): v; };
             rightLegHP = rightLegFootHP + rightLegSoleHP;
@@ -190,12 +208,9 @@ class EntityHealthPointsSystem{
     }
 
     public function takeDamageTo( place:String, value:Int ):Void{
-        var entityName:String = this._parent.entityName;
-        var entityType:String = this._parent.entityType;
-        var entitySubType:String = this._parent.entitySubType;
-        var entityID:EntityID = this._parent.getId();
         var container:BodyPart = null;
-        var msg:String = 'Error in EntityHealthPointSystem.takeDamageTo. "$entityName" "$entityType" "$entitySubType" "$entityID".';
+        var msg:String = this._errMsg();
+        msg = '$msg in takeDamageTo. ';
         switch( place ){
             case "head": {
                 if( this.head == null ) 
@@ -207,19 +222,136 @@ class EntityHealthPointsSystem{
                 container = this.head.Head;
                 this._takeDamageTo( container, value );
             }
-            case "leftEye": {};
-            case "rightEye": {};
-            case "nose": {};
-            case "mouth": {};
-            case "brain": {};
-            case "leftArm": {};
-            case "leftWrist": {};
-            case "rightArm": {};
-            case "rightWrist": {};
-            case "leftFoot": {};
-            case "leftSole": {};
-            case "rightFoot": {};
-            case "rightSole": {};
+            case "leftEye": {
+                if( this.head == null ) 
+                    throw '$msg head does not exist'; 
+        
+                if( this.head.LeftEye.Status == "disrupted" )
+                    throw '$msg Left eye already disrupted';
+
+                container = this.head.LeftEye;
+                this._takeDamageTo( container, value );
+            };
+            case "rightEye": {
+                if( this.head == null ) 
+                    throw '$msg head does not exist'; 
+        
+                if( this.head.RightEye.Status == "disrupted" )
+                    throw '$msg Right eye already disrupted';
+
+                container = this.head.RightEye;
+                this._takeDamageTo( container, value );
+            };
+            case "nose": {
+                if( this.head == null ) 
+                    throw '$msg head does not exist'; 
+        
+                if( this.head.Nose.Status == "disrupted" )
+                    throw '$msg Nose already disrupted';
+
+                container = this.head.Nose;
+                this._takeDamageTo( container, value );
+            };
+            case "mouth": {
+                if( this.head == null ) 
+                    throw '$msg head does not exist'; 
+        
+                if( this.head.Mouth.Status == "disrupted" )
+                    throw '$msg Mouth already disrupted';
+
+                container = this.head.Mouth;
+                this._takeDamageTo( container, value );
+            };
+            case "brain": {
+                if( this.head == null ) 
+                    throw '$msg head does not exist'; 
+        
+                if( this.head.Brain.Status == "disrupted" )
+                    throw '$msg Brain already disrupted';
+
+                container = this.head.Brain;
+                this._takeDamageTo( container, value );
+            };
+            case "leftArm": {
+                if( this.leftHand == null ) 
+                    throw '$msg Left hand does not exist'; 
+        
+                if( this.leftHand.Arm.Status == "disrupted" )
+                    throw '$msg Left Arm already disrupted';
+
+                container = this.leftHand.Arm;
+                this._takeDamageTo( container, value );
+            };
+            case "leftWrist": {
+                if( this.leftHand == null ) 
+                    throw '$msg Left Hand does not exist'; 
+        
+                if( this.leftHand.Wrist.Status == "disrupted" )
+                    throw '$msg Left Wrist already disrupted';
+
+                container = this.leftHand.Wrist;
+                this._takeDamageTo( container, value );
+            };
+            case "rightArm": {
+                if( this.rightHand == null ) 
+                    throw '$msg Right Hand does not exist'; 
+        
+                if( this.rightHand.Arm.Status == "disrupted" )
+                    throw '$msg Right Arm already disrupted';
+
+                container = this.rightHand.Arm;
+                this._takeDamageTo( container, value );
+            };
+            case "rightWrist": {
+                if( this.rightHand == null ) 
+                    throw '$msg Right Hand does not exist'; 
+        
+                if( this.rightHand.Wrist.Status == "disrupted" )
+                    throw '$msg Right Wrist already disrupted';
+
+                container = this.rightHand.Wrist;
+                this._takeDamageTo( container, value );
+            };
+            case "leftFoot": {
+                if( this.leftLeg == null ) 
+                    throw '$msg Left Leg does not exist'; 
+        
+                if( this.leftLeg.Foot.Status == "disrupted" )
+                    throw '$msg Left Foot already disrupted';
+
+                container = this.leftLeg.Foot;
+                this._takeDamageTo( container, value );
+            };
+            case "leftSole": {
+                if( this.leftLeg == null ) 
+                    throw '$msg Left Sole does not exist'; 
+        
+                if( this.leftLeg.Sole.Status == "disrupted" )
+                    throw '$msg Left Sole already disrupted';
+
+                container = this.leftLeg.Sole;
+                this._takeDamageTo( container, value );
+            };
+            case "rightFoot": {
+                if( this.rightLeg == null ) 
+                    throw '$msg Right Leg does not exist'; 
+        
+                if( this.rightLeg.Foot.Status == "disrupted" )
+                    throw '$msg Right Foot already disrupted';
+
+                container = this.rightLeg.Foot;
+                this._takeDamageTo( container, value );
+            };
+            case "rightSole": {
+                if( this.rightLeg == null ) 
+                    throw '$msg Right Leg does not exist'; 
+        
+                if( this.rightLeg.Sole.Status == "disrupted" )
+                    throw '$msg Right Sole already disrupted';
+
+                container = this.rightLeg.Sole;
+                this._takeDamageTo( container, value );
+            };
             case "torso": {
                 if( this.torso == null ) 
                     throw '$msg torso does not exist'; 
@@ -230,9 +362,36 @@ class EntityHealthPointsSystem{
                 container = this.torso.Torso;
                 this._takeDamageTo( container, value );
             };
-            case "leftLung": {};
-            case "rightLung": {};
-            case "heart": {};
+            case "leftLung": {
+                if( this.torso == null ) 
+                    throw '$msg torso does not exist'; 
+        
+                if( this.torso.LeftLung.Status == "disrupted" )
+                    throw '$msg Left Lung already disrupted';
+
+                container = this.torso.LeftLung;
+                this._takeDamageTo( container, value );
+            };
+            case "rightLung": {
+                if( this.torso == null ) 
+                    throw '$msg torso does not exist'; 
+        
+                if( this.torso.RightLung.Status == "disrupted" )
+                    throw '$msg Right Lung already disrupted';
+
+                container = this.torso.RightLung;
+                this._takeDamageTo( container, value );
+            };
+            case "heart": {
+                if( this.torso == null ) 
+                    throw '$msg torso does not exist'; 
+        
+                if( this.torso.Heart.Status == "disrupted" )
+                    throw '$msg Heart already disrupted';
+
+                container = this.torso.Heart;
+                this._takeDamageTo( container, value );
+            };
             default: throw '$msg. There is no "$place" in.';
         }
 
@@ -246,7 +405,7 @@ class EntityHealthPointsSystem{
         var hp:Int = switch( place.HP ){ case HealthPoint(v): v; };
         var delta:Int = currentHP - value;
         var halfHP:Int = Math.round( hp / 2 );
-        var fifteenPercentHP:Int = Math.round( hp*0.15 );// 15% - status broken;        
+        var fifteenPercentHP:Int = Math.round( hp * 0.15 );// 15% - status broken;        
 
         if( delta < halfHP && delta > fifteenPercentHP ){
             place.currentHP = HealthPoint( delta );
@@ -305,5 +464,30 @@ class EntityHealthPointsSystem{
             return true;
 
         return false;
+    }
+
+    private function _configure( place:String, params:Dynamic ):Void{
+        var msg:String = this._errMsg();
+        switch( place ){
+            case "head":{
+                this.head = { Head: null, LeftEye: null, RightEye: null, Mouth: null, Brain: null, Nose: null }
+                for( key in Reflect.fields( params )){
+
+                }
+            };
+            case "torso":{};
+            case "leftLeg":{};
+            case "rightLeg":{};
+            case "leftHand":{};
+            case "rightHand":{};
+        }
+    }
+
+    private function _errMsg():String{
+        var entityName:String = this._parent.entityName;
+        var entityType:String = this._parent.entityType;
+        var entitySubType:String = this._parent.entitySubType;
+        var entityID:EntityID = this._parent.getId();
+        return 'Error in EntityHealthPointSystem. "$entityName" "$entityType" "$entitySubType" "$entityID".';
     }
 }

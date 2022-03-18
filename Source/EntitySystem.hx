@@ -1,5 +1,9 @@
 package;
 
+enum EntityDeployID{
+    EntityDeployID( _:Int );
+}
+
 class EntitySystem{
 
     private var _parent:Game;
