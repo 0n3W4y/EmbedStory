@@ -54,8 +54,8 @@ typedef Torso = {
 
 typedef BodyPart = {
     var HP:HealthPoint;
-    var currentHP:HealthPoint;
-    var Type:String; // natural ( 100% ), wood( 75% ), steel( 90% ), carbon( 110% ), cybernetic( 150% );
+    var CurrentHP:HealthPoint;
+    var PartType:String; // natural ( 100% ), wood( 75% ), steel( 90% ), carbon( 110% ), cybernetic( 150% );
     var Status:String; // healthy ( 100% HP ), damaged( 50% HP), broken( 15% HP ), disrupted ( 0% HP );
 }
 
@@ -76,22 +76,22 @@ class EntityHealthPointsSystem{
     public function new( params:EntityHealthPointsSystemConfig ):Void{
         this._parent = params.Parent;
         if( params.Head != null )
-            this._configure( "head", params.Head );
+            this._configureHead( params.Head );
 
         if( params.Torso != null )
-            this._configure( "torso", params.Torso );
+            this._configureTorso( params.Torso );
 
         if( params.LeftHand != null )
-            this._configure( "leftHand", params.LeftHand );
+            this._configureLeftHand( params.LeftHand );
 
         if( params.RightHand != null )
-            this._configure( "rightHand", params.RightHand );
+            this._configureRightHand( params.RightHand );
 
         if( params.LeftLeg != null )
-            this._configure( "leftLeg", params.LeftLeg );
+            this._configureLeftLeg( params.LeftLeg );
 
         if( params.RightLeg != null )
-            this._configure( "rightLeg", params.RightLeg );
+            this._configureRightLeg( params.RightLeg );
 
     }
 
@@ -110,98 +110,214 @@ class EntityHealthPointsSystem{
     }
 
     public function updateTotalHP():Void{
+        var msg:String = this._errMsg();
         var headHP:Int = 0;
         if( this.head != null ){
-            var headLeftEye:Int = switch( this.head.LeftEye.HP ){case HealthPoint(v): v;};
-            var headRightEye:Int = switch( this.head.RightEye.HP ){case HealthPoint(v): v;};
-            var headNose:Int = switch( this.head.Nose.HP ){case HealthPoint(v): v;};
-            var headMouth:Int = switch( this.head.Mouth.HP ){case HealthPoint(v): v;};
-            var headBrain:Int = switch( this.head.Brain.HP ){case HealthPoint(v): v;};
+            var headLeftEye:Int = 0;
+            var headRightEye:Int = 0;
+            var headNose:Int = 0;
+            var headMouth:Int = 0;
+            var headBrain:Int = 0;
+
+            if( this.head.LeftEye != null )
+                headLeftEye = switch( this.head.LeftEye.HP ){case HealthPoint(v): v;};
+
+            if( this.head.RightEye != null )
+                headRightEye = switch( this.head.RightEye.HP ){case HealthPoint(v): v;};
+
+            if( this.head.Nose != null )
+                headNose = switch( this.head.Nose.HP ){case HealthPoint(v): v;};
+
+            if( this.head.Mouth != null )
+                headMouth = switch( this.head.Mouth.HP ){case HealthPoint(v): v;};
+
+            if( this.head.Brain != null )
+                headBrain = switch( this.head.Brain.HP ){case HealthPoint(v): v;};
+
+            if( this.head.Head == null )
+                throw '$msg updateTotalHP. head.Head is NULL!!!';
+
             var headHead:Int = switch( this.head.Head.HP ){ case HealthPoint(v): v; };
             headHP = headLeftEye + headRightEye + headNose + headMouth + headBrain + headHead;
         }
 
         var leftHandHP:Int = 0;
-        if( this.leftHand == null ){
-            var leftHandArmHP:Int = switch( this.leftHand.Arm.HP ){ case HealthPoint( v ): v; };
-            var leftHandWristHP:Int = switch( this.leftHand.Wrist.HP ){ case HealthPoint( v ): v; };
+        if( this.leftHand != null ){
+            var leftHandArmHP:Int = 0;
+            var leftHandWristHP:Int = 0;
+
+            if( this.leftHand.Arm != null )
+                leftHandArmHP = switch( this.leftHand.Arm.HP ){ case HealthPoint( v ): v; };
+
+            if( this.leftHand.Wrist != null )
+                leftHandWristHP = switch( this.leftHand.Wrist.HP ){ case HealthPoint( v ): v; };
+
             leftHandHP = leftHandArmHP + leftHandWristHP;
         }
 
         var rightHandHP:Int = 0;
-        if( this.rightHand == null ){
-            var rightHandArmHP:Int = switch( this.rightHand.Arm.HP ){ case HealthPoint( v ): v; };
-            var rightHandWristHP:Int = switch( this.rightHand.Wrist.HP ){ case HealthPoint( v ): v; };
+        if( this.rightHand != null ){
+            var rightHandArmHP:Int = 0;
+            var rightHandWristHP:Int = 0;
+
+            if( this.rightHand.Arm != null )
+                rightHandArmHP = switch( this.rightHand.Arm.HP ){ case HealthPoint( v ): v; };
+
+            if( this.rightHand.Arm != null )
+                rightHandWristHP = switch( this.rightHand.Wrist.HP ){ case HealthPoint( v ): v; };
+
             rightHandHP = rightHandArmHP + rightHandWristHP;
         }
 
         var leftLegHP:Int = 0;
-        if( this.leftLeg == null ){
-            var leftLegFootHP:Int = switch( this.leftLeg.Foot.HP ){ case HealthPoint( v ): v; };
-            var leftLegSoleHP:Int = switch( this.leftLeg.Sole.HP ){ case HealthPoint( v ): v; };
+        if( this.leftLeg != null ){
+            var leftLegFootHP:Int = 0;
+            var leftLegSoleHP:Int = 0;
+
+            if( this.leftLeg.Foot != null )
+                leftLegFootHP = switch( this.leftLeg.Foot.HP ){ case HealthPoint( v ): v; };
+
+            if( this.leftLeg.Sole != null )
+                leftLegSoleHP = switch( this.leftLeg.Sole.HP ){ case HealthPoint( v ): v; };
+
             leftLegHP = leftLegFootHP + leftLegSoleHP;
         }
 
         var rightLegHP:Int = 0;
-        if( this.rightLeg == null ){
-            var rightLegFootHP:Int = switch( this.rightLeg.Foot.HP ){ case HealthPoint( v ): v; };
-            var rightLegSoleHP:Int = switch( this.rightLeg.Sole.HP ){ case HealthPoint( v ): v; };
+        if( this.rightLeg != null ){
+            var rightLegFootHP:Int = 0;
+            var rightLegSoleHP:Int = 0;
+
+            if( this.rightLeg.Foot != null )
+                rightLegFootHP = switch( this.rightLeg.Foot.HP ){ case HealthPoint( v ): v; };
+
+            if( this.rightLeg.Sole != null )
+                rightLegSoleHP = switch( this.rightLeg.Sole.HP ){ case HealthPoint( v ): v; };
+
             rightLegHP = rightLegFootHP + rightLegSoleHP;
         }
 
-        var torsoLeftLung:Int = switch( this.torso.LeftLung.HP ){ case HealthPoint(v): v; };
-        var torsoRightLung:Int = switch( this.torso.RightLung.HP ){ case HealthPoint(v): v; };
-        var torsoHeart:Int = switch( this.torso.Heart.HP ){ case HealthPoint(v): v; };
+        var torsoLeftLung:Int = 0;
+        var torsoRightLung:Int = 0;
+        var torsoHeart:Int = 0;
         var torsoTorso:Int = switch( this.torso.Torso.HP ){ case HealthPoint(v): v; };
+
+        if( this.torso.LeftLung != null )
+            torsoLeftLung = switch( this.torso.LeftLung.HP ){ case HealthPoint(v): v; };
+
+        if( this.torso.RightLung != null )
+            torsoRightLung = switch( this.torso.RightLung.HP ){ case HealthPoint(v): v; };
+
+        if( this.torso.Heart != null )
+            torsoHeart = switch( this.torso.Heart.HP ){ case HealthPoint(v): v; };
+       
         var torsoHP:Int = torsoLeftLung + torsoRightLung + torsoHeart + torsoTorso ;
 
         this.totalHp = HealthPoint( headHP + leftHandHP + rightHandHP + leftLegHP + rightLegHP + torsoHP );
     }
 
     public function updateCurrentTotalHP():Void{
+        var msg:String = this._errMsg();
         var headHP:Int = 0;
         if( this.head != null ){
-            var headLeftEye:Int = switch( this.head.LeftEye.currentHP ){case HealthPoint(v): v;};
-            var headRightEye:Int = switch( this.head.RightEye.currentHP ){case HealthPoint(v): v;};
-            var headNose:Int = switch( this.head.Nose.currentHP ){case HealthPoint(v): v;};
-            var headMouth:Int = switch( this.head.Mouth.currentHP ){case HealthPoint(v): v;};
-            var headBrain:Int = switch( this.head.Brain.currentHP ){case HealthPoint(v): v;};
-            var headHead:Int = switch( this.head.Head.currentHP ){ case HealthPoint(v): v; };
+            var headLeftEye:Int = 0;
+            var headRightEye:Int = 0;
+            var headNose:Int = 0;
+            var headMouth:Int = 0;
+            var headBrain:Int = 0;
+
+            if( this.head.LeftEye != null )
+                headLeftEye = switch( this.head.LeftEye.CurrentHP ){case HealthPoint(v): v;};
+
+            if( this.head.RightEye != null )
+                headRightEye = switch( this.head.RightEye.CurrentHP ){case HealthPoint(v): v;};
+
+            if( this.head.Nose != null )
+                headNose = switch( this.head.Nose.CurrentHP ){case HealthPoint(v): v;};
+
+            if( this.head.Mouth != null )
+                headMouth = switch( this.head.Mouth.CurrentHP ){case HealthPoint(v): v;};
+
+            if( this.head.Brain != null )
+                headBrain = switch( this.head.Brain.CurrentHP ){case HealthPoint(v): v;};
+
+            if( this.head.Head == null )
+                throw '$msg updateTotalHP. head.Head is NULL!!!';
+
+            var headHead:Int = switch( this.head.Head.CurrentHP ){ case HealthPoint(v): v; };
             headHP = headLeftEye + headRightEye + headNose + headMouth + headBrain + headHead;
         }
 
         var leftHandHP:Int = 0;
         if( this.leftHand != null ){
-            var leftHandArmHP:Int = switch( this.leftHand.Arm.currentHP ){ case HealthPoint( v ): v; };
-            var leftHandWristHP:Int = switch( this.leftHand.Wrist.currentHP ){ case HealthPoint( v ): v; };
+            var leftHandArmHP:Int = 0;
+            var leftHandWristHP:Int = 0;
+
+            if( this.leftHand.Arm != null )
+                leftHandArmHP = switch( this.leftHand.Arm.CurrentHP ){ case HealthPoint( v ): v; };
+
+            if( this.leftHand.Wrist != null )
+                leftHandWristHP = switch( this.leftHand.Wrist.CurrentHP ){ case HealthPoint( v ): v; };
+
             leftHandHP = leftHandArmHP + leftHandWristHP;
         }
 
         var rightHandHP:Int = 0;
         if( this.rightHand != null ){
-            var rightHandArmHP:Int = switch( this.rightHand.Arm.currentHP ){ case HealthPoint( v ): v; };
-            var rightHandWristHP:Int = switch( this.rightHand.Wrist.currentHP ){ case HealthPoint( v ): v; };
+            var rightHandArmHP:Int = 0;
+            var rightHandWristHP:Int = 0;
+
+            if( this.rightHand.Arm != null )
+                rightHandArmHP = switch( this.rightHand.Arm.CurrentHP ){ case HealthPoint( v ): v; };
+
+            if( this.rightHand.Arm != null )
+                rightHandWristHP = switch( this.rightHand.Wrist.CurrentHP ){ case HealthPoint( v ): v; };
+
             rightHandHP = rightHandArmHP + rightHandWristHP;
         }
 
         var leftLegHP:Int = 0;
         if( this.leftLeg != null ){
-            var leftLegFootHP:Int = switch( this.leftLeg.Foot.currentHP ){ case HealthPoint( v ): v; };
-            var leftLegSoleHP:Int = switch( this.leftLeg.Sole.currentHP ){ case HealthPoint( v ): v; };
+            var leftLegFootHP:Int = 0;
+            var leftLegSoleHP:Int = 0;
+
+            if( this.leftLeg.Foot != null )
+                leftLegFootHP = switch( this.leftLeg.Foot.CurrentHP ){ case HealthPoint( v ): v; };
+
+            if( this.leftLeg.Sole != null )
+                leftLegSoleHP = switch( this.leftLeg.Sole.CurrentHP ){ case HealthPoint( v ): v; };
+
             leftLegHP = leftLegFootHP + leftLegSoleHP;
         }
 
         var rightLegHP:Int = 0;
         if( this.rightLeg != null ){
-            var rightLegFootHP:Int = switch( this.rightLeg.Foot.currentHP ){ case HealthPoint( v ): v; };
-            var rightLegSoleHP:Int = switch( this.rightLeg.Sole.currentHP ){ case HealthPoint( v ): v; };
+            var rightLegFootHP:Int = 0;
+            var rightLegSoleHP:Int = 0;
+
+            if( this.rightLeg.Foot != null )
+                rightLegFootHP = switch( this.rightLeg.Foot.CurrentHP ){ case HealthPoint( v ): v; };
+
+            if( this.rightLeg.Sole != null )
+                rightLegSoleHP = switch( this.rightLeg.Sole.CurrentHP ){ case HealthPoint( v ): v; };
+            
             rightLegHP = rightLegFootHP + rightLegSoleHP;
         }
 
-        var torsoLeftLung:Int = switch( this.torso.LeftLung.currentHP ){ case HealthPoint(v): v; };
-        var torsoRightLung:Int = switch( this.torso.RightLung.currentHP ){ case HealthPoint(v): v; };
-        var torsoHeart:Int = switch( this.torso.Heart.currentHP ){ case HealthPoint(v): v; };
-        var torsoTorso:Int = switch( this.torso.Torso.currentHP ){ case HealthPoint(v): v; };
+        var torsoLeftLung:Int = 0;
+        var torsoRightLung:Int = 0;
+        var torsoHeart:Int = 0;
+        var torsoTorso:Int = switch( this.torso.Torso.CurrentHP ){ case HealthPoint(v): v; };
+
+        if( this.torso.LeftLung != null )
+            torsoLeftLung = switch( this.torso.LeftLung.CurrentHP ){ case HealthPoint(v): v; };
+
+        if( this.torso.RightLung != null )
+            torsoRightLung = switch( this.torso.RightLung.CurrentHP ){ case HealthPoint(v): v; };
+
+        if( this.torso.Heart != null )
+            torsoHeart = switch( this.torso.Heart.CurrentHP ){ case HealthPoint(v): v; };
+       
         var torsoHP:Int = torsoLeftLung + torsoRightLung + torsoHeart + torsoTorso ;
 
         this.currentTotalHP = HealthPoint( headHP + leftHandHP + rightHandHP + leftLegHP + rightLegHP + torsoHP );
@@ -401,27 +517,27 @@ class EntityHealthPointsSystem{
     
 
     private function _takeDamageTo( place:BodyPart, value:Int ):Void{
-        var currentHP:Int = switch( place.currentHP ){ case HealthPoint(v): v; };
+        var CurrentHP:Int = switch( place.CurrentHP ){ case HealthPoint(v): v; };
         var hp:Int = switch( place.HP ){ case HealthPoint(v): v; };
-        var delta:Int = currentHP - value;
+        var delta:Int = CurrentHP - value;
         var halfHP:Int = Math.round( hp / 2 );
         var fifteenPercentHP:Int = Math.round( hp * 0.15 );// 15% - status broken;        
 
         if( delta < halfHP && delta > fifteenPercentHP ){
-            place.currentHP = HealthPoint( delta );
+            place.CurrentHP = HealthPoint( delta );
             place.Status = "damaged";
         }else if( delta < fifteenPercentHP && delta > 0 ){
-            place.currentHP = HealthPoint( delta );
+            place.CurrentHP = HealthPoint( delta );
             place.Status = "broken";
         }else if( delta <= 0 ){
-            place.currentHP = HealthPoint( 0 );
+            place.CurrentHP = HealthPoint( 0 );
             place.Status = "disrupted";
             if( this._checkForDeath() )
                 //Запустить процесс смерти.
 
             this._checkBodyPartsDependense();
         }else{
-            place.currentHP = HealthPoint( delta );
+            place.CurrentHP = HealthPoint( delta );
         }
     }
 
@@ -466,20 +582,74 @@ class EntityHealthPointsSystem{
         return false;
     }
 
-    private function _configure( place:String, params:Dynamic ):Void{
+    private function _configureHead( params:Dynamic ):Void{
         var msg:String = this._errMsg();
-        switch( place ){
-            case "head":{
-                this.head = { Head: null, LeftEye: null, RightEye: null, Mouth: null, Brain: null, Nose: null }
-                for( key in Reflect.fields( params )){
+        this.head = { Head: null, LeftEye: null, RightEye: null, Mouth: null, Brain: null, Nose: null }
+        var container:BodyPart = null;
+        for( key in Reflect.fields( params )){
+            switch( key ){
+                case "head": container = this.head.Head;
+                case "leftEye": container = this.head.LeftEye;
+                case "rightEye": container = this.head.RightEye;
+                case "mouth": container = this.head.Mouth;
+                case "brain": container = this.head.Brain;
+                case "nose": container = this.head.Nose;
+                default: throw '$msg. _configureHead. There is no "$key" in config';
+            }
+            container.HP = Reflect.getProperty( params, "hp" );
+            container.CurrentHP = Reflect.getProperty( params, "currentHP" );
+            container.PartType = Reflect.getProperty( params, "type" );
+            container.Status = Reflect.getProperty( params, "Status" );
+        }
+    }
 
-                }
-            };
-            case "torso":{};
-            case "leftLeg":{};
-            case "rightLeg":{};
-            case "leftHand":{};
-            case "rightHand":{};
+    private function _configureTorso( params:Dynamic ):Void{
+        var msg:String = this._errMsg();
+        this.torso = { Torso:null, LeftLung: null, RightLung: null, Heart: null };
+        var container:BodyPart = null;
+        for( key in Reflect.fields( params )){
+            switch( key ){
+            }
+        }
+    }
+
+    private function _configureLeftLeg( params:Dynamic ):Void{
+        var msg:String = this._errMsg();
+        this.leftLeg = { Foot: null, Sole: null };
+        var container:BodyPart = null;
+        for( key in Reflect.fields( params )){
+            switch( key ){
+            }
+        }
+    }
+
+    private function _configureRightLeg( params:Dynamic ):Void{
+        var msg:String = this._errMsg();
+        this.rightLeg = { Foot: null, Sole: null };
+        var container:BodyPart = null;
+        for( key in Reflect.fields( params )){
+            switch( key ){
+            }
+        }
+    }
+
+    private function _configureLeftHand( params:Dynamic ):Void{
+        var msg:String = this._errMsg();
+        this.leftHand = { Arm: null, Wrist: null };
+        var container:BodyPart = null;
+        for( key in Reflect.fields( params )){
+            switch( key ){
+            }
+        }
+    }
+
+    private function _configureRightHand( params:Dynamic ):Void{
+        var msg:String = this._errMsg();
+        this.rightHand = { Arm: null, Wrist: null };
+        var container:BodyPart = null;
+        for( key in Reflect.fields( params )){
+            switch( key ){
+            }
         }
     }
 
