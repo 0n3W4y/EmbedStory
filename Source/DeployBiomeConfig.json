@@ -61,8 +61,8 @@
         }, 
         "resources": {
             "trees":{ "tree": 30, "bush": 15, "fertileBush": 5, "log": 7 },
-            "stones":{ "stone": 10, "steel": 5, "copper": 5 },
-            "ores":{ }
+            "stones":{ "stone": 10, "steelStone": 5, "copperStone": 5 },
+            "ores":{ "copper": 30 }
         }
 
     },

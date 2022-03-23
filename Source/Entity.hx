@@ -36,4 +36,13 @@ class Entity{
     public function getId():EntityID{
         return this._ID;
     }
+
+    public function errMsg():String{
+        var entityName:String = this.entityName;
+        var entityType:String = this.entityType;
+        var entitySubType:String = this.entitySubType;
+        var entityDeployId:EntityDeployID = this.entityDeployID;
+        var entityID:EntityID = this._ID;
+        return 'Error in EntityHealthPointSystem. "$entityName", "$entityType", "$entitySubType", "$entityID", "$entityDeployId".';
+    }
 }

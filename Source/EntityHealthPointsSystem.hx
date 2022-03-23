@@ -96,21 +96,21 @@ class EntityHealthPointsSystem{
     }
 
     public function init():Void{
-       var msg:String = this._errMsg();
+       var msg:String = this._parent.errMsg();
        msg = '$msg + in init. ';
         if( torso == null )
             throw '$msg Torso is null!';
     }
 
     public function postInit():Void{
-        var msg:String = this._errMsg();
+        var msg:String = this._parent.errMsg();
         msg = '$msg in postInit. ';
         if( torso == null )
             throw '$msg Torso is null!';
     }
 
     public function updateTotalHP():Void{
-        var msg:String = this._errMsg();
+        var msg:String = this._parent.errMsg();
         var headHP:Int = 0;
         if( this.head != null ){
             var headLeftEye:Int = 0;
@@ -217,7 +217,7 @@ class EntityHealthPointsSystem{
     }
 
     public function updateCurrentTotalHP():Void{
-        var msg:String = this._errMsg();
+        var msg:String = this._parent.errMsg();
         var headHP:Int = 0;
         if( this.head != null ){
             var headLeftEye:Int = 0;
@@ -325,7 +325,7 @@ class EntityHealthPointsSystem{
 
     public function takeDamageTo( place:String, value:Int ):Void{
         var container:BodyPart = null;
-        var msg:String = this._errMsg();
+        var msg:String = this._parent.errMsg();
         msg = '$msg in takeDamageTo. ';
         switch( place ){
             case "head": {
@@ -583,10 +583,11 @@ class EntityHealthPointsSystem{
     }
 
     private function _configureHead( params:Dynamic ):Void{
-        var msg:String = this._errMsg();
+        var msg:String = this._parent.errMsg();
         this.head = { Head: null, LeftEye: null, RightEye: null, Mouth: null, Brain: null, Nose: null }
         var container:BodyPart = null;
         for( key in Reflect.fields( params )){
+            var partParams:Dynamic = Reflect.getProperty( params, key );
             switch( key ){
                 case "head": container = this.head.Head;
                 case "leftEye": container = this.head.LeftEye;
@@ -596,68 +597,102 @@ class EntityHealthPointsSystem{
                 case "nose": container = this.head.Nose;
                 default: throw '$msg. _configureHead. There is no "$key" in config';
             }
-            container.HP = Reflect.getProperty( params, "hp" );
-            container.CurrentHP = Reflect.getProperty( params, "currentHP" );
-            container.PartType = Reflect.getProperty( params, "type" );
-            container.Status = Reflect.getProperty( params, "Status" );
+            container.HP = Reflect.getProperty( partParams, "hp" );
+            container.CurrentHP = Reflect.getProperty( partParams, "currentHP" );
+            container.PartType = Reflect.getProperty( partParams, "partType" );
+            container.Status = Reflect.getProperty( partParams, "Status" );
         }
     }
 
     private function _configureTorso( params:Dynamic ):Void{
-        var msg:String = this._errMsg();
+        var msg:String = this._parent.errMsg();
         this.torso = { Torso:null, LeftLung: null, RightLung: null, Heart: null };
         var container:BodyPart = null;
         for( key in Reflect.fields( params )){
+            var partParams:Dynamic = Reflect.getProperty( params, key );
             switch( key ){
+                case "torso": container = this.torso.Torso;
+                case "leftLung": container = this.torso.LeftLung;
+                case "rightLung": container = this.torso.RightLung;
+                case "heart": container = this.torso.Heart;
+                default: throw '$msg _configureTorso. There is no "$key" in config.';
             }
+            container.HP = Reflect.getProperty( partParams, "hp" );
+            container.CurrentHP = Reflect.getProperty( partParams, "currentHP" );
+            container.PartType = Reflect.getProperty( partParams, "partType" );
+            container.Status = Reflect.getProperty( partParams, "Status" );
         }
     }
 
     private function _configureLeftLeg( params:Dynamic ):Void{
-        var msg:String = this._errMsg();
+        var msg:String = this._parent.errMsg();
         this.leftLeg = { Foot: null, Sole: null };
         var container:BodyPart = null;
         for( key in Reflect.fields( params )){
+            var partParams:Dynamic = Reflect.getProperty( params, key );
             switch( key ){
+                case "foot": container = this.leftLeg.Foot;
+                case "sole": container = this.leftLeg.Sole;
+                default: throw '$msg _configureLeftLeg. There is no "$key" in config.';
             }
+            container.HP = Reflect.getProperty( partParams, "hp" );
+            container.CurrentHP = Reflect.getProperty( partParams, "currentHP" );
+            container.PartType = Reflect.getProperty( partParams, "type" );
+            container.Status = Reflect.getProperty( partParams, "Status" );
         }
     }
 
     private function _configureRightLeg( params:Dynamic ):Void{
-        var msg:String = this._errMsg();
+        var msg:String = this._parent.errMsg();
         this.rightLeg = { Foot: null, Sole: null };
         var container:BodyPart = null;
         for( key in Reflect.fields( params )){
+            var partParams:Dynamic = Reflect.getProperty( params, key );
             switch( key ){
+                case "foot": container = this.rightLeg.Foot;
+                case "sole": container = this.rightLeg.Sole;
+                default: throw '$msg _configureRightLeg. There is no "$key" in config.';
             }
+            container.HP = Reflect.getProperty( partParams, "hp" );
+            container.CurrentHP = Reflect.getProperty( partParams, "currentHP" );
+            container.PartType = Reflect.getProperty( partParams, "type" );
+            container.Status = Reflect.getProperty( partParams, "Status" );
         }
     }
 
     private function _configureLeftHand( params:Dynamic ):Void{
-        var msg:String = this._errMsg();
+        var msg:String = this._parent.errMsg();
         this.leftHand = { Arm: null, Wrist: null };
         var container:BodyPart = null;
         for( key in Reflect.fields( params )){
+            var partParams:Dynamic = Reflect.getProperty( params, key );
             switch( key ){
+                case "arm": container = this.leftHand.Arm;
+                case "wrist": container = this.leftHand.Wrist;
+                default: throw '$msg _configureLeftHand. There is no "$key" in config.';
             }
+            container.HP = Reflect.getProperty( partParams, "hp" );
+            container.CurrentHP = Reflect.getProperty( partParams, "currentHP" );
+            container.PartType = Reflect.getProperty( partParams, "type" );
+            container.Status = Reflect.getProperty( partParams, "Status" );
         }
     }
 
     private function _configureRightHand( params:Dynamic ):Void{
-        var msg:String = this._errMsg();
+        var msg:String = this._parent.errMsg();
         this.rightHand = { Arm: null, Wrist: null };
         var container:BodyPart = null;
         for( key in Reflect.fields( params )){
+            var partParams:Dynamic = Reflect.getProperty( params, key );
             switch( key ){
+                case "arm": container = this.rightHand.Arm;
+                case "wrist": container = this.rightHand.Wrist;
+                default: throw '$msg _configureRightHand. There is no "$key" in config.';
             }
+            container.HP = Reflect.getProperty( partParams, "hp" );
+            container.CurrentHP = Reflect.getProperty( partParams, "currentHP" );
+            container.PartType = Reflect.getProperty( partParams, "type" );
+            container.Status = Reflect.getProperty( partParams, "Status" );
         }
-    }
-
-    private function _errMsg():String{
-        var entityName:String = this._parent.entityName;
-        var entityType:String = this._parent.entityType;
-        var entitySubType:String = this._parent.entitySubType;
-        var entityID:EntityID = this._parent.getId();
-        return 'Error in EntityHealthPointSystem. "$entityName" "$entityType" "$entitySubType" "$entityID".';
     }
 }
