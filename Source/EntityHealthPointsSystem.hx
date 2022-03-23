@@ -1,7 +1,5 @@
 package;
 
-import Entity.EntityID;
-
 typedef EntityHealthPointsSystemConfig = {
     var Parent:Entity;
     var Torso:Dynamic;
@@ -63,6 +61,7 @@ class EntityHealthPointsSystem{
 
     public var totalHp:HealthPoint;
     public var currentTotalHP:HealthPoint;
+    public var isDead:Bool;
 
     public var head:Head;
     public var leftHand:LeftHand;
@@ -75,6 +74,7 @@ class EntityHealthPointsSystem{
 
     public function new( params:EntityHealthPointsSystemConfig ):Void{
         this._parent = params.Parent;
+        this.isDead = false;
         if( params.Head != null )
             this._configureHead( params.Head );
 
@@ -532,10 +532,10 @@ class EntityHealthPointsSystem{
         }else if( delta <= 0 ){
             place.CurrentHP = HealthPoint( 0 );
             place.Status = "disrupted";
-            if( this._checkForDeath() )
-                //Запустить процесс смерти.
-
             this._checkBodyPartsDependense();
+            if( this._checkForDeath() )
+                this._death();
+            
         }else{
             place.CurrentHP = HealthPoint( delta );
         }
@@ -694,5 +694,9 @@ class EntityHealthPointsSystem{
             container.PartType = Reflect.getProperty( partParams, "type" );
             container.Status = Reflect.getProperty( partParams, "Status" );
         }
+    }
+
+    private function _death():Void{
+        this.isDead = true;
     }
 }

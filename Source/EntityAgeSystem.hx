@@ -39,36 +39,40 @@ class EntityAgeSystem{
         this.currentTime = 0;
         this._phases = params.Phases;
 
-        this._calculatePhase();
         this._isPhaseLast = false;
+        this._calculatePhase();
     }
 
     public function init():Void{
-        var msg:String = 'Error in AgeSystem.init. ';
+        var msg:String = this._errMsg();
 
         if( this._parent == null )
-            throw '$msg Parent is null';
+            throw '$msg init. Parent is null';
 
         if( this.currentTime == null )
-            throw '$msg Total Time is null';
+            throw '$msg init. Total Time is null';
 
         if( this.currentPhase == null )
-            throw '$msg Phase is null';
+            throw '$msg init. Phase is null';
 
         if( this.year == null )
-            throw '$msg Year is null';
+            throw '$msg init. Year is null';
 
         if( this.day == null )
-            throw '$msg Day is null';
+            throw '$msg init. Day is null';
 
         if( this.hour == null )
-            throw '$msg Hour is null';
+            throw '$msg init. Hour is null';
 
         if( this.month == null )
-            throw '$msg Month is null';
+            throw '$msg init. Month is null';
         
         if( this._phases == null )
-            throw '$msg Array with phases is null';
+            throw '$msg init. Array with phases is null';
+    }
+
+    public function postInit():Void{
+        var msg:String = this._errMsg();
     }
 
     public function update( time:Int ):Void{
@@ -99,7 +103,7 @@ class EntityAgeSystem{
             }
         }
         if( !this._isPhaseLast )
-            this._checkPhase();
+            this._checkPhaseUp();
     }
 
     public function getAge():Age{
@@ -134,15 +138,26 @@ class EntityAgeSystem{
             this._isPhaseLast = true;
             this.currentPhase = lastIndex;
         }
-
-        //changeGraphics;
     }
 
-    private function _checkPhase():Void{
+    private function _checkPhaseUp():Void{
         var phase:Int = this.currentPhase;
+        var time:Int = this.year * 12 * 30 * 24 + this.month * 30 * 24 + this.day * 24 + this.hour;
         if( phase < this._phases.length ){
             var nextPhaseTime:Int = this._phases[ phase + 1 ];
+            if( nextPhaseTime == null ){
+                this._isPhaseLast = true;
+                //change graphics;
+            }
+            if( time > nextPhaseTime )
+                this._phaseUp();
+
         }
+    }
+
+    private function _errMsg():String{
+        var msg:String = this._parent.errMsg();
+        return '$msg AgeSystem.';
     }
 
 
