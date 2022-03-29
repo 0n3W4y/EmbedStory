@@ -111,4 +111,17 @@ class Deploy{
         throw 'Error in Deploy.getBiomeDeployID. No ID for biome type: $biomeType ';
         return null;
     }
+
+    public function getEntityDeployID( type:String, subType:String ):EntityDeployID{
+        for( key in this.entityConfig.keys() ){
+            var value:Dynamic = this.entityConfig[ key ];
+            var entityType:String = Reflect.getProperty( value, "type" );
+            var entitySubType:String = Reflect.getProperty( value, "subType" );
+            if( type == entityType && subType == entitySubType )
+                return key;
+        }
+
+        throw 'Error in Deploy.getEntityDeployID. No ID for Entity with type: $type and subtype: $subType.';
+        return null;
+    }
 }

@@ -12,6 +12,7 @@
     },
 
     "102":{
+        "id": 102,
         "name": "meadow",
         "biomeType": "plain",
         "mainGroundType": "earth",

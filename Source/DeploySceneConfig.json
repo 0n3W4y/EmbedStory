@@ -4,6 +4,7 @@
     },
 
     "401":{
+        "id": 401,
         "sceneType": "groundMap",
         "tileMap": 1,
         "tileMapBiome": "plain",
