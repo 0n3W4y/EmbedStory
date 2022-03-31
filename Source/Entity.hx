@@ -1,7 +1,16 @@
 package;
 
+import EntityHealthPointsSystem.EntityHealthPointsSystemConfig;
+import EntityAgeSystem.EntityAgeSystemConfig;
+import EntityNameSystem.EntityNameSystemConfig;
 import EntitySystem.EntityDeployID;
 
+
+typedef EntityConfig = {
+    var AgeSystemConfig:EntityAgeSystemConfig;
+    var NameSystemConfig:EntityNameSystemConfig;
+    var HPSystemConfig:EntityHealthPointsSystemConfig;
+}
 
 enum EntityID{
     EntityID( _:Int );
@@ -18,13 +27,13 @@ class Entity{
     public var entityDeployID:EntityDeployID;
 
     public var age:EntityAgeSystem;
-    //public var name:EntityNameSystem;
+    public var name:EntityNameSystem;
     public var HealthPoints:EntityHealthPointsSystem;
     
 
     private var _ID:EntityID;
 
-    public function new():Void{
+    public function new( config:EntityConfig ):Void{
         
     }
 

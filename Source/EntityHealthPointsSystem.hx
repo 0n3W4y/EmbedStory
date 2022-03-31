@@ -1,7 +1,6 @@
 package;
 
 typedef EntityHealthPointsSystemConfig = {
-    var Parent:Entity;
     var Torso:Dynamic;
     var Head:Dynamic;
     var LeftLeg:Dynamic;
@@ -72,8 +71,8 @@ class EntityHealthPointsSystem{
 
     private var _parent:Entity;
 
-    public function new( params:EntityHealthPointsSystemConfig ):Void{
-        this._parent = params.Parent;
+    public function new( parent:Entity, params:EntityHealthPointsSystemConfig ):Void{
+        this._parent = parent;
         this.isDead = false;
         if( params.Head != null )
             this._configureHead( params.Head );
