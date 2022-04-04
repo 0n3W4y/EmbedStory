@@ -77,6 +77,10 @@ class SceneSystem {
         return this._parent;
     }
 
+    public function loadSceneIDs( value:Int ):Void{
+        this._sceneId = value;
+    }
+
     private function _createGroundMapScene( sceneID: SceneID, sceneDeployID:SceneDeployID ):Scene{
         var sceneDeployConfig:Dynamic = this._parent.deploy.sceneConfig[ sceneDeployID ];
         var newSceneSprite = new Sprite();

@@ -7,6 +7,10 @@ import EntitySystem.EntityDeployID;
 
 
 typedef EntityConfig = {
+    var EntityType:String;
+    var EntitySubType:String;
+    var EntityID:EntityID;
+    var DeployID:EntityDeployID;
     var AgeSystemConfig:EntityAgeSystemConfig;
     var NameSystemConfig:EntityNameSystemConfig;
     var HPSystemConfig:EntityHealthPointsSystemConfig;
@@ -19,7 +23,6 @@ enum EntityID{
 
 class Entity{
 
-    public var entityName:String;
     public var entityType:String;
     public var entitySubType:String;
     public var tileID:Int;
@@ -47,11 +50,10 @@ class Entity{
     }
 
     public function errMsg():String{
-        var entityName:String = this.entityName;
         var entityType:String = this.entityType;
         var entitySubType:String = this.entitySubType;
         var entityDeployId:EntityDeployID = this.entityDeployID;
         var entityID:EntityID = this._ID;
-        return 'Error in EntityHealthPointSystem. "$entityName", "$entityType", "$entitySubType", "$entityID", "$entityDeployId".';
+        return 'Error in EntityHealthPointSystem. "$entityType", "$entitySubType", "$entityID", "$entityDeployId".';
     }
 }

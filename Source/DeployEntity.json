@@ -1,7 +1,6 @@
 {
     "1000":{
         "id": 1000,
-        "name": "Oak",
         "type": "tree",
         "subType": "wood",
         "systems":{
@@ -12,13 +11,15 @@
                 "torso": { 
                     "torso": 100
                 }
+            },
+            "name":{
+                "name": "Oak"
             }
         }
     },
 
     "1001":{
         "id": 1001,
-        "name": "Bush",
         "type": "bush",
         "subType": "wood",
         "systems":{
@@ -29,13 +30,15 @@
                 "torso": { 
                     "torso": 50
                 }
+            },
+            "name":{
+                "name": "Bush"
             }
         }
     },
 
     "1002":{
         "id": 1002,
-        "name": "Fertile Bush",
         "type": "fertileBush",
         "subType": "wood",
         "systems":{
@@ -46,13 +49,15 @@
                 "torso": { 
                     "torso": 45
                 }
+            },
+            "name":{
+                "name": "Fertile Bush"
             }
         }
     },
 
     "1003":{
         "id": 1003,
-        "name": "Rock",
         "type": "rock",
         "subtype": "stone",
         "systems":{
@@ -60,13 +65,15 @@
                 "torso": { 
                     "torso": 200
                 }
+            },
+            "name":{
+                "name": "Rock?"
             }
         }
     },
 
     "1004":{
         "id": 1004,
-        "name": "Stone",
         "type": "stone",
         "subType": "stone",
         "systems":{
@@ -74,13 +81,15 @@
                 "torso": { 
                     "torso": 125
                 }
+            },
+            "name":{
+                "name": "Rock stone"
             }
         }
     },
 
     "1005":{
         "id": 1005,
-        "name": "Log",
         "type": "log",
         "subType": "wood",
         "systems":{
@@ -89,12 +98,15 @@
                     "torso": 90
                 }
             }
+            ,
+            "name":{
+                "name": "Tree log"
+            }
         }
     },
 
     "1006":{
         "id": 1006,
-        "name": "Copper Stone",
         "type": "stone",
         "subType": "copper",
         "systems":{
@@ -102,6 +114,10 @@
                 "torso": { 
                     "torso": 110
                 }
+            }
+            ,
+            "name":{
+                "name": "Copper"
             }
         }
     }
