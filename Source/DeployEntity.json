@@ -5,11 +5,19 @@
         "subType": "wood",
         "systems":{
             "age":{
-                "phases":[ 0, 1, 3, 5, 10 ]
+                "phases":[ 0, 1, 3, 5, 10 ],
+                "generate": 1,
+                "year":0,
+                "month":0,
+                "day":0,
+                "hour":23,
+                "minute":59
             },
             "hp":{
                 "torso": { 
-                    "torso": 100
+                    "torso": {
+                        "hp": 100
+                    }
                 }
             },
             "name":{
@@ -24,11 +32,19 @@
         "subType": "wood",
         "systems":{
             "age":{
-                "phases":[ 0, 1, 2, 3 ]
+                "phases":[ 0, 1, 2, 3 ],
+                "generate": 1,
+                "year":0,
+                "month":0,
+                "day":0,
+                "hour":23,
+                "minute":59
             },
             "hp":{
                 "torso": { 
-                    "torso": 50
+                    "torso": {
+                        "hp": 50
+                    }
                 }
             },
             "name":{
@@ -43,11 +59,19 @@
         "subType": "wood",
         "systems":{
             "age":{
-                "phases":[ 0, 1, 3, 5 ]
+                "phases":[ 0, 1, 3, 5 ],
+                "generate": 1,
+                "year":0,
+                "month":0,
+                "day":0,
+                "hour":23,
+                "minute":59
             },
             "hp":{
                 "torso": { 
-                    "torso": 45
+                    "torso": {
+                        "hp": 45
+                    }
                 }
             },
             "name":{
@@ -63,7 +87,9 @@
         "systems":{
             "hp":{
                 "torso": { 
-                    "torso": 200
+                    "torso": {
+                        "hp": 200
+                    }
                 }
             },
             "name":{
@@ -79,7 +105,9 @@
         "systems":{
             "hp":{
                 "torso": { 
-                    "torso": 125
+                    "torso": {
+                        "hp": 125
+                    }
                 }
             },
             "name":{
@@ -95,7 +123,9 @@
         "systems":{
             "hp":{
                 "torso": { 
-                    "torso": 90
+                    "torso": {
+                        "hp": 90
+                    }
                 }
             }
             ,
@@ -112,7 +142,9 @@
         "systems":{
             "hp":{
                 "torso": { 
-                    "torso": 110
+                    "torso": {
+                        "hp": 110
+                    }
                 }
             }
             ,

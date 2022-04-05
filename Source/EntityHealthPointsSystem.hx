@@ -70,10 +70,15 @@ class EntityHealthPointsSystem{
     public var rightLeg:RightLeg;
 
     private var _parent:Entity;
+    private var _percentToBrokenPart:Float;
+    private var _percentToDamagePart:Float;
 
     public function new( parent:Entity, params:EntityHealthPointsSystemConfig ):Void{
         this._parent = parent;
         this.isDead = false;
+        this._percentToBrokenPart = 15/100;
+        this._percentToDamagePart = 40/100;
+
         if( params.Head != null )
             this._configureHead( params.Head );
 
@@ -519,13 +524,13 @@ class EntityHealthPointsSystem{
         var CurrentHP:Int = switch( place.CurrentHP ){ case HealthPoint(v): v; };
         var hp:Int = switch( place.HP ){ case HealthPoint(v): v; };
         var delta:Int = CurrentHP - value;
-        var halfHP:Int = Math.round( hp / 2 );
-        var fifteenPercentHP:Int = Math.round( hp * 0.15 );// 15% - status broken;        
+        var damagedStatus:Int = Math.round( hp * ( this._percentToDamagePart ));
+        var brokenStatus:Int = Math.round( hp * ( this._percentToBrokenPart ));// 15% - status broken;        
 
-        if( delta < halfHP && delta > fifteenPercentHP ){
+        if( delta < damagedStatus && delta > brokenStatus ){
             place.CurrentHP = HealthPoint( delta );
             place.Status = "damaged";
-        }else if( delta < fifteenPercentHP && delta > 0 ){
+        }else if( delta < brokenStatus && delta > 0 ){
             place.CurrentHP = HealthPoint( delta );
             place.Status = "broken";
         }else if( delta <= 0 ){
@@ -596,10 +601,8 @@ class EntityHealthPointsSystem{
                 case "nose": container = this.head.Nose;
                 default: throw '$msg. _configureHead. There is no "$key" in config';
             }
-            container.HP = Reflect.getProperty( partParams, "hp" );
-            container.CurrentHP = Reflect.getProperty( partParams, "currentHP" );
-            container.PartType = Reflect.getProperty( partParams, "partType" );
-            container.Status = Reflect.getProperty( partParams, "Status" );
+
+            this._addParamsToBodyPart( container, partParams );
         }
     }
 
@@ -616,10 +619,7 @@ class EntityHealthPointsSystem{
                 case "heart": container = this.torso.Heart;
                 default: throw '$msg _configureTorso. There is no "$key" in config.';
             }
-            container.HP = Reflect.getProperty( partParams, "hp" );
-            container.CurrentHP = Reflect.getProperty( partParams, "currentHP" );
-            container.PartType = Reflect.getProperty( partParams, "partType" );
-            container.Status = Reflect.getProperty( partParams, "Status" );
+            this._addParamsToBodyPart( container, partParams );
         }
     }
 
@@ -634,10 +634,7 @@ class EntityHealthPointsSystem{
                 case "sole": container = this.leftLeg.Sole;
                 default: throw '$msg _configureLeftLeg. There is no "$key" in config.';
             }
-            container.HP = Reflect.getProperty( partParams, "hp" );
-            container.CurrentHP = Reflect.getProperty( partParams, "currentHP" );
-            container.PartType = Reflect.getProperty( partParams, "type" );
-            container.Status = Reflect.getProperty( partParams, "Status" );
+            this._addParamsToBodyPart( container, partParams );
         }
     }
 
@@ -652,10 +649,7 @@ class EntityHealthPointsSystem{
                 case "sole": container = this.rightLeg.Sole;
                 default: throw '$msg _configureRightLeg. There is no "$key" in config.';
             }
-            container.HP = Reflect.getProperty( partParams, "hp" );
-            container.CurrentHP = Reflect.getProperty( partParams, "currentHP" );
-            container.PartType = Reflect.getProperty( partParams, "type" );
-            container.Status = Reflect.getProperty( partParams, "Status" );
+            this._addParamsToBodyPart( container, partParams );
         }
     }
 
@@ -670,10 +664,7 @@ class EntityHealthPointsSystem{
                 case "wrist": container = this.leftHand.Wrist;
                 default: throw '$msg _configureLeftHand. There is no "$key" in config.';
             }
-            container.HP = Reflect.getProperty( partParams, "hp" );
-            container.CurrentHP = Reflect.getProperty( partParams, "currentHP" );
-            container.PartType = Reflect.getProperty( partParams, "type" );
-            container.Status = Reflect.getProperty( partParams, "Status" );
+            this._addParamsToBodyPart( container, partParams );
         }
     }
 
@@ -688,11 +679,37 @@ class EntityHealthPointsSystem{
                 case "wrist": container = this.rightHand.Wrist;
                 default: throw '$msg _configureRightHand. There is no "$key" in config.';
             }
-            container.HP = Reflect.getProperty( partParams, "hp" );
-            container.CurrentHP = Reflect.getProperty( partParams, "currentHP" );
-            container.PartType = Reflect.getProperty( partParams, "type" );
-            container.Status = Reflect.getProperty( partParams, "Status" );
+            this._addParamsToBodyPart( container, partParams );
         }
+    }
+
+    private function _addParamsToBodyPart( container:BodyPart, config:Dynamic ):Void{
+        var msg:String = this._parent.errMsg();
+
+        var hp:Int = Reflect.getProperty( config, "hp" );
+        var cHP:Int = Reflect.getProperty( config, "currentHP" );
+        var partType:String = Reflect.getProperty( config, "partType" );
+        var partStatus:String = Reflect.getProperty( config, "status" );
+
+        if( hp == null )
+            throw '$msg _addParamsToBodyPart. HP in NULL';
+
+        container.HP = HealthPoint( hp );
+
+        if( cHP == null )
+            container.CurrentHP = HealthPoint( hp );
+        else
+            container.CurrentHP = HealthPoint( cHP );
+
+        if( partType == null )
+            container.PartType = "natural";
+        else
+            container.PartType = partType;
+
+        if( partStatus == null )
+            container.Status = "healthy";
+        else
+            container.Status = partStatus;
     }
 
     private function _death():Void{

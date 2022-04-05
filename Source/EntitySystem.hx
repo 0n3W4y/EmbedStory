@@ -88,7 +88,7 @@ class EntitySystem{
     private function _createNameSystemConfig( config:Dynamic ):EntityNameSystemConfig{
         var nameSystemConfig:EntityNameSystemConfig = { Name: null, Nickname: null, Surname: null };
         for( key in Reflect.fields( config )){
-            var value = Reflect.getProperty( config, key );
+            var value:String = Reflect.getProperty( config, key );
             switch( key ){
                 case "name": nameSystemConfig.Name = value;
                 case "surname": nameSystemConfig.Surname = value;
@@ -102,12 +102,46 @@ class EntitySystem{
 
     private function _createAgeSystemConfig( config:Dynamic ):EntityAgeSystemConfig{
         var ageSystemConfig:EntityAgeSystemConfig = { Phases: null, Year: null, Month: null, Day: null, Hour: null, Minute: null };
-        return null;
+        var generate:Int = 0;
+        for( key in Reflect.fields( config )){
+            switch( key ){
+                case "phases":ageSystemConfig.Phases = Reflect.getProperty( config, key );
+                case "year": ageSystemConfig.Year = Reflect.getProperty( config, key );
+                case "month": ageSystemConfig.Month = Reflect.getProperty( config, key );
+                case "day": ageSystemConfig.Day = Reflect.getProperty( config, key );
+                case "hour": ageSystemConfig.Hour = Reflect.getProperty( config, key );
+                case "minute": ageSystemConfig.Minute = Reflect.getProperty( config, key );
+                case "generate": generate = Reflect.getProperty( config, key );
+                default: throw 'Error in EntitySystem._createAgeSystemConfig. There is no field with key "$key".';
+            }
+        }
+
+        if( generate == 1 ){ 
+            ageSystemConfig.Minute = Math.floor( Math.random() * ( ageSystemConfig.Minute + 1 ));
+            ageSystemConfig.Hour = Math.floor( Math.random() * ( ageSystemConfig.Hour + 1 ));
+            ageSystemConfig.Day = Math.floor( Math.random() * ( ageSystemConfig.Day + 1 ));
+            ageSystemConfig.Month = Math.floor( Math.random() * ( ageSystemConfig.Month + 1 ));
+            ageSystemConfig.Year = Math.floor( Math.random() * ( ageSystemConfig.Year + 1 ));
+        }
+
+        return ageSystemConfig;
     }
 
     private function _createHPSystemConfig( config:Dynamic ):EntityHealthPointsSystemConfig{
         var hpSystemConfig:EntityHealthPointsSystemConfig = { Torso: null, LeftHand: null, LeftLeg: null, RightHand: null, RightLeg: null, Head: null };
-        return null;
+        for( key in Reflect.fields( config )){
+            var value:Dynamic = Reflect.getProperty( config, key );
+            switch( key ){
+                case "torso": hpSystemConfig.Torso = value;
+                case "leftHand": hpSystemConfig.LeftHand = value;
+                case "rightHand": hpSystemConfig.RightHand = value;
+                case "lefLeg": hpSystemConfig.LeftLeg = value;
+                case "rightLeg": hpSystemConfig.RightLeg = value;
+                case "head": hpSystemConfig.Head = value;
+                default: 'Error in EntitySystem._createHPSystemConfig. There is no field with key "$key".';
+            }
+        }
+        return hpSystemConfig;
     }
 
     private function _createEntityID():Int{
