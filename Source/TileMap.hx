@@ -305,7 +305,7 @@ class TileMap{
                     FloorDeployID: FloorTypeDeployID( 300 ), // deployId of floor type 'nothing';
                     GroundDeployID: groundTileDeployID,
                     IsWalkable: Reflect.getProperty( groundTileConfig, "isWalkable" ),
-                    CanPlaceFloor: Reflect.getProperty( groundTileConfig, "canPlaceloor" ),
+                    CanPlaceFloor: Reflect.getProperty( groundTileConfig, "canPlaceFloor" ),
                     CanRemoveFloor: Reflect.getProperty( groundTileConfig, "canRemoveFloor" ),
                     MovementRatio: Reflect.getProperty( groundTileConfig, "movementRatio" ),
                     CanPlaceObjects: Reflect.getProperty( groundTileConfig, "canPlaceObjects" ),
@@ -535,7 +535,7 @@ class TileMap{
     }
 */
     private function _createRockObjects():Void{
-        
+        this._spreadIndexesForRocksObjects( );
     }
 
     private function _createEnvironment( tile:Tile ):Void{
@@ -575,6 +575,13 @@ class TileMap{
                 tile.changeGroundType( newTileConfig );
                 index++;
             }
+        }
+    }
+
+    private function _spreadIndexesForRocksObjects():Void{
+        var rocksArray:Array<Entity> = [];
+        for( i in 0...rocksArray.length ){
+            var rockEntity:Entity = rocksArray[ i ];
         }
     }
 /*

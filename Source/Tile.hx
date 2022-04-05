@@ -188,6 +188,8 @@ class Tile {
                 case "canPlaceObjects": this.canPlaceObjects = Reflect.getProperty( params, key );
                 case "canPlayerStand": this.canCharacterStand = Reflect.getProperty( params, key );
                 case "canPlaceStaff": this.canPlaceStaff = Reflect.getProperty( params, key );
+                case "canCharacterStand": this.canCharacterStand = Reflect.getProperty( params, key );
+                case "name", "id", "graphics":{};
                 default: throw 'Error in Tile._updateFields. "$key" not found.';
             }
         }
