@@ -228,12 +228,12 @@ class TileMap{
     private function _generateRiverConfig( params:Dynamic ):RiverConfig{
         var riverConfig:RiverConfig = {
             Emerging: null,
-            WidthMax: params.riverWidthMax,
-            WidthMin: params.riverWidthMin,
-            Offset: params.riverOffset,
-            WidthOffset: params.riverWidthOffset,
+            WidthMax: Reflect.getProperty( params, "widthMax" ),
+            WidthMin: Reflect.getProperty( params, "widthMin" ),
+            Offset: Reflect.getProperty( params, "offset" ),
+            WidthOffset: Reflect.getProperty( params, "widthOffset" ),
             RiverType: null,
-            GroundType: params.riverGroundType
+            GroundType: Reflect.getProperty( params, "groundType" )
         }
         var riverPercentage:Int = params.emerging;
         
@@ -251,15 +251,15 @@ class TileMap{
 
     private function _generateLakeRockConfig( params:Dynamic ):LakeRockConfig{
         var config:LakeRockConfig = {    
-            Emerging: null, // пявление
+            Emerging: null, // появление
             Amount: null,
-            WidthMax: params.widthMax,
-            WidthMin: params.widthMin,
-            HeightMax: params.heightMax,
-            HeightMin: params.heightMin,
-            Offset: params.offset,
-            WidthOffset: params.widthOffset,
-            GroundType: params.groundType
+            WidthMax: Reflect.getProperty( params, "widthMax" ),
+            WidthMin: Reflect.getProperty( params, "widthMin" ),
+            HeightMax: Reflect.getProperty( params, "heightMax" ),
+            HeightMin: Reflect.getProperty( params, "heightMin" ),
+            Offset: Reflect.getProperty( params, "offset" ),
+            WidthOffset: Reflect.getProperty( params, "widthOffset" ),
+            GroundType: Reflect.getProperty( params, "groundType" )
         };
 
         var emerging:Int = params.emegring;
@@ -428,7 +428,7 @@ class TileMap{
             var riverWidthMin:Int = params.WidthMin;
             var riverOffset:Int = params.Offset;
             var riverType:String = params.RiverType;
-            var riverGroundType:String = params.GroundType;
+            //var riverGroundType:String = params.GroundType;
             var riverWidthOffsetMax = params.WidthOffset; // -1, 0, +1;
 
             var currentRiverWidth:Int = Math.floor( riverWidthMin + Math.random() * ( riverWidthMax - riverWidthMin + 1 ));
@@ -541,6 +541,9 @@ class TileMap{
     private function _createEnvironment( tile:Tile ):Void{
         var tileGroundType:String = tile.groundType; // rock, sandrock
         var newTileConfig:Dynamic = null;
+
+        if( tileGroundType == "dirt" )
+            return;
         
         switch( tileGroundType ){
             case "water": newTileConfig = this._deploy.groundTypeConfig[ GroundTypeDeployID( 204 )]; // shallow

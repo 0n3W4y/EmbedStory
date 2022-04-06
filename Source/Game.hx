@@ -132,7 +132,7 @@ class Game {
 
 
         var scene:Scene = this.sceneSystem.createScene( 401 );
-        this.sceneSystem.changeSceneTo( scene );
+        //this.sceneSystem.changeSceneTo( scene );
     }
 
     private function _parseData():DeployConfig
