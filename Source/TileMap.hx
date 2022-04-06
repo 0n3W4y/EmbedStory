@@ -198,7 +198,14 @@ class TileMap{
     }
 
     private function _generateSolids():Void{
-
+        var biomeConfig:Dynamic = this._deploy.biomeConfig[ this._biomeDeployID ];
+        var solidConfig:Dynamic = Reflect.getProperty( biomeConfig, "solids" ); //{ rock:{ rock1:{}, rock2:{}...}};
+        for( key in Reflect.fields( solidConfig )){
+            switch( key ){
+                case "rock": this._prepareForGenerateSolid( Reflect.getProperty( solidConfig, key ));
+                default: throw 'Error in TileMap.generateSolids. Wrong key "$key".';
+            }
+        }
     }
 
     private function _prepareForGenerateRiver( params:Dynamic ):Void{
@@ -500,41 +507,12 @@ class TileMap{
         }        
     }
 
-/*
-    private function _generateGroundType( params:Dynamic ):String{
-        var randomNum:Int = Math.floor( Math.random()* 100 ); // 0 - 99;
-        var summ:Int = 0;
-        var lastSumm:Int = 0;
-        for( key in Reflect.fields( params )){
-            summ += Reflect.getProperty( params, key );
-            if( randomNum > lastSumm && randomNum <= summ )
-                return key;
-            else
-                lastSumm = summ;
-        }
-        throw 'Error in TileMap._generateGroundType. Ground type is null for Params: $params';      
-        return null;
-    }
 
-    private function _generateFloorType( groundType:String, params:Dynamic ):String{
-        if( groundType == "water" || groundType == "rock" )
-            return "nothing";
-
-        var summ:Int = 0;
-        var lastSumm:Int = 0;
-        var randomNum:Int = Math.floor( Math.random()* 100 ); // 0-99;
-        for( key in Reflect.fields( params )){
-            summ += Reflect.getProperty( params, key );
-            if( randomNum > lastSumm && randomNum <= summ )
-                return key;
-            else
-                lastSumm = summ;
-        }
-        throw 'Error in TileMap._generateFloorType. Floor type is null for Ground Type: $groundType and Params: $params';
-        return null;
-    }
-*/
     private function _createRockObjects():Void{
+        var newTileStorage:Array<Tile> = this.tileStorage;
+        for( i in 0...newTileStorage.length ){
+            
+        }
         this._spreadIndexesForRocksObjects( );
     }
 
@@ -554,7 +532,7 @@ class TileMap{
 
         //рандомно выбираем "подложку" 0 - 1 - 2 по умолчанию
         var number:Int = 2; // радиус распространения подложки.
-        var randomNumber:Int = Math.floor(Math.random()*( number + 1 ));
+        var randomNumber:Int = Math.floor( Math.random()*( number + 1 )); // 0 - 2;
        
 
         var y:Int = tile.gridY;
@@ -587,7 +565,59 @@ class TileMap{
             var rockEntity:Entity = rocksArray[ i ];
         }
     }
-/*
+
+
+    private function _findTileByTileId( tileId:TileID ):Tile{
+        var tile:Tile = null;
+        for( i in 0...this.tileStorage.length ){
+            tile = this.tileStorage[ i ];
+            if( EnumValueTools.equals( tileId, tile.getId() ))
+                return tile;
+        }
+
+        throw 'Error in TileMap._findTile. No tile found in storage with TileID: $tileId .';
+        return null;
+    }
+
+    private function _generateTileID():TileID {
+        this._tileID++;
+        return TileID( this._tileID );
+    }
+
+    /*
+    private function _generateGroundType( params:Dynamic ):String{
+        var randomNum:Int = Math.floor( Math.random()* 100 ); // 0 - 99;
+        var summ:Int = 0;
+        var lastSumm:Int = 0;
+        for( key in Reflect.fields( params )){
+            summ += Reflect.getProperty( params, key );
+            if( randomNum > lastSumm && randomNum <= summ )
+                return key;
+            else
+                lastSumm = summ;
+        }
+        throw 'Error in TileMap._generateGroundType. Ground type is null for Params: $params';      
+        return null;
+    }
+
+    private function _generateFloorType( groundType:String, params:Dynamic ):String{
+        if( groundType == "water" || groundType == "rock" )
+            return "nothing";
+
+        var summ:Int = 0;
+        var lastSumm:Int = 0;
+        var randomNum:Int = Math.floor( Math.random()* 100 ); // 0-99;
+        for( key in Reflect.fields( params )){
+            summ += Reflect.getProperty( params, key );
+            if( randomNum > lastSumm && randomNum <= summ )
+                return key;
+            else
+                lastSumm = summ;
+        }
+        throw 'Error in TileMap._generateFloorType. Floor type is null for Ground Type: $groundType and Params: $params';
+        return null;
+    }
+
     private function _generateFloorTypeForEarthTiles():Void{
         var biomeFloorTypes:Map<String, Dynamic> = this._deploy.biomeConfig[ this.biome ];
 
@@ -618,22 +648,5 @@ class TileMap{
         }
     }
 */
-
-    private function _findTileByTileId( tileId:TileID ):Tile{
-        var tile:Tile = null;
-        for( i in 0...this.tileStorage.length ){
-            tile = this.tileStorage[ i ];
-            if( EnumValueTools.equals( tileId, tile.getId() ))
-                return tile;
-        }
-
-        throw 'Error in TileMap._findTile. No tile found in storage with TileID: $tileId .';
-        return null;
-    }
-
-    private function _generateTileID():TileID {
-        this._tileID++;
-        return TileID( this._tileID );
-    }
 
 }
