@@ -40,8 +40,6 @@ class Scene {
 
     public var isShow:Bool;
     public var isHide:Bool;
-    public var isShowing:Bool;
-    public var isHiding:Bool;
 
 
     private var _sceneId:SceneID;
@@ -51,8 +49,6 @@ class Scene {
 
     private var _deleteAfterHiding:Bool;
 
-    private var showHideTime:Int = 2000; // ~  2 seconds;
-
     public function new( parent:SceneSystem, params:SceneConfig ):Void{
         this._parent = parent;
         this._sceneId = params.ID;        
@@ -61,22 +57,19 @@ class Scene {
         this._sceneDeployID = params.DeployID;
         this.isHide = false;
         this.isShow = false;
-        this.isShowing = false;
-        this.isHiding = false;
-
-        this._deleteAfterHiding = false;
 
         this.tileMapStorage = new Array<TileMap>();
         this._tileID = 0;
+        this.sceneGraphics = new Sprite();
     }
 
     public function show():Void{
         if( isShow )
             throw 'Error in Scene.show. Scene already shown';
 
-        this.isShowing = true;
+        this.isShow = true;
         this.sceneGraphics.alpha = 0.0;
-        this.sceneGraphics.visible = true;
+        //UI.graphics.visible = true;
 
     }
 
@@ -84,25 +77,16 @@ class Scene {
         if( isHide )
             throw 'Error in Scene.hide. Scene Already hided';
 
-        this.isHiding = true;
-        //UI.graphics.visible = false;
+        this.isHide = true;
+        this.sceneGraphics.visible = false;        
     }
 
-    public function hideAndDelete():Void{
-        if( isHide )
-            throw 'Error in Scene.hide. Scene Already hided';
-
-        this.isHiding = true;
-        this._deleteAfterHiding = true;
-        //UI.graphics.visible = false;
+    public function delete():Void{
+        this._parent.deleteScene( this );
     }
 
     public function update( time:Int ):Void{
-        if( this.isShowing )
-            this._showingScene( time );
 
-        if( this.isHiding )
-            this._hidingScene( time );
     }
 
     public function getParent():SceneSystem{
@@ -128,7 +112,18 @@ class Scene {
         return null;
     }
 
-    public function generateTileMap():Void{
+    public function generate():Void{
+        this._generateTileMap();
+        this._generateObjects();
+    }
+
+
+
+
+
+    
+
+    private function _generateTileMap():Void{
         var id:TileMapID = this._generateTileMapID();
         var sceneDeployConfig:Dynamic = this._parent.getParent().deploy.sceneConfig[ this._sceneDeployID ];
         var biome:String = Reflect.getProperty( sceneDeployConfig, "tileMapBiome" );
@@ -153,33 +148,44 @@ class Scene {
         this.tileMapStorage.push( tileMap );
     }
 
+    private function _generateObjects():Void{
+        this._createRockObjects();
+    }
+
+    private function _createRockObjects():Void{
+        for( i in 0...this.tileMapStorage.length ){
+            var tileMap:TileMap = this.tileMapStorage[ i ];
+            var newTileStorage:Array<Tile> = tileMap.tileStorage;
+            for( j in 0...newTileStorage.length ){
+                var tile:Tile = newTileStorage[ j ];
+                var tileGroundType:String = tile.groundType;
+                var rockEntity:Entity = null;
+                switch( tileGroundType ){
+                    case "rock": rockEntity = this._parent.getParent().entitySystem.createEntityByDeployID( EntityDeployID( 1020 )); // 1020 - type "rock", subtype "rock";
+                    case "sandrock": rockEntity = this._parent.getParent().entitySystem.createEntityByDeployID( EntityDeployID( 1021 )); // 1021 - type "rock", subtype "sandrock";
+                    default: continue;
+                }
+
+                if( rockEntity != null )
+                    this.objectStorage.push( rockEntity );
+                    
+            }
+        }
+        
+        
+        this._spreadIndexesForRocksObjects( );
+    }
+
+    private function _spreadIndexesForRocksObjects():Void{
+        var rocksArray:Array<Entity> = [];
+        for( i in 0...rocksArray.length ){
+            var rockEntity:Entity = rocksArray[ i ];
+        }
+    }
+
     private function _generateTileMapID():TileMapID{
         this._tileID++;
         return TileMapID( this._tileID );
     }
 
-    private function _showingScene( time:Int ):Void{
-        var numberToIncreaseAlpha:Float =  time / this.showHideTime;
-        this.sceneGraphics.alpha += numberToIncreaseAlpha;
-        if( this.sceneGraphics.alpha >= 1.0 ){
-            this.sceneGraphics.alpha = 1.0;
-            this.isShowing = false;
-            this.isShow = true;
-            // UI.graphics.visible = true;
-        }
-    }
-
-    private function _hidingScene( time:Int ):Void{
-        var numberToDecreaseAlpha:Float =  time / this.showHideTime;
-        this.sceneGraphics.alpha -= numberToDecreaseAlpha;
-        if( this.sceneGraphics.alpha<= 0 ){
-            this.sceneGraphics.alpha = 0.0;
-            this.sceneGraphics.visible = false;
-            this.isHiding = false;
-            this.isHide = true;
-            if( this._deleteAfterHiding )
-                this._parent.deleteScene( this );
-        }
-        
-    }
 }

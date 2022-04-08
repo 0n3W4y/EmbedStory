@@ -141,7 +141,6 @@ class TileMap{
 
         this._generateGroundLayer();
         this._generateFloorLayer();
-        this._generateObjectsLayer(); // rocks, trees, bushes, stones, logs, etc;
     }
 
     public function changeFloorTypeForTile( tileId:TileID, floorType:String ):Void{
@@ -179,10 +178,6 @@ class TileMap{
     private function _generateFloorLayer():Void{
         this._fillTileMapWithMainFloorType(); // покрываем первый слой.
         this._fillTileMapWithAdditionalFloorType(); // покарываем первый слой дополнительно.
-    }
-
-    private function _generateObjectsLayer():Void{
-        this._createRockObjects();
     }
 
     private function _generateLiquids():Void{
@@ -508,13 +503,6 @@ class TileMap{
     }
 
 
-    private function _createRockObjects():Void{
-        var newTileStorage:Array<Tile> = this.tileStorage;
-        for( i in 0...newTileStorage.length ){
-            
-        }
-        this._spreadIndexesForRocksObjects( );
-    }
 
     private function _createEnvironment( tile:Tile ):Void{
         var tileGroundType:String = tile.groundType; // rock, sandrock
@@ -559,12 +547,7 @@ class TileMap{
         }
     }
 
-    private function _spreadIndexesForRocksObjects():Void{
-        var rocksArray:Array<Entity> = [];
-        for( i in 0...rocksArray.length ){
-            var rockEntity:Entity = rocksArray[ i ];
-        }
-    }
+ 
 
 
     private function _findTileByTileId( tileId:TileID ):Tile{

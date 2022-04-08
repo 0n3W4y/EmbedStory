@@ -6,8 +6,8 @@
     "401":{
         "id": 401,
         "sceneType": "groundMap",
-        "tileMap": 1,
         "tileMapBiome": "plain",
+        "dungeon": 0,
         "height": 200,
         "width": 200,
         "tileSize": 64 

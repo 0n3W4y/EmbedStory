@@ -20,6 +20,7 @@ class Game {
     public var sceneSystem:SceneSystem;
     public var gameTimeSystem:GameTimeSystem;
     public var gameEventSystem:GameEventSystem;
+    public var entitySystem:EntitySystem;
 
     public var gameStart:Float;
     public var onPause:Bool;
@@ -119,6 +120,7 @@ class Game {
 
         this.gameTimeSystem = new GameTimeSystem( this );
         this.gameEventSystem = new GameEventSystem( this );
+        this.entitySystem = new EntitySystem( this );
         this.stage = new Stage( this );
         var spriteForScenes:Sprite = new Sprite();
         var spriteForUI:Sprite = new Sprite();
@@ -132,7 +134,7 @@ class Game {
 
 
         var scene:Scene = this.sceneSystem.createScene( 401 );
-        //this.sceneSystem.changeSceneTo( scene );
+        this.sceneSystem.changeSceneTo( scene );
     }
 
     private function _parseData():DeployConfig

@@ -29,25 +29,25 @@
         "id": 202,
         "name": "rock",
         "movementRatio": 100,
-        "isWalkable": 1,
-        "canPlaceFloor": 1,
-        "canRemoveFloor": 1,
-        "canPlaceObjects": 1,
-        "canPlaceStaff": 1,
-        "canCharacterStand": 1,
+        "isWalkable": 0,
+        "canPlaceFloor": 0,
+        "canRemoveFloor": 0,
+        "canPlaceObjects": 0,
+        "canPlaceStaff": 0,
+        "canCharacterStand": 0,
         "graphics": []
     },
 
     "203":{
         "id": 203,
-        "name": "sandstone",
+        "name": "sandrock",
         "movementRatio": 100,
-        "isWalkable": 1,
-        "canPlaceFloor": 1,
-        "canRemoveFloor": 1,
-        "canPlaceObjects": 1,
-        "canPlaceStaff": 1,
-        "canCharacterStand": 1,
+        "isWalkable": 0,
+        "canPlaceFloor": 0,
+        "canRemoveFloor": 0,
+        "canPlaceObjects": 0,
+        "canPlaceStaff": 0,
+        "canCharacterStand": 0,
         "graphics": []
     },
 
@@ -105,7 +105,7 @@
 
     "208":{
         "id": 208,
-        "name": "sandstoneEnvironment",
+        "name": "sandrockEnvironment",
         "movementRatio": 100,
         "isWalkable": 1,
         "canPlaceFloor": 1,

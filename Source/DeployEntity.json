@@ -2,7 +2,7 @@
     "1000":{
         "id": 1000,
         "type": "tree",
-        "subType": "wood",
+        "subType": "tree",
         "systems":{
             "age":{
                 "phases":[ 0, 1, 3, 5, 10 ],
@@ -26,10 +26,10 @@
         }
     },
 
-    "1001":{
-        "id": 1001,
+    "1010":{
+        "id": 1010,
         "type": "bush",
-        "subType": "wood",
+        "subType": "bush",
         "systems":{
             "age":{
                 "phases":[ 0, 1, 2, 3 ],
@@ -53,10 +53,10 @@
         }
     },
 
-    "1002":{
-        "id": 1002,
-        "type": "fertileBush",
-        "subType": "wood",
+    "1011":{
+        "id": 1011,
+        "type": "bush",
+        "subType": "fertile",
         "systems":{
             "age":{
                 "phases":[ 0, 1, 3, 5 ],
@@ -80,10 +80,10 @@
         }
     },
 
-    "1003":{
-        "id": 1003,
+    "1020":{
+        "id": 1020,
         "type": "rock",
-        "subtype": "stone",
+        "subtype": "rock",
         "systems":{
             "hp":{
                 "torso": { 
@@ -98,8 +98,26 @@
         }
     },
 
-    "1004":{
-        "id": 1004,
+    "1021":{
+        "id": 1021,
+        "type": "rock",
+        "subtype": "sandrock",
+        "systems":{
+            "hp":{
+                "torso":{
+                    "torso":{
+                        "hp": 190
+                    }
+                }
+            },
+            "name": {
+                "name": "Sandrock"
+            }
+        }
+    },
+
+    "1030":{
+        "id": 1030,
         "type": "stone",
         "subType": "stone",
         "systems":{
@@ -116,10 +134,10 @@
         }
     },
 
-    "1005":{
-        "id": 1005,
+    "1031":{
+        "id": 1031,
         "type": "log",
-        "subType": "wood",
+        "subType": "tree",
         "systems":{
             "hp":{
                 "torso": { 
@@ -135,8 +153,8 @@
         }
     },
 
-    "1006":{
-        "id": 1006,
+    "1032":{
+        "id": 1032,
         "type": "stone",
         "subType": "copper",
         "systems":{

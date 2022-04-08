@@ -54,25 +54,6 @@ class SceneSystem {
         this.sceneStorage.splice( index, 1 ); // удаляет сцену раз и навсегда и все ее объекты.
     }
 
-    public function changeSceneTo( scene:Scene ):Void{
-        var sceneType:String = scene.sceneType;
-        switch( sceneType ){
-            case "globalMap":{};
-            case "dungeonMap": {};
-            case "groundMap": this._changeSceneToGroundMap( scene );
-            default: throw 'Error in SceneSystem.changeSceneTo. There is no scene type "$sceneType" in switch/case!';
-        }
-    }
-
-    private function _changeSceneToGroundMap( scene:Scene ):Void{
-        if( this.activeScene == null ){
-            this.activeScene = scene;
-            scene.show();
-        }else{
-            //TODO: если сцена "временная". удаляем ее к чертям после того как зайхадим
-        }
-    }
-
     public function getParent():Game{
         return this._parent;
     }
@@ -80,6 +61,10 @@ class SceneSystem {
     public function loadSceneIDs( value:Int ):Void{
         this._sceneId = value;
     }
+
+
+
+    
 
     private function _createGroundMapScene( sceneID: SceneID, sceneDeployID:SceneDeployID ):Scene{
         var sceneDeployConfig:Dynamic = this._parent.deploy.sceneConfig[ sceneDeployID ];
@@ -95,11 +80,8 @@ class SceneSystem {
         }
 
         var scene:Scene = new Scene( this, sceneConfig );
-        var tileMap:Int = Reflect.getProperty( sceneDeployConfig, "tileMap" );
-        
-        if( tileMap == 1 ){
-            scene.generateTileMap();
-        }
+        scene.generate();
+
         return scene;
     }
 
