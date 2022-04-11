@@ -20,20 +20,33 @@ class GameEventSystem{
     }
 
     public function update( time:Int ):Void{
-        this._updateSceneEvent( this._sceneEventsQueue[ 0 ] ); // Апдейт очереди ивентов. Апдейтится всегда 1-й ивент, потом удаляется.
+        if( this._sceneEventsQueue.length > 1 )
+            this._updateSceneEvent( time, this._sceneEventsQueue[ 0 ] ); // Апдейт очереди ивентов. Апдейтится всегда 1-й ивент, потом удаляется.
+
         for( i in 0...this._sceneEvents.length ){
             var event:SceneEvent = this._sceneEvents[ i ];
-            this._updateSceneEvent( event );
+            this._updateSceneEvent( time, event );
         }
 
     }
 
-    public function createChangeSceneEvent( eventType:String, oldScene:Scene, newScene:Scene ):Void{
+    public function createQueSceneEvent( eventType:String, scene:Scene ):Void{
+        var actionTime:Int = 0;
         switch( eventType ){
-            case "hideSceneAndShowNext":{
-                this._sceneEventsQueue.push({ EventType: "hide", CurrentTime: 0, ActionTime: this._hideSceneTime, Scene: oldScene });
-                this._sceneEventsQueue.push({ EventType: "show", CurrentTime: 0, ActionTime: this._showSceneTime, Scene: newScene });
-                //TODO: we can use Loader :)
+            case "show":{
+                scene.sceneGraphics.visible = true;
+
+                if( scene.sceneType != "loader" )
+                    actionTime = this._showSceneTime;
+
+                this._sceneEventsQueue.push({ EventType: "show", CurrentTime: 0, ActionTime: actionTime, Scene: scene });
+            }
+            case "hide":{
+                actionTime = this._hideSceneTime;
+                this._sceneEventsQueue.push({ EventType: "hide", CurrentTime: 0, ActionTime: actionTime, Scene: scene });
+            }
+            case "doLoader":{
+                this._sceneEventsQueue.push({ EventType: "doLoader", CurrentTime: 0, ActionTime: 1000, Scene: scene });
             }
             default: throw 'Error in GameEventSystem.createChangeSceneEvent. There is no event with type "$eventType".';
         }
@@ -41,36 +54,61 @@ class GameEventSystem{
 
 
 
-    private function _updateSceneEvent( event:SceneEvent ):Void{
+    private function _updateSceneEvent( time:Int, event:SceneEvent ):Void{
         var eventType:String = event.EventType;
+        event.CurrentTime += time;
+        var value:Float = 1.0;
         switch( eventType ){
-            case "show":{};
-            case "hide":{};
+            case "show": {
+                if( event.ActionTime != 0 )
+                    value = event.CurrentTime / event.ActionTime;
+
+                this._showScene( value, event );
+            }
+            case "hide": {
+                if( event.ActionTime != 0 )
+                    value = event.CurrentTime / event.ActionTime;
+
+                this._hideScene( value, event );
+            }
+            case "doLoader":{
+                this._doLoader( event );
+            }
             default: throw 'Error in GameEventSystem._updateSceneEvent. There is no event with type "$eventType".';
         }
     }
 
-    private function _showScene( event:SceneEvent ):Void{
-        var numberToIncreaseAlpha:Float =  time / this.showHideTime;
-        this.sceneGraphics.alpha += numberToIncreaseAlpha;
-        if( this.sceneGraphics.alpha >= 1.0 ){
-            this.sceneGraphics.alpha = 1.0;
-            this.isShowing = false;
-            this.isShow = true;
-            // UI.graphics.visible = true;
+    private function _doLoader( event:SceneEvent ):Void{
+        if( event.CurrentTime >= event.ActionTime ){
+            var scene:Scene = this._parent.stage.nextScene;
+            if( scene == null )
+                throw 'Error in GameEventSystem._doLoader. Next scene from stage is NULL!';
+
+            scene.prepare();
+            this._parent.stage.nextScene = null;
+            this._endQueSceneEvent();
         }
     }
 
-    private function _hideScene( event:SceneEvent ):Void{
-        var numberToDecreaseAlpha:Float =  time / this._hideSceneTime;
-        this.sceneGraphics.alpha -= numberToDecreaseAlpha;
-        if( this.sceneGraphics.alpha<= 0 ){
-            this.sceneGraphics.alpha = 0.0;
-            this.sceneGraphics.visible = false;
-            this.isHiding = false;
-            this.isHide = true;
-            if( this._deleteAfterHiding )
-                this._parent.deleteScene( this );
+    private function _showScene( value:Float, event:SceneEvent ):Void{
+        event.Scene.sceneGraphics.alpha += value;
+        if( event.Scene.sceneGraphics.alpha >= 1.0 ){
+            event.Scene.sceneGraphics.alpha = 1.0;
+            event.Scene.show();
+            this._endQueSceneEvent();
+        }
+    }
+
+    private function _hideScene( value:Float, event:SceneEvent ):Void{
+        event.Scene.sceneGraphics.alpha -= value;
+        if( event.Scene.sceneGraphics.alpha <= 0 ){
+            event.Scene.sceneGraphics.alpha = 0.0;
+            event.Scene.hide();
+            this._endQueSceneEvent();
         } 
+    }
+
+    private function _endQueSceneEvent():Void{
+        this._sceneEventsQueue.splice( 0, 1 ); // delete first index from array of que events
     }
 }

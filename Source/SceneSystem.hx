@@ -22,21 +22,38 @@ class SceneSystem {
     }
 
     public function createScene( sceneDeploy:Int ):Scene{
-        var newSceneId:SceneID = this._generateSceneId();
-        var newSceneDeployID:SceneDeployID = SceneDeployID( sceneDeploy );
+        var sceneID:SceneID = this._generateSceneId();
+        var sceneDeployID:SceneDeployID = SceneDeployID( sceneDeploy );
+        var sceneDeployConfig:Dynamic = this._parent.deploy.sceneConfig[ sceneDeployID ];
+        var newSceneSprite = new Sprite();
+        var sceneType:String = Reflect.getProperty( sceneDeployConfig, "sceneType" );
+        var sceneName:String = Reflect.getProperty( sceneDeployConfig, "name" );
 
-        var scene:Scene = null;
+        var sceneConfig:SceneConfig = {
+            ID: sceneID,
+            SceneName: sceneName,
+            SceneType: sceneType,
+            DeployID: sceneDeployID,
+            SceneSprite: newSceneSprite
+        }
+
+        var scene:Scene = new Scene( this, sceneConfig );
 
         switch( sceneDeploy ){
-            case 401: scene = this._createGroundMapScene( newSceneId, newSceneDeployID );
+            case 400: scene = this._createLoader( scene ); // loader
+            case 401: scene = this._createGameStartScene( scene ); // Scene when game start;
+            case 403: scene = this._createGroundMapScene( scene );
             default: throw 'Error in SceneSystem.createScene. No scene with deploy ID: $sceneDeploy .';
         }
 
         this.sceneStorage.push( scene );
+        this.sceneSprite.addChild( scene.sceneGraphics );
         return scene;
     }
 
     public function deleteScene( scene:Scene ):Void{
+
+        //TODO: check scene status;
         var sceneId:SceneID = scene.getSceneID();
         var index:Int = null;
         for( i in 0...this.sceneStorage.length ){
@@ -58,7 +75,18 @@ class SceneSystem {
         return this._parent;
     }
 
-    public function loadSceneIDs( value:Int ):Void{
+    public function getSceneByDeployID( ID:SceneDeployID ):Scene {
+        var scene:Scene = null;
+        for( i in 0...this.sceneStorage.length ){
+            scene = this.sceneStorage[ i ];
+            var sceneDeployID:SceneDeployID = scene.getSceneDeployID();
+            if( EnumValueTools.equals( ID, sceneDeployID ))
+                break;    
+        }
+        return scene;
+    }
+
+    public function loadScenesID( value:Int ):Void{
         this._sceneId = value;
     }
 
@@ -66,22 +94,15 @@ class SceneSystem {
 
     
 
-    private function _createGroundMapScene( sceneID: SceneID, sceneDeployID:SceneDeployID ):Scene{
-        var sceneDeployConfig:Dynamic = this._parent.deploy.sceneConfig[ sceneDeployID ];
-        var newSceneSprite = new Sprite();
-        var sceneType:String = Reflect.getProperty( sceneDeployConfig, "sceneType" );
+    private function _createGroundMapScene( scene:Scene ):Scene{
+        return scene;
+    }
 
-        var sceneConfig:SceneConfig = {
-            ID: sceneID,
-            SceneName: "Green plain",
-            SceneType: sceneType,
-            DeployID: sceneDeployID,
-            SceneSprite: newSceneSprite
-        }
+    private function _createLoader( scene:Scene ):Scene{
+        return scene;
+    }
 
-        var scene:Scene = new Scene( this, sceneConfig );
-        scene.generate();
-
+    private function _createGameStartScene( scene:Scene ):Scene{
         return scene;
     }
 

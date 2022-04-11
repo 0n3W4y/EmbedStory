@@ -29,6 +29,9 @@ class Entity{
     public var tileMapID:Int;
     public var entityDeployID:EntityDeployID;
 
+    public var canBeUsed:Bool;
+    public var canBeDestroy:Bool;
+
     public var gridX:Int;
     public var gridY:Int;
 

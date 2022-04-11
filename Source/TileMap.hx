@@ -16,11 +16,9 @@ enum BiomeDeployID{
 typedef TileMapConfig = {
     var Height:Int;
     var Width:Int;
-    var Biome:String;
     var TileSize:Int;
     var DeployID:BiomeDeployID;
     var TileMapID:TileMapID;
-    var Name:String;
 }
 
 typedef TileMapGeneratedConfig = {
@@ -61,8 +59,6 @@ class TileMap{
     public var height:Int;
     public var width:Int;
     public var tileStorage:Array<Tile>;
-    public var biome:String;
-    public var name:String;
 
 
     private var _tileID:Int;
@@ -77,9 +73,7 @@ class TileMap{
     public function new( parent:Scene, params:TileMapConfig ):Void {
         this.height = params.Height;
         this.width = params.Width;
-        this.biome = params.Biome;
         this.tileSize = params.TileSize;
-        this.name = params.Name;
         this._tileMapID = params.TileMapID;
         this._biomeDeployID = params.DeployID;
         this._totalTiles = this.height * this.width;
@@ -106,9 +100,6 @@ class TileMap{
         if( this.width == null )
             throw '$errMsg Width is null';
 
-        if( this.biome == null )
-            throw '$errMsg Biome config is null';
-
         if( this._parent == null )
             throw '$errMsg Parent is null';
 
@@ -117,9 +108,6 @@ class TileMap{
 
         if( this._tileMapID == null )
             throw '$errMsg Tile Map ID is null';
-
-        if( this.name == null )
-            throw '$errMsg Name is null';
 
         if( this._deploy == null )
             throw '$errMsg Deploy is null';

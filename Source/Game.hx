@@ -12,8 +12,6 @@ class Game {
     public var height:Int;
 
     public var mainSprite:Sprite;
-    public var sceneSprite:Sprite;
-    public var uiSprite:Sprite;
 
     public var stage:Stage;
     public var deploy:Deploy;
@@ -21,6 +19,7 @@ class Game {
     public var gameTimeSystem:GameTimeSystem;
     public var gameEventSystem:GameEventSystem;
     public var entitySystem:EntitySystem;
+    public var ui:UserInterface;
 
     public var gameStart:Float;
     public var onPause:Bool;
@@ -118,23 +117,25 @@ class Game {
 
     private function _preStartGame():Void{
 
+        var config:DeployConfig = this._parseData();
+        this.deploy = new Deploy( this, config );
+
         this.gameTimeSystem = new GameTimeSystem( this );
         this.gameEventSystem = new GameEventSystem( this );
         this.entitySystem = new EntitySystem( this );
-        this.stage = new Stage( this );
+        this.stage = new Stage( this );        
+        
         var spriteForScenes:Sprite = new Sprite();
         var spriteForUI:Sprite = new Sprite();
-
         mainSprite.addChild( spriteForScenes );
         mainSprite.addChild( spriteForUI );
-        
-        var config:DeployConfig = this._parseData();
-        this.deploy = new Deploy( this, config );
         this.sceneSystem = new SceneSystem( this, spriteForScenes );
+        this.ui = new UserInterface( this, spriteForUI );  
+        
 
 
-        var scene:Scene = this.sceneSystem.createScene( 401 );
-        this.sceneSystem.changeSceneTo( scene );
+        var scene:Scene = this.sceneSystem.createScene( 403 );
+        this.stage.changeSceneTo( scene );
     }
 
     private function _parseData():DeployConfig

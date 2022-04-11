@@ -1,13 +1,28 @@
 {
     "400":{
-        "sceneType": "globalMap"
+        "id": 400,
+        "name": "Loader",
+        "sceneType": "loader"
     },
 
     "401":{
         "id": 401,
+        "name": "Main Scene",
+        "sceneType": "gameStartScene"
+    },
+
+    "402":{
+        "id": 402,
+        "name": "Global Map",
+        "sceneType": "globalMap"
+    },
+
+    "403":{
+        "id": 403,
+        "name": "Green Plain",
         "sceneType": "groundMap",
         "tileMapBiome": "plain",
-        "dungeon": 0,
+        "underground": 0,
         "height": 200,
         "width": 200,
         "tileSize": 64 

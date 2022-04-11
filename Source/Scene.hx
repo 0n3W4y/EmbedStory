@@ -21,7 +21,7 @@ typedef SceneConfig = {
 }
 
 class Scene {
-    public var tileMapStorage:Array<TileMap>;
+    public var tileMap:TileMap;
     public var objectStorage:Array<Entity>;
     public var stuffStorage:Array<Entity>;
     public var effectStorage:Array<Effect>;
@@ -38,11 +38,13 @@ class Scene {
     public var sceneType:String; // globalMap, battle;
     public var sceneGraphics:Sprite;
 
-    public var isShow:Bool;
-    public var isHide:Bool;
+    public var showed:Bool;
+    public var hided:Bool;
+    public var prepared:Bool;
+    public var drawed:Bool;
 
 
-    private var _sceneId:SceneID;
+    private var _sceneID:SceneID;
     private var _parent:SceneSystem;
     private var _sceneDeployID:SceneDeployID;
     private var _tileID:Int;
@@ -51,34 +53,66 @@ class Scene {
 
     public function new( parent:SceneSystem, params:SceneConfig ):Void{
         this._parent = parent;
-        this._sceneId = params.ID;        
+        this._sceneID = params.ID;        
         this.sceneName = params.SceneName;
         this.sceneType = params.SceneType;
         this._sceneDeployID = params.DeployID;
-        this.isHide = false;
-        this.isShow = false;
 
-        this.tileMapStorage = new Array<TileMap>();
+        this.hided = false;
+        this.showed = false;
+        this.prepared = false;
+        this.drawed = false;
+
         this._tileID = 0;
         this.sceneGraphics = new Sprite();
+        this.groundTileMapGraphics = new Sprite();
+        this.floorTileMapGraphics = new Sprite();
+        this.objectGraphics = new Sprite();
+        this.stuffGraphics = new Sprite();
+        this.characterGraphics = new Sprite();
+        this.effectGraphics = new Sprite();
+
+        this.sceneGraphics.addChild(  this.groundTileMapGraphics );
+        this.sceneGraphics.addChild(  this.floorTileMapGraphics );
+        this.sceneGraphics.addChild(  this.objectGraphics );
+        this.sceneGraphics.addChild(  this.stuffGraphics );
+        this.sceneGraphics.addChild(  this.characterGraphics );
+        this.sceneGraphics.addChild(  this.effectGraphics );
+        
+
+        //by default scene not visible and transperent;
+        this.sceneGraphics.visible = false;
+        this.sceneGraphics.alpha = 0.0;
     }
 
     public function show():Void{
-        if( isShow )
+        if( this.showed )
             throw 'Error in Scene.show. Scene already shown';
 
-        this.isShow = true;
-        this.sceneGraphics.alpha = 0.0;
-        //UI.graphics.visible = true;
-
+        this._parent.activeScene = this;
+        this._parent.getParent().ui.show();
+        this.showed = true;
     }
 
     public  function hide():Void{
-        if( isHide )
+        if( this.hided )
             throw 'Error in Scene.hide. Scene Already hided';
 
-        this.isHide = true;
-        this.sceneGraphics.visible = false;        
+        this._parent.activeScene = null;
+        this.sceneGraphics.visible = false;
+        this.hided = true;       
+    }
+
+    public function prepare():Void{
+        // this function prepare scene like generate map, add grphics etc.
+        if( this.prepared )
+            throw 'Error in scene $sceneName, $_sceneID, $_sceneDeployID';
+
+        this.prepared = true;
+
+        if( this.sceneType == "groundMap" || this.sceneType == "globalMap" )
+            this._generate();        
+
     }
 
     public function delete():Void{
@@ -98,30 +132,18 @@ class Scene {
     }
 
     public function getSceneID():SceneID{
-        return this._sceneId;
+        return this._sceneID;
     }
 
-    public function getTileMapWithID( tileMapID:TileMapID ):TileMap{
-        for( i in 0...this.tileMapStorage.length ){
-            var tileMap:TileMap = this.tileMapStorage[ i ];
-            if( EnumValueTools.equals( tileMap.getTileMpaID(), tileMapID ))
-                return tileMap;
-        }
 
-        throw 'Error in Scene.getTileMapWithID. No tile map with ID: $tileMapID .';
-        return null;
-    }
 
-    public function generate():Void{
+
+
+
+    private function _generate():Void{
         this._generateTileMap();
         this._generateObjects();
-    }
-
-
-
-
-
-    
+    }   
 
     private function _generateTileMap():Void{
         var id:TileMapID = this._generateTileMapID();
@@ -135,17 +157,13 @@ class Scene {
         var tileMapConfig:TileMapConfig = {
             Height: height,
             Width: width,
-            Biome: biome,
             TileSize: tileSize,
             DeployID: biomeDeployID,
-            TileMapID: id,
-            Name: "TEST"
+            TileMapID: id
         }
-        var tileMap:TileMap = new TileMap( this, tileMapConfig );
-        tileMap.init();
-        tileMap.generateMap();
-
-        this.tileMapStorage.push( tileMap );
+        this.tileMap = new TileMap( this, tileMapConfig );
+        this.tileMap.init();
+        this.tileMap.generateMap();
     }
 
     private function _generateObjects():Void{
@@ -153,26 +171,21 @@ class Scene {
     }
 
     private function _createRockObjects():Void{
-        for( i in 0...this.tileMapStorage.length ){
-            var tileMap:TileMap = this.tileMapStorage[ i ];
-            var newTileStorage:Array<Tile> = tileMap.tileStorage;
-            for( j in 0...newTileStorage.length ){
-                var tile:Tile = newTileStorage[ j ];
-                var tileGroundType:String = tile.groundType;
-                var rockEntity:Entity = null;
-                switch( tileGroundType ){
-                    case "rock": rockEntity = this._parent.getParent().entitySystem.createEntityByDeployID( EntityDeployID( 1020 )); // 1020 - type "rock", subtype "rock";
-                    case "sandrock": rockEntity = this._parent.getParent().entitySystem.createEntityByDeployID( EntityDeployID( 1021 )); // 1021 - type "rock", subtype "sandrock";
-                    default: continue;
-                }
-
-                if( rockEntity != null )
-                    this.objectStorage.push( rockEntity );
-                    
+        var newTileStorage:Array<Tile> = this.tileMap.tileStorage;
+        for( i in 0...newTileStorage.length ){
+            var tile:Tile = newTileStorage[ i ];
+            var tileGroundType:String = tile.groundType;
+            var rockEntity:Entity = null;
+            switch( tileGroundType ){
+                case "rock": rockEntity = this._parent.getParent().entitySystem.createEntityByDeployID( EntityDeployID( 1020 )); // 1020 - type "rock", subtype "rock";
+                case "sandrock": rockEntity = this._parent.getParent().entitySystem.createEntityByDeployID( EntityDeployID( 1021 )); // 1021 - type "rock", subtype "sandrock";
+                default: continue;
             }
+
+            if( rockEntity != null )
+                this.objectStorage.push( rockEntity );
+                
         }
-        
-        
         this._spreadIndexesForRocksObjects( );
     }
 
