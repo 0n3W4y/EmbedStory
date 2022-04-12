@@ -156,7 +156,7 @@ class Tile {
         this.graphY = tileSize * this.gridY;
     }
 
-    public function getId():TileID {
+    public function getID():TileID {
         return this._id;
     }
 

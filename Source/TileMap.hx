@@ -148,7 +148,7 @@ class TileMap{
         return tile;
     }
 
-    public function getTileMpaID():TileMapID{
+    public function getID():TileMapID{
         return this._tileMapID;
     }
 
@@ -542,7 +542,7 @@ class TileMap{
         var tile:Tile = null;
         for( i in 0...this.tileStorage.length ){
             tile = this.tileStorage[ i ];
-            if( EnumValueTools.equals( tileId, tile.getId() ))
+            if( EnumValueTools.equals( tileId, tile.getID() ))
                 return tile;
         }
 

@@ -24,7 +24,7 @@ class Scene {
     public var tileMap:TileMap;
     public var objectStorage:Array<Entity>;
     public var stuffStorage:Array<Entity>;
-    public var effectStorage:Array<Effect>;
+    public var effectStorage:Array<Dynamic>;
     public var characterStorage:Array<Entity>;
 
     public var groundTileMapGraphics:Sprite;
@@ -168,6 +168,7 @@ class Scene {
 
     private function _generateObjects():Void{
         this._createRockObjects();
+        this._spreadIndexesForRocksObjects();
     }
 
     private function _createRockObjects():Void{
@@ -182,18 +183,81 @@ class Scene {
                 default: continue;
             }
 
-            if( rockEntity != null )
-                this.objectStorage.push( rockEntity );
-                
+            if( rockEntity == null )
+                throw 'Error in Scene._createRockObject. Created Entity is NULL! $tileGroundType';
+
+            rockEntity.gridX = tile.gridX;
+            rockEntity.gridY = tile.gridY;
+            rockEntity.tileID = tile.getID();
+            rockEntity.tileMapID = this.tileMap.getID();
+            rockEntity.init();
+            this.objectStorage.push( rockEntity );       
         }
-        this._spreadIndexesForRocksObjects( );
     }
 
     private function _spreadIndexesForRocksObjects():Void{
         var rocksArray:Array<Entity> = [];
         for( i in 0...rocksArray.length ){
-            var rockEntity:Entity = rocksArray[ i ];
+            var entity:Entity = rocksArray[ i ];
+            var entityType:String = entity.entityType;
+            var entitySubType:String = entity.entitySubType;
+            if( entityType == "rock" && ( entitySubType == "rock" || entitySubType == "sandrock" )){
+                this._spreadIndexForRockObject( entity );
+            }
         }
+    }
+
+    private function _spreadIndexForRockObject( entity:Entity ):Void{
+        //for walls;
+        var x:Int = entity.gridX;
+        var y:Int = entity.gridY;
+        //index 1 - solo struct; 1 
+        //index 2 - only on top; 1
+        //index 3 - only on left; 1
+        //index 4 - only on right; 1
+        //index 5 - left+top; 2
+        //index 6 - right+top; 2
+        //index 7 - left+bottom; 2
+        //index 8 - right+bottom; 2
+        //index 9 - top+bottom; 2
+        //index 10 - right+left; 2
+        //index 10 - left+top+right; 3
+        //index 11 - left+bottom+right; 3
+        //index 12 - left+top+bottom; 3
+        //index 13 - right+top+bottom; 3
+        //index 14 - bottom+bottomleft+left; 3
+        //index 15 - bottom+bottomright+right; 3
+        //index 15 - top+lefttop+left; 3
+        //index 16 - top+righttop+right; 3
+        //index 17 - right+top+bottom+left; 4
+        //index 18 - top+lefttop+left+bottom; 4
+        //index 19 - top+righttop+right+bottom; 4
+        //index -- - top+righttop+right+left; 4
+        //index -- - top+lefttop+left+right; 4
+        //index -- - bottom+bottomright+right+top; 4
+        //index -- - bottom+bottomright+right+left; 4
+        //index -- - bottom+bottmleft+left+top; 4
+        //index -- - bottom+bottomleft+left+right; 4
+        //index 20 - top+righttop+right+lefttop+left; 5
+        //index 21 - bottom+rightbottom+right+leftbottom+left; 5
+        //index 22 - top+lefttop+left+leftbottom+bottom; 5
+        //index 23 - top+righttop+right+rightbottom+bottom; 5
+        //index -- - top+lefttop+left+leftbottom+bottom; 5
+        //index 24 - left+lefttop+top+right+bottom; 5
+        //index -- - top+topright+right+bottom+left; 5
+        //index -- - right+rightbottom+bottom+left+top; 5
+        //index -- - bottom+leftbottom+left+top+right; 5
+        //index -- - top+righttop+right+left+leftbottom+bottom; 6
+        //index -- - top+lefttop+left+right+rightbottom+bottom; 6
+        //index -- - left+lefttop+top+righttop+right+bottom; 6
+        //index -- - top+righttop+right+rightbottom+bottom+left; 6
+        //index -- - right+rightbottom+bottom+leftbottom+left+top; 6
+        //index -- - bottom+rightbottom+right
+        //index xx - left+lefttop+top+righttop+right+rightbottom+bottom; 7
+        //index xx - right+righttop+top+lefttop+left+leftbottom+bottom; 7
+        //index xx - top+lefttop+left+leftbottom+bottom+bottomright+right; 7
+        //index xx - top+righttop+right+rightbottom+bottom+leftbottom+left; 7
+        //index xx - all;
     }
 
     private function _generateTileMapID():TileMapID{

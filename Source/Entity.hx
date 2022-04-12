@@ -1,5 +1,7 @@
 package;
 
+import TileMap.TileMapID;
+import Tile.TileID;
 import EntityHealthPointsSystem.EntityHealthPointsSystemConfig;
 import EntityAgeSystem.EntityAgeSystemConfig;
 import EntityNameSystem.EntityNameSystemConfig;
@@ -25,12 +27,12 @@ class Entity{
 
     public var entityType:String;
     public var entitySubType:String;
-    public var tileID:Int;
-    public var tileMapID:Int;
+    public var tileID:TileID;
+    public var tileMapID:TileMapID;
     public var entityDeployID:EntityDeployID;
 
-    public var canBeUsed:Bool;
-    public var canBeDestroy:Bool;
+    public var canUse:Bool;
+    public var canDestroy:Bool;
 
     public var gridX:Int;
     public var gridY:Int;
@@ -47,6 +49,8 @@ class Entity{
     public function new( config:EntityConfig ):Void{
         this._inited = false;
         this._postInited = false;
+        //this.canUse = false;
+        //this.canDestroy = false;
     }
 
     public function init():Void{
