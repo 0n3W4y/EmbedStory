@@ -36,6 +36,7 @@ class Entity{
 
     public var gridX:Int;
     public var gridY:Int;
+    public var graphicIndex:Int;
 
     public var age:EntityAgeSystem;
     public var name:EntityNameSystem;

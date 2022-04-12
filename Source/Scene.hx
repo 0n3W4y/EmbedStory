@@ -211,53 +211,70 @@ class Scene {
         //for walls;
         var x:Int = entity.gridX;
         var y:Int = entity.gridY;
-        //index 1 - solo struct; 1 
+        
+        if( x < 1 && y < 1 ){
+
+        }else if( x == 0 && y == this.tileMap.height ){
+
+        }else if( x == this.tileMap.width && y == 0 ){
+
+        }else if( x == this.tileMap.width && y == this.tileMap.height ){
+
+        }else{
+
+        }
+        //index 1 - solo struct; 0 
         //index 2 - only on top; 1
         //index 3 - only on left; 1
         //index 4 - only on right; 1
-        //index 5 - left+top; 2
-        //index 6 - right+top; 2
-        //index 7 - left+bottom; 2
-        //index 8 - right+bottom; 2
-        //index 9 - top+bottom; 2
-        //index 10 - right+left; 2
-        //index 10 - left+top+right; 3
-        //index 11 - left+bottom+right; 3
-        //index 12 - left+top+bottom; 3
-        //index 13 - right+top+bottom; 3
-        //index 14 - bottom+bottomleft+left; 3
-        //index 15 - bottom+bottomright+right; 3
-        //index 15 - top+lefttop+left; 3
-        //index 16 - top+righttop+right; 3
-        //index 17 - right+top+bottom+left; 4
-        //index 18 - top+lefttop+left+bottom; 4
-        //index 19 - top+righttop+right+bottom; 4
-        //index -- - top+righttop+right+left; 4
-        //index -- - top+lefttop+left+right; 4
-        //index -- - bottom+bottomright+right+top; 4
-        //index -- - bottom+bottomright+right+left; 4
-        //index -- - bottom+bottmleft+left+top; 4
-        //index -- - bottom+bottomleft+left+right; 4
-        //index 20 - top+righttop+right+lefttop+left; 5
-        //index 21 - bottom+rightbottom+right+leftbottom+left; 5
-        //index 22 - top+lefttop+left+leftbottom+bottom; 5
-        //index 23 - top+righttop+right+rightbottom+bottom; 5
-        //index -- - top+lefttop+left+leftbottom+bottom; 5
-        //index 24 - left+lefttop+top+right+bottom; 5
-        //index -- - top+topright+right+bottom+left; 5
-        //index -- - right+rightbottom+bottom+left+top; 5
-        //index -- - bottom+leftbottom+left+top+right; 5
-        //index -- - top+righttop+right+left+leftbottom+bottom; 6
-        //index -- - top+lefttop+left+right+rightbottom+bottom; 6
-        //index -- - left+lefttop+top+righttop+right+bottom; 6
-        //index -- - top+righttop+right+rightbottom+bottom+left; 6
-        //index -- - right+rightbottom+bottom+leftbottom+left+top; 6
-        //index -- - bottom+rightbottom+right
-        //index xx - left+lefttop+top+righttop+right+rightbottom+bottom; 7
-        //index xx - right+righttop+top+lefttop+left+leftbottom+bottom; 7
-        //index xx - top+lefttop+left+leftbottom+bottom+bottomright+right; 7
-        //index xx - top+righttop+right+rightbottom+bottom+leftbottom+left; 7
-        //index xx - all;
+        //index 5 - only on bottom; 1
+        //index 6 - left+top; 2
+        //index 7 - right+top; 2
+        //index 8 - left+bottom; 2
+        //index 9 - right+bottom; 2
+        //index 10 - top+bottom; 2
+        //index 11 - right+left; 2
+        //index 12 - left+top+right; 3
+        //index 13 - left+bottom+right; 3
+        //index 14 - left+top+bottom; 3
+        //index 15 - right+top+bottom; 3
+        //index 16 - bottom+bottomleft+left; 3
+        //index 17 - bottom+bottomright+right; 3
+        //index 18 - top+lefttop+left; 3
+        //index 19 - top+righttop+right; 3
+        //index 20 - right+top+bottom+left; 4
+        //index 21 - top+lefttop+left+bottom; 4
+        //index 22 - top+righttop+right+bottom; 4
+        //index 23 - top+righttop+right+left; 4
+        //index 24 - top+lefttop+left+right; 4
+        //index 25 - bottom+bottomright+right+top; 4
+        //index 26 - bottom+bottomright+right+left; 4
+        //index 27 - bottom+bottmleft+left+top; 4
+        //index 28 - bottom+bottomleft+left+right; 4
+        //index 29 - top+righttop+right+lefttop+left; 5
+        //index 30 - bottom+rightbottom+right+leftbottom+left; 5
+        //index 31 - top+lefttop+left+leftbottom+bottom; 5
+        //index 32 - top+righttop+right+rightbottom+bottom; 5
+        //index 33 - top+lefttop+left+leftbottom+bottom; 5
+        //index 34 - left+lefttop+top+right+bottom; 5
+        //index 35 - top+topright+right+bottom+left; 5
+        //index 36 - right+rightbottom+bottom+left+top; 5
+        //index 37 - bottom+leftbottom+left+top+right; 5
+        //index 38 - top+righttop+right+left+leftbottom+bottom; 6
+        //index 39 - top+lefttop+left+right+rightbottom+bottom; 6
+        //index 40 - left+lefttop+top+righttop+right+bottom; 6
+        //index 41 - top+righttop+right+rightbottom+bottom+left; 6
+        //index 42 - right+rightbottom+bottom+leftbottom+left+top; 6
+        //index 43 - bottom+leftbottom+left+lefttop+top+right; 6
+        //index 44 - left+lefttop+top+righttop+right+rightbottom+bottom; 7
+        //index 45 - right+righttop+top+lefttop+left+leftbottom+bottom; 7
+        //index 46 - top+lefttop+left+leftbottom+bottom+bottomright+right; 7
+        //index 47 - top+righttop+right+rightbottom+bottom+leftbottom+left; 7
+        //index 48 - lefttop+left+leftbottom+bottom+rightbottom+right+righttop; 7
+        //index 49 - leftbottom+bottom+rightbottom+right+righttop+top+lefttop; 7
+        //index 50 - rightbottom+right+righttop+top+lefttop+left+leftbottom; 7
+        //index 51 - righttop+top+lefttop+left+leftbottom+bottom+rightbottom; 7
+        //index 52 - all; 8
     }
 
     private function _generateTileMapID():TileMapID{
