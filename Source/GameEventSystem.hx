@@ -17,6 +17,8 @@ class GameEventSystem{
 
     public function new( parent:Game ):Void{
         this._parent = parent;
+        this._sceneEvents = [];
+        this._sceneEventsQueue = [];
     }
 
     public function update( time:Int ):Void{
@@ -87,6 +89,7 @@ class GameEventSystem{
             scene.prepare();
             this._parent.stage.nextScene = null;
             this._endQueSceneEvent();
+            trace( 'doloader()');
         }
     }
 

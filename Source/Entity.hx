@@ -50,6 +50,10 @@ class Entity{
     public function new( config:EntityConfig ):Void{
         this._inited = false;
         this._postInited = false;
+        this.entityType = config.EntityType;
+        this.entitySubType = config.EntitySubType;
+        this._ID = config.EntityID;
+        this.entityDeployID = config.DeployID;
         //this.canUse = false;
         //this.canDestroy = false;
     }
@@ -57,7 +61,7 @@ class Entity{
     public function init():Void{
         var msg:String = this.errMsg();
 
-        if( !this._inited )
+        if( this._inited )
             throw '$msg already inited';
 
         if( this.age != null )
@@ -69,10 +73,13 @@ class Entity{
         if( this.healthPoints != null )
             this.healthPoints.init();
 
+        this._inited = true;
+
     }
 
     public function postInit():Void{
         var msg:String = this.errMsg();
+        this._postInited = true;
     }
 
     public function update( time:Int ):Void{

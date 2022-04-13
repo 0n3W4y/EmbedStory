@@ -20,6 +20,7 @@ class EntitySystem{
     public function new( parent:Game ):Void{
         this._parent = parent;
         this._deploy = parent.deploy;
+        this._entityID = 0;
     }
 
     public function createEntity( type:String, subType:String ):Entity {
@@ -29,12 +30,12 @@ class EntitySystem{
             var valueType = Reflect.getProperty( value, "type" );
             var valueSubType = Reflect.getProperty( value, "subType" );
             if( valueType == type && valueSubType == subType )
-                config = Reflect.getProperty( value, "systems" );
+                config = value;
 
         }
 
         if( config == null )
-            throw 'Error in EntitySystem._createRockEntity. No Config found for entity with type "$type" and sub type "$subType".';
+            throw 'Error in EntitySystem._createEntity. No Config found for entity with type "$type" and sub type "$subType".';
 
         return this._createEntity( config );
     }
@@ -59,14 +60,15 @@ class EntitySystem{
         var hpSystemConfig:EntityHealthPointsSystemConfig = null;
         var nameSystemConfig:EntityNameSystemConfig = null;
         
+        var configSystems:Dynamic = Reflect.getProperty( params, "systems" );
 
-        for( key in Reflect.fields( params )){
-            var value:Dynamic = Reflect.getProperty( params, key );
+        for( key in Reflect.fields( configSystems )){
+            var value:Dynamic = Reflect.getProperty( configSystems, key );
             switch( key ){
-                case "hp": {};
-                case "age": {};
+                case "hp": hpSystemConfig = this._createHPSystemConfig( value );
+                case "age": ageSystemConfig = this._createAgeSystemConfig( value );
                 case "name": nameSystemConfig = this._createNameSystemConfig( value );
-                default: throw 'Error in EntitySystem._createRockEntity. No system found with key "$key".';
+                default: throw 'Error in EntitySystem._createEntity. No system found with key "$key".';
             }
         }
 

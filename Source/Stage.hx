@@ -24,6 +24,7 @@ class Stage{
         if( loaderScene == null ){
             loaderScene = this._parent.sceneSystem.createScene( 400 );
             loaderScene.prepare();
+            trace(" i create loader scene");
         }
 
         switch( sceneType ){
@@ -36,6 +37,8 @@ class Stage{
                     eventSystem.createQueSceneEvent( "doLoader", loaderScene );
                     this.nextScene = scene;
                     eventSystem.createQueSceneEvent( "hide", loaderScene );
+                    eventSystem.createQueSceneEvent( "show", scene );
+                }else{
                     eventSystem.createQueSceneEvent( "show", scene );
                 }
             }

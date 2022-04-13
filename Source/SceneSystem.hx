@@ -18,6 +18,8 @@ class SceneSystem {
         this.sceneSprite = sceneSprite;
         this.activeScene = null;
 
+        this._sceneId = 0;
+
         this.sceneStorage = new Array<Scene>();
     }
 
@@ -83,6 +85,7 @@ class SceneSystem {
             if( EnumValueTools.equals( ID, sceneDeployID ))
                 break;    
         }
+        trace( scene );
         return scene;
     }
 

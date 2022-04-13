@@ -83,7 +83,7 @@
     "1020":{
         "id": 1020,
         "type": "rock",
-        "subtype": "rock",
+        "subType": "rock",
         "systems":{
             "hp":{
                 "torso": { 
@@ -101,7 +101,7 @@
     "1021":{
         "id": 1021,
         "type": "rock",
-        "subtype": "sandrock",
+        "subType": "sandrock",
         "systems":{
             "hp":{
                 "torso":{
