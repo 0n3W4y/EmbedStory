@@ -218,17 +218,9 @@ class Scene {
         var x:Int = entity.gridX;
         var y:Int = entity.gridY;        
 
-        var leftTop:Bool = false;
-        var leftTopCoordX = x - 1;
-        var leftTopCoordY = y - 1;
-
         var top:Bool = false;
         var topCorrdX = x;
         var topCoordY = y - 1;
-
-        var rightTop:Bool = false;
-        var rightTopCoordX = x + 1;
-        var rightTopCoordY = y - 1;
 
         var left:Bool = false;
         var leftCoordX = x - 1;
@@ -238,195 +230,83 @@ class Scene {
         var rightCoordX = x + 1;
         var rightCoordY = y;
 
-        var leftBottom:Bool = false;
-        var leftBottomCoordX = x - 1;
-        var leftBottomCoordY = y + 1;
-
         var bottom:Bool = false;
         var bottomCoordX = x;
         var bottomCoordY = x + 1;
 
-        var rightBottom:Bool = false;
-        var rightBottomCoordX = x + 1;
-        var rightBorromCoordY = y + 1;
 
         for( i in 0...this.objectStorage.length ){
             var obj:Entity = this.objectStorage[ i ];
+            if( obj.entityType != "rock" && ( obj.entitySubType != "rock" || obj.entitySubType != "sandrock" ))
+                continue;
+
             var objX:Int = obj.gridX;
             var objY:Int = obj.gridY;
-            if( objX == leftTopCoordX && objY == leftTopCoordY )
-                leftTop = true;
-            else if( objX == topCorrdX && objY == topCoordY )
+            if( objX == topCorrdX && objY == topCoordY )
                 top = true;
-            else if( objX == rightTopCoordX && objY == rightTopCoordY )
-                rightTop = true;
             else if( objX == leftCoordX && objY == leftCoordY )
                 left = true;
             else if( objX == rightCoordX && objY == rightCoordY )
                 right = true;
-            else if( objX == leftBottomCoordX && objY == leftBottomCoordY )
-                leftBottom = true;
             else if( objX == bottomCoordX && objY == bottomCoordY )
                 bottom = true;
-            else if( objX == rightBottomCoordX && objY == rightBorromCoordY )
-                rightBottom = true;
             else
                 continue;
-        }        
+        }
 
-        if( !leftTop && !top && !rightTop && !left && !right && !leftBottom && !bottom && !rightBottom ){
-            //index 1 - solo struct; 0        
+        if( top && left && right && bottom ){
+            //index 1; 4
             entity.graphicIndex = 1;
-        }else if( !leftTop && top && !rightTop && !left && !right && !leftBottom && !bottom && !rightBottom ){
-            //index 2 - only on top; 1
+        }else if( top && left && right && !bottom ){
+            //index 2; 3 top+left+right
             entity.graphicIndex = 2;
-        }else if( !leftTop && !top && !rightTop && left && !right && !leftBottom && !bottom && !rightBottom ){
-            //index 3 - only on left; 1
+        }else if( top && left && !right && bottom ){
+            //index 3; 3 top+left+bottom
             entity.graphicIndex = 3;
-        }else if( !leftTop && !top && !rightTop && !left && right && !leftBottom && !bottom && !rightBottom ){
-            //index 4 - only on right; 1        
+        }else if( top && !left && right && bottom ){
+            //index 4; 3 top+right+bottom
             entity.graphicIndex = 4;
-        }else if( !leftTop && !top && !rightTop && !left && !right && !leftBottom && bottom && !rightBottom ){
-            //index 5 - only on bottom; 1
+        }else if( !top && left && right && bottom ){
+            //index 5; 3 left+right+bottom
             entity.graphicIndex = 5;
-        }else if( !leftTop && top && !rightTop && left && !right && !leftBottom && !bottom && !rightBottom ){
-            //index 6 - left+top; 2
+        }else if( top && left && !right && !bottom ){
+            //index 6; 2 top+left
             entity.graphicIndex = 6;
-        }else if( !leftTop && top && !rightTop && !left && right && !leftBottom && !bottom && !rightBottom ){
-            //index 7 - right+top; 2
+        }else if( !top && left && right && !bottom ){
+            //index 7; 2 left+right
             entity.graphicIndex = 7;
-        }else if( !leftTop && !top && !rightTop && left && !right && !leftBottom && bottom && !rightBottom ){
-            //index 8 - left+bottom; 2
+        }else if( !top && !left && right && bottom ){
+            //index 8; 2 right+bottom
             entity.graphicIndex = 8;
-        }else if( !leftTop && !top && !rightTop && !left && right && !leftBottom && bottom && !rightBottom ){
-            //index 9 - right+bottom; 2
+        }else if( top && !left && !right && bottom ){
+            //index 9; 2 top+bottom
             entity.graphicIndex = 9;
-        }else if( !leftTop && top && !rightTop && !left && !right && !leftBottom && bottom && !rightBottom ){
-            //index 10 - top+bottom; 2
+        }else if( top && !left && !right && bottom ){
+            //index 10; 2 top+bottom
             entity.graphicIndex = 10;
-        }else if( !leftTop && !top && !rightTop && left && right && !leftBottom && !bottom && !rightBottom ){
-            //index 11 - right+left; 2
+        }else if( !top && left && !right && bottom ){
+            //index 11; 2 bot+left
             entity.graphicIndex = 11;
-        }else if( !leftTop && top && !rightTop && left && right && !leftBottom && !bottom && !rightBottom ){
-            //index 12 - left+top+right; 3
+        }else if( top && !left && right && !bottom ){
+            //index 12; 2 top+right
             entity.graphicIndex = 12;
-        }else if( !leftTop && !top && !rightTop && !left && !right && !leftBottom && !bottom && !rightBottom ){
-            //index 13 - left+bottom+right; 3
+        }else if( top && !left && !right && !bottom ){
+            //index 11; 1 top
             entity.graphicIndex = 13;
-        }else if( !leftTop && top && !rightTop && left && !right && !leftBottom && bottom && !rightBottom ){
-             //index 14 - left+top+bottom; 3
+        }else if( !top && !left && right && !bottom ){
+            //index 12; 1 right
             entity.graphicIndex = 14;
-        }else if( !leftTop && top && !rightTop && !left && right && !leftBottom && bottom && !rightBottom ){
-            //index 15 - right+top+bottom; 3
+        }else if( !top && left && !right && !bottom ){
+            //index 13; 1 left
             entity.graphicIndex = 15;
-        }else if( !leftTop && !top && !rightTop && left && !right && leftBottom && bottom && !rightBottom ){
-            //index 16 - bottom+bottomleft+left; 3
+        }else if( !top && !left && !right && bottom ){
+            //index 14; 1 bottom
             entity.graphicIndex = 16;
-        }else if( !leftTop && !top && !rightTop && !left && right && !leftBottom && bottom && rightBottom ){
-            //index 17 - bottom+bottomright+right; 3
+        }else if( !top && !left && !right && !bottom ){
+            //index 15; 0
             entity.graphicIndex = 17;
-        }else if( leftTop && top && !rightTop && left && !right && !leftBottom && !bottom && !rightBottom ){
-            //index 18 - top+lefttop+left; 3
-            entity.graphicIndex = 18;
-        }else if( !leftTop && top && rightTop && !left && right && !leftBottom && !bottom && !rightBottom ){
-            //index 19 - top+righttop+right; 3
-            entity.graphicIndex = 19;
-        }else if( !leftTop && top && !rightTop && left && right && !leftBottom && bottom && !rightBottom ){
-            //index 20 - right+top+bottom+left; 4
-            entity.graphicIndex = 20;
-        }else if( leftTop && top && !rightTop && left && !right && !leftBottom && bottom && !rightBottom ){
-            //index 21 - top+lefttop+left+bottom; 4
-            entity.graphicIndex = 21;
-        }else if( !leftTop && top && rightTop && !left && right && !leftBottom && bottom && !rightBottom ){
-            //index 22 - top+righttop+right+bottom; 4
-            entity.graphicIndex = 22;
-        }else if( !leftTop && top && rightTop && left && right && !leftBottom && !bottom && !rightBottom ){
-            //index 23 - top+righttop+right+left; 4
-            entity.graphicIndex = 23;
-        }else if( leftTop && top && !rightTop && left && right && !leftBottom && !bottom && !rightBottom ){
-            //index 24 - top+lefttop+left+right; 4
-            entity.graphicIndex = 24;
-        }else if( !leftTop && top && !rightTop && !left && right && !leftBottom && bottom && rightBottom ){
-            //index 25 - bottom+bottomright+right+top; 4
-            entity.graphicIndex = 25;
-        }else if( !leftTop && !top && !rightTop && left && right && !leftBottom && bottom && rightBottom ){
-            //index 26 - bottom+bottomright+right+left; 4
-            entity.graphicIndex = 26;
-        }else if( !leftTop && top && !rightTop && left && !right && leftBottom && bottom && !rightBottom ){
-            //index 27 - bottom+bottmleft+left+top; 4
-            entity.graphicIndex = 27;
-        }else if( !leftTop && !top && !rightTop && left && right && leftBottom && bottom && !rightBottom ){
-            //index 28 - bottom+bottomleft+left+right; 4
-            entity.graphicIndex = 28;
-        }else if( leftTop && top && rightTop && left && right && !leftBottom && !bottom && !rightBottom ){
-            //index 29 - top+righttop+right+lefttop+left; 5
-            entity.graphicIndex = 29;
-        }else if( !leftTop && !top && !rightTop && left && right && leftBottom && bottom && rightBottom ){
-            //index 30 - bottom+rightbottom+right+leftbottom+left; 5
-            entity.graphicIndex = 30;
-        }else if( leftTop && top && !rightTop && left && !right && leftBottom && bottom && !rightBottom ){
-             //index 31 - top+lefttop+left+leftbottom+bottom; 5
-            entity.graphicIndex = 31;
-        }else if( !leftTop && top && rightTop && !left && right && !leftBottom && bottom && rightBottom ){
-            //index 32 - top+righttop+right+rightbottom+bottom; 5
-            entity.graphicIndex = 32;
-        }else if( leftTop && top && !rightTop && left && !right && leftBottom && bottom && !rightBottom ){
-            //index 33 - top+lefttop+left+leftbottom+bottom; 5
-            entity.graphicIndex = 33;
-        }else if( leftTop && top && !rightTop && left && right && !leftBottom && bottom && !rightBottom ){
-            //index 34 - left+lefttop+top+right+bottom; 5
-            entity.graphicIndex = 34;
-        }else if( !leftTop && top && rightTop && left && right && !leftBottom && bottom && !rightBottom ){
-            //index 35 - top+topright+right+bottom+left; 5
-            entity.graphicIndex = 35;
-        }else if( !leftTop && top && !rightTop && left && right && !leftBottom && bottom && rightBottom ){
-            //index 36 - right+rightbottom+bottom+left+top; 5
-            entity.graphicIndex = 36;
-        }else if( !leftTop && top && !rightTop && left && right && leftBottom && bottom && !rightBottom ){
-            //index 37 - bottom+leftbottom+left+top+right; 5
-            entity.graphicIndex = 37;
-        }else if( !leftTop && top && rightTop && left && right && leftBottom && bottom && !rightBottom ){
-            //index 38 - top+righttop+right+left+leftbottom+bottom; 6
-            entity.graphicIndex = 38;
-        }else if( leftTop && top && !rightTop && !left && right && !leftBottom && bottom && rightBottom ){
-            //index 39 - top+lefttop+left+right+rightbottom+bottom; 6
-            entity.graphicIndex = 39;
-        }else if( leftTop && top && rightTop && left && right && !leftBottom && bottom && !rightBottom ){
-            //index 40 - left+lefttop+top+righttop+right+bottom; 6
-            entity.graphicIndex = 40;
-        }else if( !leftTop && top && rightTop && left && right && !leftBottom && bottom && rightBottom ){
-            //index 41 - top+righttop+right+rightbottom+bottom+left; 6
-            entity.graphicIndex = 41;
-        }else if( !leftTop && top && !rightTop && left && right && leftBottom && bottom && rightBottom ){
-            //index 42 - right+rightbottom+bottom+leftbottom+left+top; 6
-            entity.graphicIndex = 42;
-        }else if( leftTop && top && !rightTop && left && right && leftBottom && bottom && !rightBottom ){
-            //index 43 - bottom+leftbottom+left+lefttop+top+right; 6
-            entity.graphicIndex = 43;
-        }else if( leftTop && top && rightTop && left && right && !leftBottom && bottom && rightBottom ){
-            //index 44 - left+lefttop+top+righttop+right+rightbottom+bottom; 7
-            entity.graphicIndex = 44;
-        }else if( leftTop && top && rightTop && left && right && leftBottom && bottom && !rightBottom ){
-            //index 45 - right+righttop+top+lefttop+left+leftbottom+bottom; 7
-            entity.graphicIndex = 45;
-        }else if( leftTop && top && !rightTop && left && right && leftBottom && bottom && rightBottom ){
-            //index 46 - top+lefttop+left+leftbottom+bottom+bottomright+right; 7
-            entity.graphicIndex = 46;
-        }else if( !leftTop && top && rightTop && left && right && leftBottom && bottom && rightBottom ){
-            //index 47 - top+righttop+right+rightbottom+bottom+leftbottom+left; 7
-            entity.graphicIndex = 47;
-        }else if( leftTop && top && rightTop && left && right && leftBottom && bottom && rightBottom ){
-            //index 48 - all; 8
-            entity.graphicIndex = 48;
-        }else if( leftTop && top && rightTop && left && right && leftBottom && bottom && rightBottom ){
-
-        }else if( leftTop && top && rightTop && left && right && leftBottom && bottom && rightBottom ){
-
-        }else if( leftTop && top && rightTop && left && right && leftBottom && bottom && rightBottom ){
-
-        }else if( leftTop && top && rightTop && left && right && leftBottom && bottom && rightBottom ){
-            
         }else{
+            trace( 'Top: $top, Bot: $bottom, Left: $left, Right: $right ');
             throw 'Error in Scene._spreadIndexForRockObject. Something wrong with function.';
         }
         trace( entity.graphicIndex );    
