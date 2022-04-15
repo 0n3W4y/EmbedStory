@@ -1,7 +1,7 @@
 package;
 
 
-import js.html.svg.Number;
+import js.html.CharacterData;
 import haxe.EnumTools;
 import TileMap;
 import openfl.display.Sprite;
@@ -22,12 +22,28 @@ typedef SceneConfig = {
     var SceneSprite:Sprite;
 }
 
+typedef ObjectStorage = {
+    var Rocks:Array<Entity>;
+}
+
+typedef StuffStorage = {
+
+}
+
+typedef EffectStorage = {
+
+}
+
+typedef CharacterStorage = {
+
+}
+
 class Scene {
     public var tileMap:TileMap;
-    public var objectStorage:Array<Entity>;
-    public var stuffStorage:Array<Entity>;
-    public var effectStorage:Array<Dynamic>;
-    public var characterStorage:Array<Entity>;
+    public var objectStorage:ObjectStorage;
+    public var stuffStorage:StuffStorage;
+    public var effectStorage:EffectStorage;
+    public var characterStorage:CharacterStorage;
 
     public var groundTileMapGraphics:Sprite;
     public var floorTileMapGraphics:Sprite;
@@ -41,7 +57,6 @@ class Scene {
     public var sceneGraphics:Sprite;
 
     public var showed:Bool;
-    public var hided:Bool;
     public var prepared:Bool;
     public var drawed:Bool;
 
@@ -60,7 +75,6 @@ class Scene {
         this.sceneType = params.SceneType;
         this._sceneDeployID = params.DeployID;
 
-        this.hided = false;
         this.showed = false;
         this.prepared = false;
         this.drawed = false;
@@ -81,10 +95,10 @@ class Scene {
         this.sceneGraphics.addChild(  this.characterGraphics );
         this.sceneGraphics.addChild(  this.effectGraphics );
         
-        this.objectStorage = [];
-        this.stuffStorage = [];
-        this.effectStorage = [];
-        this.characterStorage = [];
+        this.objectStorage = { Rocks: [] };
+        //this.stuffStorage = [];
+        //this.effectStorage = [];
+        //this.characterStorage = [];
 
         //by default scene not visible and transperent;
         this.sceneGraphics.visible = false;
@@ -101,12 +115,12 @@ class Scene {
     }
 
     public  function hide():Void{
-        if( this.hided )
+        if( !this.showed )
             throw 'Error in Scene.hide. Scene Already hided';
 
         this._parent.activeScene = null;
         this.sceneGraphics.visible = false;
-        this.hided = true;       
+        this.showed = false;
     }
 
     public function prepare():Void{
@@ -170,11 +184,46 @@ class Scene {
         this.tileMap = new TileMap( this, tileMapConfig );
         this.tileMap.init();
         this.tileMap.generateMap();
+
     }
 
     private function _generateObjects():Void{
         this._createRockObjects();
         this._spreadIndexesForRocksObjects();
+        this._createResources();
+    }
+
+    private function _createResources():Void{
+        var sceneDeployConfig:Dynamic = this._parent.getParent().deploy.sceneConfig[ this._sceneDeployID ];
+        var biome:String = Reflect.getProperty( sceneDeployConfig, "tileMapBiome" );
+        var biomeDeployID:BiomeDeployID = this._parent.getParent().deploy.getBiomeDeployID( biome );
+        var biomeConfig:Dynamic = this._parent.getParent().deploy.biomeConfig[ biomeDeployID ];
+        var resourcesConfig:Dynamic = Reflect.getProperty( biomeConfig, "resources" );
+
+        if( resourcesConfig == null )
+            throw 'Error in Scene._createResources. Config for $biome biome is NULL!!';
+
+        for( key in Reflect.fields( resourcesConfig )){
+            var value:Dynamic = Reflect.getProperty( resourcesConfig, key );
+            switch( key ){
+                case "trees": this._createTrees( value );
+                case "stones": this._createStones( value);
+                case "ores": this._createOres( value );
+                default: throw 'Error in Scene._createResources. Can not create resources with key: $key';
+            }
+        }
+    }
+
+    private function _createTrees( config:Dynamic):Void {
+        
+    }
+
+    private function _createStones( config:Dynamic ):Void{
+
+    }
+
+    private function _createOres( config:Dynamic ):Void {
+        
     }
 
     private function _createRockObjects():Void{
@@ -197,12 +246,12 @@ class Scene {
             rockEntity.tileID = tile.getID();
             rockEntity.tileMapID = this.tileMap.getID();
             rockEntity.init();
-            this.objectStorage.push( rockEntity );       
+            this.objectStorage.Rocks.push( rockEntity );       
         }
     }
 
     private function _spreadIndexesForRocksObjects():Void{
-        var rocksArray:Array<Entity> = this.objectStorage;
+        var rocksArray:Array<Entity> = this.objectStorage.Rocks;
         for( i in 0...rocksArray.length ){
             var entity:Entity = rocksArray[ i ];
             var entityType:String = entity.entityType;
@@ -235,8 +284,8 @@ class Scene {
         var bottomCoordY = x + 1;
 
 
-        for( i in 0...this.objectStorage.length ){
-            var obj:Entity = this.objectStorage[ i ];
+        for( i in 0...this.objectStorage.Rocks.length ){
+            var obj:Entity = this.objectStorage.Rocks[ i ];
             if( obj.entityType != "rock" && ( obj.entitySubType != "rock" || obj.entitySubType != "sandrock" ))
                 continue;
 
@@ -308,8 +357,7 @@ class Scene {
         }else{
             trace( 'Top: $top, Bot: $bottom, Left: $left, Right: $right ');
             throw 'Error in Scene._spreadIndexForRockObject. Something wrong with function.';
-        }
-        trace( entity.graphicIndex );    
+        }   
     }
 
     private function _generateTileMapID():TileMapID{
