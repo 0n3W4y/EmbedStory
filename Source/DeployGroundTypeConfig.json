@@ -1,7 +1,7 @@
 {
     "200":{
         "id": 200,
-        "name": "earth",
+        "groundType": "earth",
         "movementRatio": 100,
         "isWalkable": 1,
         "canPlaceFloor": 1,
@@ -14,9 +14,9 @@
 
     "201":{
         "id": 201,
-        "name": "water",
-        "movementRatio": 25,
-        "isWalkable": 1,
+        "groundType": "rock",
+        "movementRatio": 100,
+        "isWalkable": 0,
         "canPlaceFloor": 0,
         "canRemoveFloor": 0,
         "canPlaceObjects": 0,
@@ -27,7 +27,7 @@
 
     "202":{
         "id": 202,
-        "name": "rock",
+        "groundType": "sandrock",
         "movementRatio": 100,
         "isWalkable": 0,
         "canPlaceFloor": 0,
@@ -40,21 +40,21 @@
 
     "203":{
         "id": 203,
-        "name": "sandrock",
-        "movementRatio": 100,
-        "isWalkable": 0,
-        "canPlaceFloor": 0,
-        "canRemoveFloor": 0,
-        "canPlaceObjects": 0,
-        "canPlaceStaff": 0,
-        "canCharacterStand": 0,
+        "groundType": "shallow",
+        "movementRatio": 70,
+        "isWalkable": 1,
+        "canPlaceFloor": 1,
+        "canRemoveFloor": 1,
+        "canPlaceObjects": 1,
+        "canPlaceStaff": 1,
+        "canCharacterStand": 1,
         "graphics": []
     },
 
     "204":{
         "id": 204,
-        "name": "shallow",
-        "movementRatio": 70,
+        "groundType": "iceShallow",
+        "movementRatio": 100,
         "isWalkable": 1,
         "canPlaceFloor": 1,
         "canRemoveFloor": 1,
@@ -66,7 +66,7 @@
 
     "205":{
         "id": 205,
-        "name": "dryEarth",
+        "groundType": "dryEarth",
         "movementRatio": 100,
         "isWalkable": 1,
         "canPlaceFloor": 1,
@@ -79,7 +79,7 @@
 
     "206":{
         "id": 206,
-        "name": "dirt",
+        "groundType": "dirt",
         "movementRatio": 90,
         "isWalkable": 1,
         "canPlaceFloor": 1,
@@ -92,7 +92,7 @@
 
     "207":{
         "id": 207,
-        "name": "rockEnvironment",
+        "groundType": "rockEnvironment",
         "movementRatio": 100,
         "isWalkable": 1,
         "canPlaceFloor": 1,
@@ -105,7 +105,7 @@
 
     "208":{
         "id": 208,
-        "name": "sandrockEnvironment",
+        "groundType": "sandrockEnvironment",
         "movementRatio": 100,
         "isWalkable": 1,
         "canPlaceFloor": 1,

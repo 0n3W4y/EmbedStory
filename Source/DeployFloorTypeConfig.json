@@ -1,48 +1,65 @@
 {
     "300":{
         "id": 300,
-        "name": "nothing"       
+        "floorType": "nothing"       
     },
 
     "301":{
         "id": 301,
-        "name": "grass",
-        "graphics": { "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }
+        "floorType": "grass",
+        "graphics": []
     },
 
     "302":{
         "id": 302,
-        "name": "sand",
-        "movementratio": 60,
-        "graphics":{ "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }
+        "floorType": "sand",
+        "movementRatio": 60,
+        "graphics": []
     },
 
     "303":{
         "id": 303,
-        "name": "stones",
-        "graphics":{ "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }
+        "floorType": "stones",
+        "graphics": []
     },
 
     "304":{
         "id": 304,
-        "name": "snow",
-        "movementratio": 60,
-        "graphics":{ "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }
+        "floorType": "snow",
+        "movementRatio": 60,
+        "graphics": []
+    },
+
+    "305":{
+        "id": 305,
+        "floorType": "water",
+        "movementRatio": 30,
+        "canPlaceFloor": 0,
+        "canRemoveFloor": 0,
+        "canCharacterStand": 0,
+        "canPlaceObjects": 0,
+        "canPlaceStaff": 0,
+        "graphics": []
+    },
+    
+    "306":{
+        "id": 306,
+        "floorType": "ice"
     },
 
     "320":{
         "id": 320,
-        "name": "woodenFloor",
+        "floorType": "woodenFloor",
         "movementRatio": 115,
         "canPlaceFloor": 0,
-        "graphics":{ "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }
+        "graphics": []
     },
 
     "321":{
         "id": 321,
-        "name": "rockRoad",
+        "floorType": "rockRoad",
         "movementRatio": 120,
         "canPlaceFloor": 0,
-        "graphics":{ "url1": "url", "url2": "url2", "url3": "url3", "url4": "url4", "url5": "url5" }
+        "graphics": []
     }
 }

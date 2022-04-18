@@ -16,9 +16,9 @@
         "name": "meadow",
         "biomeType": "plain",
         "mainGroundType": "earth",
-        "additionalGroundType": { "dirt": 10, "rock": 5 },
-        "mainFloorType": { "grass": 80, "stones": 10 },
-        "additionalFloorType": { "rockRoad": 5 },
+        "additionalGroundType": { "dirt": 3, "rockEnvironment": 1 },
+        "mainFloorType": "grass",
+        "additionalFloorType": { "rockRoad": 1 },
         "liquids": {
             "river": { 
                 "river1":{
@@ -28,19 +28,21 @@
                     "offset": 1,
                     "widthOffset": 1,
                     "type": null,
-                    "groundType": "water"
+                    "floorType": "water"
                 }                
             },
             "lake": {
                 "lake1":{
                     "emerging":15,
-                    "amount": 3,
+                    "amount": 1,
                     "widthMax": 20,
                     "widthMin": 10,
                     "heightMax": 20,
                     "heightMin": 10,
-                    "offset": 3,
+                    "offsetX": 3,
+                    "offsetY": 3,
                     "widthOffset": 2,
+                    "heightOffset": 2,
                     "groundType": "water"
                 }                
             }
@@ -54,14 +56,16 @@
                     "widthMin": 5,
                     "heightMax": 20,
                     "heightMin": 5,
-                    "offset": 1,
+                    "offsetX": 1,
+                    "offsetY": 1,
                     "widthOffset": 2,
+                    "heightOffset": 2,
                     "groundType": "rock"
                 }                
             }
         }, 
         "resources": {
-            "trees":{ "tree": 30, "bush": 15, "fertileBush": 5, "log": 7 },
+            "trees":{ "tree": 30, "bush": 5, "fertileBush": 1, "log": 6 },
             "stones":{ "stone": 10, "steelStone": 5, "copperStone": 5 },
             "ores":{ "copper": 30 }
         }

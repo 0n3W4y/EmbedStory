@@ -64,7 +64,6 @@ class Scene {
     private var _sceneID:SceneID;
     private var _parent:SceneSystem;
     private var _sceneDeployID:SceneDeployID;
-    private var _tileID:Int;
 
     private var _deleteAfterHiding:Bool;
 
@@ -79,7 +78,6 @@ class Scene {
         this.prepared = false;
         this.drawed = false;
 
-        this._tileID = 0;
         this.sceneGraphics = new Sprite();
         this.groundTileMapGraphics = new Sprite();
         this.floorTileMapGraphics = new Sprite();
@@ -130,8 +128,8 @@ class Scene {
 
         this.prepared = true;
 
-        if( this.sceneType == "groundMap" || this.sceneType == "globalMap" )
-            this._generate();      
+        if( this.sceneType == "groundMap" || this.sceneType == "globalMap" || this.sceneType == "dungeonMap" )
+            this._generate();     
 
     }
 
@@ -153,6 +151,14 @@ class Scene {
 
     public function getSceneID():SceneID{
         return this._sceneID;
+    }
+
+    public function addEntity( entity:Entity ):Void{
+
+    }
+
+    public function removeEntity( entity:Entity ):Entity{
+        return null;
     }
 
 
@@ -243,7 +249,7 @@ class Scene {
 
             rockEntity.gridX = tile.gridX;
             rockEntity.gridY = tile.gridY;
-            rockEntity.tileID = tile.getID();
+            //rockEntity.tileID = tile.getID();
             rockEntity.tileMapID = this.tileMap.getID();
             rockEntity.init();
             this.objectStorage.Rocks.push( rockEntity );       
@@ -257,13 +263,16 @@ class Scene {
             var entityType:String = entity.entityType;
             var entitySubType:String = entity.entitySubType;
             if( entityType == "rock" && ( entitySubType == "rock" || entitySubType == "sandrock" )){
-                this._spreadIndexForRockObject( entity );
+                this._spreadIndexForObject( entity );
             }
         }
     }
 
-    private function _spreadIndexForRockObject( entity:Entity ):Void{
+    private function _spreadIndexForObject( entity:Entity ):Void{
         //for walls;
+        // maybe for water;
+        var entityType:String = entity.entityType;
+        var entitySubType:String = entity.entitySubType;
         var x:Int = entity.gridX;
         var y:Int = entity.gridY;        
 
@@ -286,21 +295,21 @@ class Scene {
 
         for( i in 0...this.objectStorage.Rocks.length ){
             var obj:Entity = this.objectStorage.Rocks[ i ];
-            if( obj.entityType != "rock" && ( obj.entitySubType != "rock" || obj.entitySubType != "sandrock" ))
-                continue;
+            if( obj.entityType == entityType && obj.entitySubType == entitySubType ){
 
-            var objX:Int = obj.gridX;
-            var objY:Int = obj.gridY;
-            if( objX == topCorrdX && objY == topCoordY )
-                top = true;
-            else if( objX == leftCoordX && objY == leftCoordY )
-                left = true;
-            else if( objX == rightCoordX && objY == rightCoordY )
-                right = true;
-            else if( objX == bottomCoordX && objY == bottomCoordY )
-                bottom = true;
-            else
-                continue;
+                var objX:Int = obj.gridX;
+                var objY:Int = obj.gridY;
+                if( objX == topCorrdX && objY == topCoordY )
+                    top = true;
+                else if( objX == leftCoordX && objY == leftCoordY )
+                    left = true;
+                else if( objX == rightCoordX && objY == rightCoordY )
+                    right = true;
+                else if( objX == bottomCoordX && objY == bottomCoordY )
+                    bottom = true;
+                else
+                    continue;
+            }
         }
 
         if( top && left && right && bottom ){
@@ -340,29 +349,25 @@ class Scene {
             //index 12; 2 top+right
             entity.graphicIndex = 12;
         }else if( top && !left && !right && !bottom ){
-            //index 11; 1 top
+            //index 13; 1 top
             entity.graphicIndex = 13;
         }else if( !top && !left && right && !bottom ){
-            //index 12; 1 right
+            //index 14; 1 right
             entity.graphicIndex = 14;
         }else if( !top && left && !right && !bottom ){
-            //index 13; 1 left
+            //index 15; 1 left
             entity.graphicIndex = 15;
         }else if( !top && !left && !right && bottom ){
-            //index 14; 1 bottom
+            //index 16; 1 bottom
             entity.graphicIndex = 16;
         }else if( !top && !left && !right && !bottom ){
-            //index 15; 0
+            //index 17; 0
             entity.graphicIndex = 17;
         }else{
-            trace( 'Top: $top, Bot: $bottom, Left: $left, Right: $right ');
-            throw 'Error in Scene._spreadIndexForRockObject. Something wrong with function.';
-        }   
+            throw 'Error in Scene._spreadIndexForRockObject. Something wrong with function. Top: $top, Bot: $bottom, Left: $left, Right: $right .';
+        }
+        
     }
 
-    private function _generateTileMapID():TileMapID{
-        this._tileID++;
-        return TileMapID( this._tileID );
-    }
 
 }

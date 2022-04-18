@@ -1,7 +1,6 @@
 package;
 
-import TileMap.TileMapID;
-import Tile.TileID;
+import Scene.SceneID;
 import EntityHealthPointsSystem.EntityHealthPointsSystemConfig;
 import EntityAgeSystem.EntityAgeSystemConfig;
 import EntityNameSystem.EntityNameSystemConfig;
@@ -27,8 +26,8 @@ class Entity{
 
     public var entityType:String;
     public var entitySubType:String;
-    public var tileID:TileID;
-    public var tileMapID:TileMapID;
+    public var tileIndex:Int;
+    public var sceneID:SceneID;
     public var entityDeployID:EntityDeployID;
 
     public var canUse:Bool;

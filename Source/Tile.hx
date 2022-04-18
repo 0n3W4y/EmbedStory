@@ -2,10 +2,6 @@ package;
 
 import openfl.display.Sprite;
 
-enum TileID
-{
-	TileID( _:Int );
-}
 
 enum FloorTypeDeployID{
     FloorTypeDeployID( _:Int );
@@ -16,7 +12,6 @@ enum GroundTypeDeployID{
 }
 
 typedef TileConfig = {
-    var ID:TileID;
     var GridX:Int;
     var GridY:Int;
     var TileSize:Int;
@@ -37,7 +32,7 @@ typedef TileConfig = {
 class Tile {
     public var tileSize:Int;
     public var groundType:String; // earth, water, rock, sandstone, shallow, dirt, dryEarth;
-    public var groundTypeGraphicsIndex:Int;
+    public var groundTypeGraphicIndex:Int;
     public var floorType:String; // grass, rockroad, woodenfloor, sand;
     public var floorTypeGraphicIndex:Int;
     public var gridX:Int;
@@ -53,10 +48,11 @@ class Tile {
     public var canPlaceStaff:Int;
     public var canCharacterStand:Int;
 
+    public var floorGraphicIndex:Int;
+
     public var tileGroundSprite:Sprite;
     public var tileFloorSprite:Sprite;
 
-    private var _id:TileID;
     private var _init:Bool;
     private var _postInit:Bool;
     private var _index:Int;
@@ -71,7 +67,6 @@ class Tile {
         this.isWalkable = params.IsWalkable;
         this.floorType = params.FloorType;
         this.movementRatio = params.MovementRatio;
-        this._id = params.ID;
         this._index = params.Index;
         this.canPlaceFloor = params.CanPlaceFloor;
         this.canRemoveFloor = params.CanRemoveFloor;
@@ -141,11 +136,15 @@ class Tile {
         if( this._groundTypeDeployID == null )
             throw '$errMsg Ground type deploy ID is null';
 
+        if( this._index == null )
+            throw '$errMsg Index is null';
+
         this._init = true;
     }
 
     public function postInit():Void {
         var errMsg:String = 'Error in Tile.postInit. ';
+        
         if( this._postInit )
             trace( 'Tile already post inited' );
         //check sprites;
@@ -154,10 +153,6 @@ class Tile {
     public function calculateGraphicsPosition():Void {
         this.graphX = tileSize * this.gridX;
         this.graphY = tileSize * this.gridY;
-    }
-
-    public function getID():TileID {
-        return this._id;
     }
 
     public function getIndex():Int{
