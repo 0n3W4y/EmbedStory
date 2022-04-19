@@ -22,7 +22,7 @@ typedef SolidRiverConfig = {
     var WidthMax:Int;
     var WidthMin:Int;
     var OffsetX:Int;
-    var OffSetY:Int;
+    var OffsetY:Int;
     var WidthOffset:Int;
     var HeightOffset:Int;
     var RiverType:String;
@@ -33,10 +33,8 @@ typedef LiquidRiverConfig = {
     var Emerging:Int;
     var WidthMax:Int;
     var WidthMin:Int;
-    var OffsetX:Int;
-    var OffSetY:Int;
+    var Offset:Int;
     var WidthOffset:Int;
-    var HeightOffset:Int;
     var RiverType:String;
     var FloorType:String;
 }
@@ -140,8 +138,8 @@ class TileMap{
 
     public function generateMap():Void {
         this._prepareTileMap();
-        this._generateSolids();
         this._generateLiquids();
+        this._generateSolids();
     }
 
 
@@ -154,14 +152,6 @@ class TileMap{
         this._fillTileMapWithAdditionalGroundTypeTiles(); // добавляем пятна;
         this._fillTileMapWithMainFloorType(); // покрываем основным полом.
         this._fillTileMapWithAdditionalFloorType(); // покарываем дополнительными полами.
-    }
-
-    private function _prepareSolids():Void{
-
-    }
-
-    private function _prepareLiquids():Void{
-
     }
 
     private function _fillTileMapWithMainGroundTypeTiles():Void{
@@ -338,6 +328,7 @@ class TileMap{
     private function _generateSolid( params:SolidConfig ):Void{
         var groundTileDeployID:GroundTypeDeployID = this._deploy.getGroundTypeDeployID( params.GroundType );
         var groundTileConfig:Dynamic = this._deploy.groundTypeConfig[ groundTileDeployID ];
+        var floorTileConfigForNothing:Dynamic = this._deploy.floorTypeConfig[ FloorTypeDeployID( 300 ) ];
 
         for( n in 0...params.Amount ){
             var randomNum:Int = Math.floor( Math.random() * 100 ); // 0 - 99;
@@ -353,15 +344,62 @@ class TileMap{
             var widthOffset:Int = params.WidthOffset; // -x 0 +x;
             var heightOffset:Int = params.HeightOffset; // -y 0 +y;
 
-            for( i in 0...heightMax ){
-                for( j in 0...widthMax ){
-                    
+            var startingPointX:Int = Math.floor( Math.random() * ( this.width - widthMax )); // random starting point on x with safe distance on right;
+            var startingPointY:Int = Math.floor( Math.random() * ( this.height - heightMax )); // random starting point on y with safe distance on bottom;
+            var currentWidth:Int = Math.floor( widthMin + Math.random() * ( widthMin + widthMax + 1 ));
+            var currentHeight:Int = Math.floor( heightMin + Math.random() * ( heightMax + heightMin + 1 ));
+
+            var leftTopPointX:Int = startingPointX;
+            var leftTopPointY:Int = startingPointY;
+            var averageWidth:Int = Math.round(( widthMax + widthMin) / 2 );
+            var averageHeight:Int = Math.round(( heightMax + heightMin ) / 2 );
+
+            for( i in 0...averageHeight ){ // do horizontal lines;
+                leftTopPointX += Math.floor( -offsetX + Math.random()*( offsetX*2 + 1 ));
+                currentWidth += Math.floor( -widthOffset + Math.random()*( widthOffset*2 + 1 ));
+                if( currentWidth > widthMax )
+                    currentWidth = widthMax;
+
+                if( currentWidth < widthMin )
+                    currentWidth = widthMin;
+
+                var y:Int = startingPointY + i;
+                for( j in 0...currentWidth ){
+                    var x:Int = leftTopPointX + j;
+                    var index:Int = y * this.height + x;
+                    if( index < 0 || index >= this._totalTiles )
+                        continue;
+
+                    var tile:Tile = this.tileStorage[ index ];
+                    tile.changeGroundType( groundTileConfig );
+                    tile.changeFloorType( floorTileConfigForNothing );
+                    this._createEnvironment( tile );
                 }
             }
 
+            for( k in 0...averageWidth ){ // do vertical lines;
+                leftTopPointY = Math.floor( -offsetY + Math.random()*( offsetY*2 + 1 ));
+                currentHeight = Math.floor( -heightOffset + Math.random()*( heightOffset*2 + 1));
+                if( currentHeight > heightMax )
+                    currentHeight = heightMax;
+
+                if( currentHeight < heightMin )
+                    currentHeight = heightMin;
+
+                var x:Int = startingPointX + k;
+                for( l in 0...currentHeight ){
+                    var y:Int = leftTopPointY + l;
+                    var index:Int = y * this.height + x;
+                    if( index < 0 || index >= this._totalTiles )
+                        continue;
+
+                    var tile:Tile = this.tileStorage[ index ];
+                    tile.changeGroundType( groundTileConfig );
+                    tile.changeFloorType( floorTileConfigForNothing );
+                    this._createEnvironment( tile );
+                }
+            }
         }
-        
-        
     }
 
     private function _generateLiquids():Void{
@@ -379,8 +417,8 @@ class TileMap{
     private function _prepareForGenerateLiquidRiver( params:Dynamic ):Void{
         for( key in Reflect.fields( params )){
             var config:Dynamic = Reflect.getProperty( params, key );
-            var generatedConfig:RiverConfig = this._generateRiverConfig( config );
-            this._generateRiver( generatedConfig );
+            var generatedConfig:LiquidRiverConfig = this._generateLiquidRiverConfig( config );
+            this._generateLiquidRiver( generatedConfig );
         }
     }
 
@@ -391,150 +429,179 @@ class TileMap{
     private function _prepareForGenerateLiquid( params:Dynamic ):Void{
         for( key in Reflect.fields( params )){
             var config:Dynamic = Reflect.getProperty( params, key );
-            var generatedConfig:LakeRockConfig = this._generateLakeRockConfig( config );
-            this._generateLakeRock( generatedConfig );
+            var generatedConfig:LiquidConfig = this._generateLiquidConfig( config );
+            this._generateLiquid( generatedConfig );
         }
-    }
+    }    
 
-    
-
-    private function _generateRiverConfig( params:Dynamic ):RiverConfig{
-        var riverConfig:RiverConfig = {
-            Emerging: null,
+    private function _generateLiquidRiverConfig( params:Dynamic ):LiquidRiverConfig{
+        var riverConfig:LiquidRiverConfig = {
+            Emerging: Reflect.getProperty( params, "emerging" ),
             WidthMax: Reflect.getProperty( params, "widthMax" ),
             WidthMin: Reflect.getProperty( params, "widthMin" ),
-            Offset: Reflect.getProperty( params, "offset" ),
+            Offset: Reflect.getProperty( params, "offsetX" ),
             WidthOffset: Reflect.getProperty( params, "widthOffset" ),
-            RiverType: null,
+            RiverType: Reflect.getProperty( params, "riverType" ),
             FloorType: Reflect.getProperty( params, "FloorType" )
         }
-        var riverPercentage:Int = params.emerging;
-        
-        var randomNumForRiver:Int = Math.floor( Math.random()*( 100 )); // 0 - 99 ;
-        var randomNumForRiverType:Int = Math.floor( Math.random()*( 2 )); // 0 - 1;        
-
-        if( randomNumForRiver <= riverPercentage ) // use 0 -> riverPercentage;
-            riverConfig.Emerging = true;
-        
-        if( randomNumForRiverType == 0 )
-            riverConfig.RiverType = "h"; // horizontal;
-
         return riverConfig;
     }
 
-    private function _generateLakeRockConfig( params:Dynamic ):LakeRockConfig{
-        var config:LakeRockConfig = {    
-            Emerging: null, // появление
-            Amount: null,
+    private function _generateLiquidConfig( params:Dynamic ):LiquidConfig{
+        var config:LiquidConfig = {    
+            Emerging: Reflect.getProperty( params, "emerging" ),
+            Amount: Reflect.getProperty( params, "amount" ),
             WidthMax: Reflect.getProperty( params, "widthMax" ),
             WidthMin: Reflect.getProperty( params, "widthMin" ),
             HeightMax: Reflect.getProperty( params, "heightMax" ),
             HeightMin: Reflect.getProperty( params, "heightMin" ),
-            Offset: Reflect.getProperty( params, "offset" ),
+            OffsetX: Reflect.getProperty( params, "offsetX" ),
+            OffsetY: Reflect.getProperty( params, "offsetY" ),
             WidthOffset: Reflect.getProperty( params, "widthOffset" ),
-            GroundType: Reflect.getProperty( params, "groundType" )
+            HeightOffset: Reflect.getProperty( params, "heightOffset" ),
+            FloorType: Reflect.getProperty( params, "floorType" )
         };
-
-        var emerging:Int = params.emegring;
-
-        var randomNumForEmerging:Int = Math.floor( Math.random()*( 100 )); // 0 - 99;
-        var randomNumForAmount:Int = Math.floor( 1 + Math.random()*( params.amount ));
-
-        if( randomNumForEmerging <= emerging )
-            config.Emerging = true;
-
-        config.Amount = randomNumForAmount;
         return config;
     }
 
 
     private function _generateLiquidRiver( params:LiquidRiverConfig ):Void{
-        //generate river;
         var floorTileDeployID:FloorTypeDeployID = this._deploy.getFloorTypeDeployID( params.FloorType );
         var floorTileConfig:Dynamic = this._deploy.floorTypeConfig[ floorTileDeployID ];
-        if( params.Emerging ){
-            var riverWidthMax:Int = params.WidthMax;
-            var riverWidthMin:Int = params.WidthMin;
-            var riverOffset:Int = params.Offset;
-            var riverType:String = params.RiverType;
-            //var riverGroundType:String = params.GroundType;
-            var riverWidthOffsetMax = params.WidthOffset; // -1, 0, +1;
 
-            var currentRiverWidth:Int = Math.floor( riverWidthMin + Math.random() * ( riverWidthMax - riverWidthMin + 1 ));
+        var randomNum:Int = Math.floor( Math.random() * 100 ); // 0 - 99;
+        if( randomNum >= params.Emerging )
+            return;
+        
+        var widthMax:Int = params.WidthMax;
+        var widthMin:Int = params.WidthMin;
+        var offset:Int = params.Offset;
+        var riverType:String = params.RiverType;
+        var widthOffset = params.WidthOffset;
 
-            //horizontal river
-            var tileMapHeight = this.height;
-            var tileMapWidth = this.width;
-            if( riverType == "h" ){
-                //TODO
-            }else{
-                var riverPoint:Int = Math.floor( currentRiverWidth + riverOffset + Math.random()* ( tileMapWidth - currentRiverWidth - riverOffset + 1 ));
+        var currentRiverWidth:Int = Math.floor( widthMin + Math.random() * ( widthMax - widthMin + 1 ));
+        if( riverType == null ){
+            var randNum:Int = Math.floor( Math.random()* 2 ); // 0 - 1;
+            if( randNum == 0 )
+                riverType = "h"; // horizontal
+            else
+                riverType = "v"; // vertical
+        }
+    
+        if( riverType == "h" ){
+            var riverPoint:Int = Math.floor( currentRiverWidth + offset + Math.random()* ( this.height - currentRiverWidth - offset ));
+            for( i in 0...this.width ){
+                riverPoint += Math.floor( -offset + Math.random()* ( offset*2 + 1 ));
+                currentRiverWidth += Math.floor( -widthOffset + Math.random()*( widthOffset*2 + 1 ));
 
-                for( i in 0...tileMapHeight ){
-                    currentRiverWidth += Math.floor( -riverWidthOffsetMax + Math.random()*( riverWidthOffsetMax*2 + 1 ));
-                    if( currentRiverWidth > riverWidthMax )
-                        currentRiverWidth = riverWidthMax;
-                    else if( currentRiverWidth < riverWidthMin )
-                        currentRiverWidth = riverWidthMin;
+                if( currentRiverWidth > widthMax )
+                    currentRiverWidth = widthMax;
+                else if( currentRiverWidth < widthMin )
+                    currentRiverWidth = widthMin;
 
-                    riverPoint += Math.floor( -riverOffset + Math.random()* ( riverOffset*2 + 1 )); // offset on coord x -1, 0, +1;
-                    for( j in 0...currentRiverWidth ){
-                        var index:Int = ( riverPoint + j ) + tileMapHeight * i;
-                        if( this._totalTiles < index )
-                            break; // защита от выхода за пределы максимального значения тайлов
+                for( j in 0...currentRiverWidth ){
+                    var index = ( riverPoint + j ) * this.height + i;
+                    if( index < 0 || index >= this._totalTiles )
+                        continue;
 
-                        if( tileMapHeight * i < index || tileMapHeight * (i+1) > index )
-                            continue; // защита от выхода за пределы карты
-
-                        var tile:Tile = this.tileStorage[ index ];
-                        tile.changeFloorType( floorTileConfig );
-                    }                
+                    var tile:Tile = this.tileStorage[ index ];
+                    tile.changeFloorType( floorTileConfig );
                 }
+            }
+        }else{
+            var riverPoint:Int = Math.floor( currentRiverWidth + offset + Math.random()* ( this.width - currentRiverWidth - offset ));
+            for( i in 0...this.height ){
+                riverPoint += Math.floor( -offset + Math.random()* ( offset*2 + 1 ));
+                currentRiverWidth += Math.floor( -widthOffset + Math.random()*( widthOffset*2 + 1 ));
+                
+                if( currentRiverWidth > widthMax )
+                    currentRiverWidth = widthMax;
+                else if( currentRiverWidth < widthMin )
+                    currentRiverWidth = widthMin;                
+                
+                for( j in 0...currentRiverWidth ){
+                    var index:Int = riverPoint + j + this.height * i;
+                    if( this._totalTiles <= index || index < 0)
+                        continue;
+
+                    var tile:Tile = this.tileStorage[ index ];
+                    tile.changeFloorType( floorTileConfig );
+                }                
             }
         }
     }
 
     private function _generateLiquid( params:LiquidConfig ):Void{
-        var groundTileDeployID:GroundTypeDeployID = this._deploy.getGroundTypeDeployID( params.GroundType );
-        var groundTileConfig:Dynamic = this._deploy.groundTypeConfig[ groundTileDeployID ];
-        if( params.Emerging ){
-            var amount:Int = params.Amount;
+        var floorTileDeployID:FloorTypeDeployID = this._deploy.getFloorTypeDeployID( params.FloorType );
+        var floorTileConfig:Dynamic = this._deploy.floorTypeConfig[ floorTileDeployID ];
+
+        for( n in 0...params.Amount ){
+            var randomNum:Int = Math.floor( Math.random() * 100 ); // 0 - 99;
+            if( params.Emerging <= randomNum )
+                continue;
+
             var widthMax:Int = params.WidthMax;
             var widthMin:Int = params.WidthMin;
             var heightMax:Int = params.HeightMax;
             var heightMin:Int = params.HeightMin;
-            var offset:Int = params.Offset;
-            var widthOffset:Int = params.WidthOffset; // -1, 0, +1;
+            var offsetX:Int = params.OffsetX;
+            var offsetY:Int = params.OffsetY;
+            var widthOffset:Int = params.WidthOffset; // -x 0 +x;
+            var heightOffset:Int = params.HeightOffset; // -y 0 +y;
 
-            for( i in 0...amount ){
-                var lakeWidthAverage = Math.floor( widthMin + Math.random()*( widthMax - widthMin + 1 ));
-                var lakeHeightAverage = Math.floor( heightMin + Math.random()*( heightMax - heightMin + 1 ));
-                var lakePointTop = Math.floor( lakeHeightAverage/2 + Math.random()*( this.height - lakeHeightAverage/2 + 1)); // if lake going out of range, we must place about half of lake;
-                var lakePointLeft = Math.floor( lakeWidthAverage/2 + Math.random()*( this.width - lakeWidthAverage/2 + 1 ));
-                
-                for( j in 0...lakeHeightAverage ){
-                    lakePointLeft += Math.floor( -offset + Math.random()*( offset*2 + 1 ));
-                    lakeWidthAverage += Math.floor( -widthOffset + Math.random()*( widthOffset*2 +1 ));
-                    for( k in 0...lakeWidthAverage ){
-                        var index:Int = ( lakePointTop + j ) * this.height + lakePointLeft + k;
-                        if( this._totalTiles <= index || index < 0 )
-                            break; // защита от выхода за пределы карты.
+            var startingPointX:Int = Math.floor( Math.random() * ( this.width - widthMax )); // random starting point on x with safe distance on right;
+            var startingPointY:Int = Math.floor( Math.random() * ( this.height - heightMax )); // random starting point on y with safe distance on bottom;
+            var currentWidth:Int = Math.floor( widthMin + Math.random() * ( widthMin + widthMax + 1 ));
+            var currentHeight:Int = Math.floor( heightMin + Math.random() * ( heightMax + heightMin + 1 ));
 
-                        var tile:Tile = this.tileStorage[ index ];
-                        if( tile == null )
-                            throw 'Error in TileMpa._generateLakeRock. Tile storage does not have tile with index $index.';
+            var leftTopPointX:Int = startingPointX;
+            var leftTopPointY:Int = startingPointY;
+            var averageWidth:Int = Math.round(( widthMax + widthMin) / 2 );
+            var averageHeight:Int = Math.round(( heightMax + heightMin ) / 2 );
 
-                        tile.changeGroundType( groundTileConfig );
-                        this._createEnvironment( tile );
-                    }
+            for( i in 0...averageHeight ){ // do horizontal lines;
+                leftTopPointX += Math.floor( -offsetX + Math.random()*( offsetX*2 + 1 ));
+                currentWidth += Math.floor( -widthOffset + Math.random()*( widthOffset*2 + 1 ));
+                if( currentWidth > widthMax )
+                    currentWidth = widthMax;
+
+                if( currentWidth < widthMin )
+                    currentWidth = widthMin;
+
+                var y:Int = startingPointY + i;
+                for( j in 0...currentWidth ){
+                    var x:Int = leftTopPointX + j;
+                    var index:Int = y * this.height + x;
+                    if( index < 0 || index >= this._totalTiles )
+                        continue;
+
+                    var tile:Tile = this.tileStorage[ index ];
+                    tile.changeFloorType( floorTileConfig );
                 }
             }
-        }        
+
+            for( k in 0...averageWidth ){ // do vertical lines;
+                leftTopPointY = Math.floor( -offsetY + Math.random()*( offsetY*2 + 1 ));
+                currentHeight = Math.floor( -heightOffset + Math.random()*( heightOffset*2 + 1));
+                if( currentHeight > heightMax )
+                    currentHeight = heightMax;
+
+                if( currentHeight < heightMin )
+                    currentHeight = heightMin;
+
+                var x:Int = startingPointX + k;
+                for( l in 0...currentHeight ){
+                    var y:Int = leftTopPointY + l;
+                    var index:Int = y * this.height + x;
+                    if( index < 0 || index >= this._totalTiles )
+                        continue;
+
+                    var tile:Tile = this.tileStorage[ index ];
+                    tile.changeFloorType( floorTileConfig );
+                }
+            }
+        }
     }
-
-    
-
-
 
     private function _createEnvironment( tile:Tile ):Void{
         var tileGroundType:String = tile.groundType; // rock, sandrock
