@@ -1,8 +1,8 @@
 package;
 
+import haxe.rtti.CType.Rights;
 import Tile;
 import Deploy;
-import haxe.EnumTools;
 
 
 
@@ -17,19 +17,8 @@ typedef TileMapConfig = {
     var DeployID:BiomeDeployID;
 }
 
-typedef SolidRiverConfig = {
-    var Emerging:Int;
-    var WidthMax:Int;
-    var WidthMin:Int;
-    var OffsetX:Int;
-    var OffsetY:Int;
-    var WidthOffset:Int;
-    var HeightOffset:Int;
-    var RiverType:String;
-    var GroundType:String;
-}
 
-typedef LiquidRiverConfig = {
+typedef LiquidSolidRiverConfig = {
     var Emerging:Int;
     var WidthMax:Int;
     var WidthMin:Int;
@@ -37,9 +26,10 @@ typedef LiquidRiverConfig = {
     var WidthOffset:Int;
     var RiverType:String;
     var FloorType:String;
+    var GroundType:String;
 }
 
-typedef LiquidConfig = {
+typedef LiquidSolidConfig = {
     var Emerging:Int;
     var Amount:Int;
     var WidthMax:Int;
@@ -51,19 +41,6 @@ typedef LiquidConfig = {
     var WidthOffset:Int;
     var HeightOffset:Int;
     var FloorType:String;
-}
-
-typedef SolidConfig = {
-    var Emerging:Int;
-    var Amount:Int;
-    var WidthMax:Int;
-    var WidthMin:Int;
-    var HeightMax:Int;
-    var HeightMin:Int;
-    var OffsetX:Int;
-    var OffsetY:Int;
-    var WidthOffset:Int;
-    var HeightOffset:Int;
     var GroundType:String;
 }
 
@@ -140,6 +117,7 @@ class TileMap{
         this._prepareTileMap();
         this._generateLiquids();
         this._generateSolids();
+        this._spreadIndexesForWaterAndShallow();
     }
 
 
@@ -203,7 +181,7 @@ class TileMap{
                 var currentWidthMin:Int = Math.round( currentMaxWidth / 4 ); // 25% of maximum value
                 var currentHeightMin:Int = Math.round( currentMaxHeight / 4 ); // 25% of maximum value
 
-                var config:SolidConfig = {
+                var config:LiquidSolidConfig = {
                     Emerging: 100,
                     Amount: 1,
                     WidthMax: currentMaxWidth,
@@ -214,9 +192,10 @@ class TileMap{
                     OffsetY: 1,
                     WidthOffset: 1,
                     HeightOffset: 1,
+                    FloorType: null,
                     GroundType: key
                 }
-                this._generateSolid( config );
+                this._generateLiquidSolid( config );
 
                 remainTiles -= Math.round((( currentMaxWidth + currentWidthMin ) / 2 ) * (( currentMaxHeight + currentHeightMin ) / 2 ));
                 if( remainTiles <= 10 )
@@ -244,7 +223,7 @@ class TileMap{
                 continue;
             }
 
-            var randomIndex:Int = Math.floor( Math.random()* floorTypeGraphics.length ); //random index for floor graphics if exist;
+            var randomIndex:Int = Math.floor( Math.random() * floorTypeGraphics.length ); //random index for floor graphics if exist;
             if(( tileGroundType == "rockEnvironment" || tileGroundType == "sandrockEnvironment" ) && mainFloorType == "grass" )
                 tile.changeFloorType( configForNothingFloorType );
             else
@@ -286,6 +265,10 @@ class TileMap{
             var additionalFloorTypeDeployID:FloorTypeDeployID = this._deploy.getFloorTypeDeployID( floorType );
             var additionalFloorTypeConfig:Dynamic = this._deploy.floorTypeConfig[ additionalFloorTypeDeployID ];
             tile.changeFloorType( additionalFloorTypeConfig );
+
+            var floorTypeGraphics:Array<String> = Reflect.getProperty( additionalFloorTypeConfig, "graphics" );
+            var randomIndex:Int = Math.floor( Math.random() * floorTypeGraphics.length ); //random index for floor graphics if exist;
+            tile.floorTypeGraphicIndex = randomIndex;
         }
     }
 
@@ -303,13 +286,13 @@ class TileMap{
     private function _prepareForGenerateSolid( params:Dynamic ):Void{
         for( key in Reflect.fields( params )){
             var config:Dynamic = Reflect.getProperty( params, key );
-            var generatedConfig:SolidConfig = this._generateSolidConfig( config );
-            this._generateSolid( generatedConfig );
+            var generatedConfig:LiquidSolidConfig = this._generateSolidConfig( config );
+            this._generateLiquidSolid( generatedConfig );
         }
     }
 
-    private function _generateSolidConfig( params:Dynamic ):SolidConfig{
-        var config:SolidConfig = {  
+    private function _generateSolidConfig( params:Dynamic ):LiquidSolidConfig{
+        var config:LiquidSolidConfig = {  
             Emerging: Reflect.getProperty( params, "emerging" ),  
             Amount: Reflect.getProperty( params, "amount" ),
             WidthMax: Reflect.getProperty( params, "widthMax" ),
@@ -320,86 +303,10 @@ class TileMap{
             OffsetY: Reflect.getProperty( params, "offsetY" ),
             WidthOffset: Reflect.getProperty( params, "widthOffset" ),
             HeightOffset: Reflect.getProperty( params, "heightOffset" ),
+            FloorType: null,
             GroundType: Reflect.getProperty( params, "groundType" )
         };
         return config;
-    }
-
-    private function _generateSolid( params:SolidConfig ):Void{
-        var groundTileDeployID:GroundTypeDeployID = this._deploy.getGroundTypeDeployID( params.GroundType );
-        var groundTileConfig:Dynamic = this._deploy.groundTypeConfig[ groundTileDeployID ];
-        var floorTileConfigForNothing:Dynamic = this._deploy.floorTypeConfig[ FloorTypeDeployID( 300 ) ];
-
-        for( n in 0...params.Amount ){
-            var randomNum:Int = Math.floor( Math.random() * 100 ); // 0 - 99;
-            if( randomNum >= params.Emerging )
-                continue;
-
-            var widthMax:Int = params.WidthMax;
-            var widthMin:Int = params.WidthMin;
-            var heightMax:Int = params.HeightMax;
-            var heightMin:Int = params.HeightMin;
-            var offsetX:Int = params.OffsetX;
-            var offsetY:Int = params.OffsetY;
-            var widthOffset:Int = params.WidthOffset; // -x 0 +x;
-            var heightOffset:Int = params.HeightOffset; // -y 0 +y;
-
-            var startingPointX:Int = Math.floor( Math.random() * ( this.width - widthMax )); // random starting point on x with safe distance on right;
-            var startingPointY:Int = Math.floor( Math.random() * ( this.height - heightMax )); // random starting point on y with safe distance on bottom;
-            var currentWidth:Int = Math.floor( widthMin + Math.random() * ( widthMin + widthMax + 1 ));
-            var currentHeight:Int = Math.floor( heightMin + Math.random() * ( heightMax + heightMin + 1 ));
-
-            var leftTopPointX:Int = startingPointX;
-            var leftTopPointY:Int = startingPointY;
-            var averageWidth:Int = Math.round(( widthMax + widthMin) / 2 );
-            var averageHeight:Int = Math.round(( heightMax + heightMin ) / 2 );
-
-            for( i in 0...averageHeight ){ // do horizontal lines;
-                leftTopPointX += Math.floor( -offsetX + Math.random()*( offsetX*2 + 1 ));
-                currentWidth += Math.floor( -widthOffset + Math.random()*( widthOffset*2 + 1 ));
-                if( currentWidth > widthMax )
-                    currentWidth = widthMax;
-
-                if( currentWidth < widthMin )
-                    currentWidth = widthMin;
-
-                var y:Int = startingPointY + i;
-                for( j in 0...currentWidth ){
-                    var x:Int = leftTopPointX + j;
-                    var index:Int = y * this.height + x;
-                    if( index < 0 || index >= this._totalTiles )
-                        continue;
-
-                    var tile:Tile = this.tileStorage[ index ];
-                    tile.changeGroundType( groundTileConfig );
-                    tile.changeFloorType( floorTileConfigForNothing );
-                    this._createEnvironment( tile );
-                }
-            }
-
-            for( k in 0...averageWidth ){ // do vertical lines;
-                leftTopPointY = Math.floor( -offsetY + Math.random()*( offsetY*2 + 1 ));
-                currentHeight = Math.floor( -heightOffset + Math.random()*( heightOffset*2 + 1));
-                if( currentHeight > heightMax )
-                    currentHeight = heightMax;
-
-                if( currentHeight < heightMin )
-                    currentHeight = heightMin;
-
-                var x:Int = startingPointX + k;
-                for( l in 0...currentHeight ){
-                    var y:Int = leftTopPointY + l;
-                    var index:Int = y * this.height + x;
-                    if( index < 0 || index >= this._totalTiles )
-                        continue;
-
-                    var tile:Tile = this.tileStorage[ index ];
-                    tile.changeGroundType( groundTileConfig );
-                    tile.changeFloorType( floorTileConfigForNothing );
-                    this._createEnvironment( tile );
-                }
-            }
-        }
     }
 
     private function _generateLiquids():Void{
@@ -417,8 +324,8 @@ class TileMap{
     private function _prepareForGenerateLiquidRiver( params:Dynamic ):Void{
         for( key in Reflect.fields( params )){
             var config:Dynamic = Reflect.getProperty( params, key );
-            var generatedConfig:LiquidRiverConfig = this._generateLiquidRiverConfig( config );
-            this._generateLiquidRiver( generatedConfig );
+            var generatedConfig:LiquidSolidRiverConfig = this._generateRiverConfig( config );
+            this._generateLiquidSolidRiver( generatedConfig );
         }
     }
 
@@ -429,26 +336,27 @@ class TileMap{
     private function _prepareForGenerateLiquid( params:Dynamic ):Void{
         for( key in Reflect.fields( params )){
             var config:Dynamic = Reflect.getProperty( params, key );
-            var generatedConfig:LiquidConfig = this._generateLiquidConfig( config );
-            this._generateLiquid( generatedConfig );
+            var generatedConfig:LiquidSolidConfig = this._generateLiquidConfig( config );
+            this._generateLiquidSolid( generatedConfig );
         }
     }    
 
-    private function _generateLiquidRiverConfig( params:Dynamic ):LiquidRiverConfig{
-        var riverConfig:LiquidRiverConfig = {
+    private function _generateRiverConfig( params:Dynamic ):LiquidSolidRiverConfig{
+        var riverConfig:LiquidSolidRiverConfig = {
             Emerging: Reflect.getProperty( params, "emerging" ),
             WidthMax: Reflect.getProperty( params, "widthMax" ),
             WidthMin: Reflect.getProperty( params, "widthMin" ),
             Offset: Reflect.getProperty( params, "offsetX" ),
             WidthOffset: Reflect.getProperty( params, "widthOffset" ),
             RiverType: Reflect.getProperty( params, "riverType" ),
-            FloorType: Reflect.getProperty( params, "FloorType" )
+            FloorType: Reflect.getProperty( params, "floorType" ),
+            GroundType: Reflect.getProperty( params, "groundType" ),
         }
         return riverConfig;
     }
 
-    private function _generateLiquidConfig( params:Dynamic ):LiquidConfig{
-        var config:LiquidConfig = {    
+    private function _generateLiquidConfig( params:Dynamic ):LiquidSolidConfig{
+        var config:LiquidSolidConfig = {    
             Emerging: Reflect.getProperty( params, "emerging" ),
             Amount: Reflect.getProperty( params, "amount" ),
             WidthMax: Reflect.getProperty( params, "widthMax" ),
@@ -459,13 +367,14 @@ class TileMap{
             OffsetY: Reflect.getProperty( params, "offsetY" ),
             WidthOffset: Reflect.getProperty( params, "widthOffset" ),
             HeightOffset: Reflect.getProperty( params, "heightOffset" ),
-            FloorType: Reflect.getProperty( params, "floorType" )
+            FloorType: Reflect.getProperty( params, "floorType" ),
+            GroundType: null
         };
         return config;
     }
 
 
-    private function _generateLiquidRiver( params:LiquidRiverConfig ):Void{
+    private function _generateLiquidSolidRiver( params:LiquidSolidRiverConfig ):Void{
         var floorTileDeployID:FloorTypeDeployID = this._deploy.getFloorTypeDeployID( params.FloorType );
         var floorTileConfig:Dynamic = this._deploy.floorTypeConfig[ floorTileDeployID ];
 
@@ -531,9 +440,26 @@ class TileMap{
         }
     }
 
-    private function _generateLiquid( params:LiquidConfig ):Void{
-        var floorTileDeployID:FloorTypeDeployID = this._deploy.getFloorTypeDeployID( params.FloorType );
-        var floorTileConfig:Dynamic = this._deploy.floorTypeConfig[ floorTileDeployID ];
+    private function _generateLiquidSolid( params:LiquidSolidConfig ):Void{
+        var floorType:String = params.FloorType;
+        var groundType:String = params.GroundType;
+
+        var groundTileDeployID:GroundTypeDeployID = null;
+        var groundTileConfig:Dynamic = null;
+        var floorTileConfigForNothing:Dynamic = null;
+
+        var floorTileDeployID:FloorTypeDeployID = null;
+        var floorTileConfig:Dynamic = null;
+
+        if( floorType == null ){
+            groundTileDeployID= this._deploy.getGroundTypeDeployID( params.GroundType );
+            groundTileConfig = this._deploy.groundTypeConfig[ groundTileDeployID ];
+            floorTileConfigForNothing = this._deploy.floorTypeConfig[ FloorTypeDeployID( 300 ) ];
+        }else{
+            floorTileDeployID = this._deploy.getFloorTypeDeployID( params.FloorType );
+            floorTileConfig = this._deploy.floorTypeConfig[ floorTileDeployID ];
+        }
+        
 
         for( n in 0...params.Amount ){
             var randomNum:Int = Math.floor( Math.random() * 100 ); // 0 - 99;
@@ -576,7 +502,13 @@ class TileMap{
                         continue;
 
                     var tile:Tile = this.tileStorage[ index ];
-                    tile.changeFloorType( floorTileConfig );
+                    if( floorType == null ){
+                        tile.changeGroundType( groundTileConfig );
+                        tile.changeFloorType( floorTileConfigForNothing );
+                        this._createGroundEnvironment( tile );
+                    }else{
+                        tile.changeFloorType( floorTileConfig );
+                    }                    
                 }
             }
 
@@ -597,13 +529,19 @@ class TileMap{
                         continue;
 
                     var tile:Tile = this.tileStorage[ index ];
-                    tile.changeFloorType( floorTileConfig );
+                    if( floorType == null ){
+                        tile.changeGroundType( groundTileConfig );
+                        tile.changeFloorType( floorTileConfigForNothing );
+                        this._createGroundEnvironment( tile );
+                    }else{
+                        tile.changeFloorType( floorTileConfig );
+                    }
                 }
             }
         }
     }
 
-    private function _createEnvironment( tile:Tile ):Void{
+    private function _createGroundEnvironment( tile:Tile ):Void{
         var tileGroundType:String = tile.groundType; // rock, sandrock
         var newTileConfig:Dynamic = null;
 
@@ -632,16 +570,132 @@ class TileMap{
                 if( index < 0 || index >= this._totalTiles ) // защита от значений не принадлежащих текущей карты
                     continue; 
 
-                var indexTileGroundType = tile.groundType;
-                if( indexTileGroundType == "water" || indexTileGroundType == "rock" || indexTileGroundType == "sandstone" ){ // защита от перезаписи существующих тайлов
+                var newTile:Tile = this.tileStorage[ index ];
+                var indexTileGroundType = newTile.groundType;
+                if( indexTileGroundType == tileGroundType ){ // защита от перезаписи существующих тайлов
                     index++;
                     continue;
                 }
 
-                var tile:Tile = this.tileStorage[ index ];
-                tile.changeGroundType( newTileConfig );
+                newTile.changeGroundType( newTileConfig );
                 index++;
             }
+        }
+    }
+
+    private function _spreadIndexesForWaterAndShallow():Void{
+        for( i in 0...this.tileStorage.length ){
+            var tile:Tile = this.tileStorage[ i ];
+            var floorType:String = tile.floorType;
+            if( floorType == "shallow" || floorType == "water" )
+                this._spreadIndexForTileFloor( tile );
+        }
+    }
+
+    private function _spreadIndexForTileFloor( tile:Tile ):Void{
+        var floorType:String = tile.floorType;
+
+        var x:Int = tile.gridX;
+        var y:Int = tile.gridY;     
+
+        var top:Bool = false;
+        var topIndex:Int = ( y - 1 ) * this.height + x;
+        if( topIndex < 0 || topIndex >= this._totalTiles )
+            top = false;
+        else{
+            var topTile:Tile = this.tileStorage[ topIndex ];
+            var tileFloorType:String = topTile.floorType;
+            if( floorType == tileFloorType )
+                top = true;
+        }
+
+        var left:Bool = false;
+        var leftIndex:Int = y * this.height + x - 1;
+        if( leftIndex < 0 || leftIndex >= this._totalTiles )
+            left = false;
+        else{
+            var leftTile:Tile = this.tileStorage[ leftIndex ];
+            var tileFloorType:String = leftTile.floorType;
+            if( floorType == tileFloorType )
+                left = true;
+        }
+
+        var right:Bool = false;
+        var rightIndex:Int = y * this.height + x + 1;
+        if( rightIndex < 0 || rightIndex >= this._totalTiles )
+            right = false;
+        else{
+            var rightTile:Tile = this.tileStorage[ rightIndex ];
+            var tileFloorType:String = rightTile.floorType;
+            if( floorType == tileFloorType )
+                right = true;
+        }
+
+        var bottom:Bool = false;
+        var bottomIndex = ( y + 1 ) * this.height + x;
+        if( bottomIndex < 0 || bottomIndex >= this._totalTiles )
+            bottom = false;
+        else{
+            var bottomTile:Tile = this.tileStorage[ bottomIndex ];
+            var tileFloorType:String = bottomTile.floorType;
+            if( floorType == tileFloorType )
+                bottom = true;
+        }
+
+
+        if( top && left && right && bottom ){
+            //index 1; 4
+            tile.floorTypeGraphicIndex = 1;
+        }else if( top && left && right && !bottom ){
+            //index 2; 3 top+left+right
+            tile.floorTypeGraphicIndex = 2;
+        }else if( top && left && !right && bottom ){
+            //index 3; 3 top+left+bottom
+            tile.floorTypeGraphicIndex = 3;
+        }else if( top && !left && right && bottom ){
+            //index 4; 3 top+right+bottom
+            tile.floorTypeGraphicIndex = 4;
+        }else if( !top && left && right && bottom ){
+            //index 5; 3 left+right+bottom
+            tile.floorTypeGraphicIndex = 5;
+        }else if( top && left && !right && !bottom ){
+            //index 6; 2 top+left
+            tile.floorTypeGraphicIndex = 6;
+        }else if( !top && left && right && !bottom ){
+            //index 7; 2 left+right
+            tile.floorTypeGraphicIndex = 7;
+        }else if( !top && !left && right && bottom ){
+            //index 8; 2 right+bottom
+            tile.floorTypeGraphicIndex = 8;
+        }else if( top && !left && !right && bottom ){
+            //index 9; 2 top+bottom
+            tile.floorTypeGraphicIndex = 9;
+        }else if( top && !left && !right && bottom ){
+            //index 10; 2 top+bottom
+            tile.floorTypeGraphicIndex = 10;
+        }else if( !top && left && !right && bottom ){
+            //index 11; 2 bot+left
+            tile.floorTypeGraphicIndex = 11;
+        }else if( top && !left && right && !bottom ){
+            //index 12; 2 top+right
+            tile.floorTypeGraphicIndex = 12;
+        }else if( top && !left && !right && !bottom ){
+            //index 13; 1 top
+            tile.floorTypeGraphicIndex = 13;
+        }else if( !top && !left && right && !bottom ){
+            //index 14; 1 right
+            tile.floorTypeGraphicIndex = 14;
+        }else if( !top && left && !right && !bottom ){
+            //index 15; 1 left
+            tile.floorTypeGraphicIndex = 15;
+        }else if( !top && !left && !right && bottom ){
+            //index 16; 1 bottom
+            tile.floorTypeGraphicIndex = 16;
+        }else if( !top && !left && !right && !bottom ){
+            //index 17; 0
+            tile.floorTypeGraphicIndex = 17;
+        }else{
+            throw 'Error in TileMpa._spreadIndexForTileFloor. Something wrong with function. Top: $top, Bot: $bottom, Left: $left, Right: $right .';
         }
     }
 

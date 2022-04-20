@@ -19,32 +19,42 @@
 
     "303":{
         "id": 303,
-        "floorType": "stones",
-        "graphics": []
-    },
-
-    "304":{
-        "id": 304,
         "floorType": "snow",
         "movementRatio": 60,
         "graphics": []
     },
 
-    "305":{
-        "id": 305,
+    "304":{
+        "id": 304,
         "floorType": "water",
         "movementRatio": 30,
+        "isWalkable": 1,
         "canPlaceFloor": 0,
         "canRemoveFloor": 0,
-        "canCharacterStand": 0,
+        "canCharacterStand": 1,
         "canPlaceObjects": 0,
         "canPlaceStaff": 0,
         "graphics": []
     },
     
+    "305":{
+        "id": 305,
+        "floorType": "ice",
+        "movementRatio": 75,
+        "graphics": []
+    },
+
     "306":{
         "id": 306,
-        "floorType": "ice"
+        "floorType": "shallow",
+        "movementRatio": 70,
+        "isWalkable": 1,
+        "canPlaceFloor": 0,
+        "canRemoveFloor": 0,
+        "canPlaceObjects": 0,
+        "canPlaceStaff": 0,
+        "canCharacterStand": 1,
+        "graphics": []
     },
 
     "320":{

@@ -40,32 +40,6 @@
 
     "203":{
         "id": 203,
-        "groundType": "shallow",
-        "movementRatio": 70,
-        "isWalkable": 1,
-        "canPlaceFloor": 1,
-        "canRemoveFloor": 1,
-        "canPlaceObjects": 1,
-        "canPlaceStaff": 1,
-        "canCharacterStand": 1,
-        "graphics": []
-    },
-
-    "204":{
-        "id": 204,
-        "groundType": "iceShallow",
-        "movementRatio": 100,
-        "isWalkable": 1,
-        "canPlaceFloor": 1,
-        "canRemoveFloor": 1,
-        "canPlaceObjects": 1,
-        "canPlaceStaff": 1,
-        "canCharacterStand": 1,
-        "graphics": []
-    },
-
-    "205":{
-        "id": 205,
         "groundType": "dryEarth",
         "movementRatio": 100,
         "isWalkable": 1,

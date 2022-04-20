@@ -1,7 +1,6 @@
 package;
 
 
-import js.html.CharacterData;
 import haxe.EnumTools;
 import TileMap;
 import openfl.display.Sprite;
@@ -24,6 +23,11 @@ typedef SceneConfig = {
 
 typedef ObjectStorage = {
     var Rocks:Array<Entity>;
+    var Trees:Array<Entity>;
+    var Bushes:Array<Entity>;
+    var Stones:Array<Entity>;
+    var Logs:Array<Entity>;
+    var Ores:Array<Entity>;
 }
 
 typedef StuffStorage = {
@@ -35,7 +39,7 @@ typedef EffectStorage = {
 }
 
 typedef CharacterStorage = {
-
+    var Player: Entity;
 }
 
 class Scene {
@@ -53,7 +57,7 @@ class Scene {
     public var effectGraphics:Sprite;
 
     public var sceneName:String;
-    public var sceneType:String; // globalMap, battle;
+    public var sceneType:String;
     public var sceneGraphics:Sprite;
 
     public var showed:Bool;
@@ -93,10 +97,10 @@ class Scene {
         this.sceneGraphics.addChild(  this.characterGraphics );
         this.sceneGraphics.addChild(  this.effectGraphics );
         
-        this.objectStorage = { Rocks: [] };
-        //this.stuffStorage = [];
-        //this.effectStorage = [];
-        //this.characterStorage = [];
+        this.objectStorage = { Rocks: [], Trees: [], Stones: [], Ores: [], Bushes: [], Logs: [] };
+        this.stuffStorage = {};
+        this.effectStorage = {};
+        this.characterStorage = { Player: null };
 
         //by default scene not visible and transperent;
         this.sceneGraphics.visible = false;
@@ -172,7 +176,6 @@ class Scene {
     }   
 
     private function _generateTileMap():Void{
-        var id:TileMapID = this._generateTileMapID();
         var sceneDeployConfig:Dynamic = this._parent.getParent().deploy.sceneConfig[ this._sceneDeployID ];
         var biome:String = Reflect.getProperty( sceneDeployConfig, "tileMapBiome" );
         var height:Int = Reflect.getProperty( sceneDeployConfig, "height" );
@@ -185,7 +188,6 @@ class Scene {
             Width: width,
             TileSize: tileSize,
             DeployID: biomeDeployID,
-            TileMapID: id
         }
         this.tileMap = new TileMap( this, tileMapConfig );
         this.tileMap.init();
@@ -249,8 +251,7 @@ class Scene {
 
             rockEntity.gridX = tile.gridX;
             rockEntity.gridY = tile.gridY;
-            //rockEntity.tileID = tile.getID();
-            rockEntity.tileMapID = this.tileMap.getID();
+            rockEntity.tileIndex = tile.getIndex();
             rockEntity.init();
             this.objectStorage.Rocks.push( rockEntity );       
         }
@@ -290,7 +291,7 @@ class Scene {
 
         var bottom:Bool = false;
         var bottomCoordX = x;
-        var bottomCoordY = x + 1;
+        var bottomCoordY = y + 1;
 
 
         for( i in 0...this.objectStorage.Rocks.length ){
