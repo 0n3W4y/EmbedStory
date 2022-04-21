@@ -93,6 +93,12 @@ class SceneSystem {
         this._sceneId = value;
     }
 
+    public function update( time:Int ):Void{
+        for( i in 0...this.sceneStorage.length ){
+            this.sceneStorage[ i ].update( time );
+        }
+    }
+
 
 
     

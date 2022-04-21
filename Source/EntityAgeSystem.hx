@@ -85,6 +85,7 @@ class EntityAgeSystem{
     }
 
     public function timeUp():Void{
+        trace( "timeUp");
         this.minute++;
         if( this.minute >= 60 ){
             this.minute = 0;
@@ -119,6 +120,8 @@ class EntityAgeSystem{
         if( this.currentPhase >= this._phases.length )
             this._isPhaseLast = true;
 
+        var msg:String = this._errMsg();
+        trace( '$msg is phase UPPED!');
         //change graphics;
     }
 

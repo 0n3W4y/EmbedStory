@@ -67,7 +67,7 @@ class Deploy{
     public function getFloorTypeDeployID( name:String ):FloorTypeDeployID{
         for( key in this.floorTypeConfig.keys() ){
             var value:Map<String, Dynamic> = this.floorTypeConfig[ key ];
-            var floorTypeName:String = Reflect.getProperty( value, "name" );
+            var floorTypeName:String = Reflect.getProperty( value, "floorType" );
             if( name == floorTypeName )
                 return key;
         }
@@ -79,7 +79,7 @@ class Deploy{
     public function getGroundTypeDeployID( name:String ):GroundTypeDeployID{
         for( key in this.groundTypeConfig.keys() ){
             var value:Map<String, Dynamic> = this.groundTypeConfig[ key ];
-            var groundTypeName:String = Reflect.getProperty( value, "name" );
+            var groundTypeName:String = Reflect.getProperty( value, "groundType" );
             if( name == groundTypeName )
                 return key;
         }

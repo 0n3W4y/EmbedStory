@@ -25,8 +25,7 @@ class EntitySystem{
 
     public function createEntity( type:String, subType:String ):Entity {
         var config:Dynamic = null;  
-        for( key in this._deploy.entityConfig ){
-            var value:Dynamic = this._deploy.entityConfig[ key ];
+        for( value in this._deploy.entityConfig ){
             var valueType = Reflect.getProperty( value, "type" );
             var valueSubType = Reflect.getProperty( value, "subType" );
             if( valueType == type && valueSubType == subType )

@@ -108,6 +108,7 @@ class Game {
         if( !onPause ) {
             this.gameTimeSystem.update( time );
             this.gameEventSystem.update( time );
+            this.sceneSystem.update( time );
         }
     }
 

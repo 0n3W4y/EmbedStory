@@ -86,7 +86,7 @@ class Entity{
             age.update( time );
     }
 
-    public function getId():EntityID{
+    public function getID():EntityID{
         return this._ID;
     }
 

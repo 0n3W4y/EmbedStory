@@ -26,9 +26,36 @@
         }
     },
 
+    "1001":{
+        "id": 1001,
+        "type": "tree",
+        "subType": "fertileTree",
+        "systems":{
+            "age":{
+                "phases":[ 0, 1, 3, 5, 10],
+                "generate": 1,
+                "year": 0,
+                "month": 0,
+                "day": 0,
+                "hour": 23,
+                "minute": 59
+            },
+            "hp":{
+                "torso":{
+                    "torso":{
+                        "hp": 95
+                    }
+                }
+            },
+            "name":{
+                "name": "Apple Tree"
+            }
+        }
+    },
+
     "1010":{
         "id": 1010,
-        "type": "bush",
+        "type": "tree",
         "subType": "bush",
         "systems":{
             "age":{
@@ -55,8 +82,8 @@
 
     "1011":{
         "id": 1011,
-        "type": "bush",
-        "subType": "fertile",
+        "type": "tree",
+        "subType": "fertileBush",
         "systems":{
             "age":{
                 "phases":[ 0, 1, 3, 5 ],
@@ -136,8 +163,8 @@
 
     "1031":{
         "id": 1031,
-        "type": "log",
-        "subType": "tree",
+        "type": "tree",
+        "subType": "log",
         "systems":{
             "hp":{
                 "torso": { 
@@ -167,7 +194,26 @@
             }
             ,
             "name":{
-                "name": "Copper"
+                "name": "Copper Stone"
+            }
+        }
+    },
+
+    "1033":{
+        "id": 1033,
+        "type": "stone",
+        "subType": "steel",
+        "systems":{
+            "hp":{
+                "torso": { 
+                    "torso": {
+                        "hp": 110
+                    }
+                }
+            }
+            ,
+            "name":{
+                "name": "Steel Stone"
             }
         }
     }

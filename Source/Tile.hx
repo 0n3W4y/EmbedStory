@@ -1,5 +1,6 @@
 package;
 
+import Entity.EntityID;
 import openfl.display.Sprite;
 
 
@@ -48,6 +49,13 @@ class Tile {
     public var canPlaceStaff:Int;
     public var canCharacterStand:Int;
 
+    public var currentObject:EntityID;
+    public var currentStuff:EntityID;
+    public var currentCharacter:EntityID;
+    public var currentEffect:Dynamic;
+
+    public var hasRockFog:Bool;
+
     public var floorGraphicIndex:Int;
 
     public var tileGroundSprite:Sprite;
@@ -75,6 +83,13 @@ class Tile {
         this.canCharacterStand = params.CanCharacterStand;
         this._floorTypeDeployID = params.FloorDeployID;
         this._groundTypeDeployID = params.GroundDeployID;
+
+        this.currentCharacter = null;
+        this.currentObject = null;
+        this.currentStuff = null;
+        this.currentEffect = null;
+        
+        this.hasRockFog = false;
 
         this._init = false;
         this._postInit = false;        
@@ -160,14 +175,14 @@ class Tile {
     }
 
     public function changeFloorType( params:Dynamic ):Void{
-        this.floorType = Reflect.getProperty( params, "name" );
+        this.floorType = Reflect.getProperty( params, "floorType" );
         var deployID:Int = Reflect.getProperty( params, "id" );
         this._floorTypeDeployID = FloorTypeDeployID( deployID );
         this._updateFields( params );
     }
 
     public function changeGroundType( params:Dynamic ):Void{
-        this.groundType = Reflect.getProperty( params, "name" );
+        this.groundType = Reflect.getProperty( params, "groundType" );
         var deployID:Int = Reflect.getProperty( params, "id" );
         this._groundTypeDeployID = GroundTypeDeployID( deployID );
         this._updateFields( params );
@@ -184,7 +199,7 @@ class Tile {
                 case "canPlayerStand": this.canCharacterStand = Reflect.getProperty( params, key );
                 case "canPlaceStaff": this.canPlaceStaff = Reflect.getProperty( params, key );
                 case "canCharacterStand": this.canCharacterStand = Reflect.getProperty( params, key );
-                case "name", "id", "graphics":{};
+                case "groundType", "id", "graphics", "floorType":{};
                 default: throw 'Error in Tile._updateFields. "$key" not found.';
             }
         }

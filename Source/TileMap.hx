@@ -115,6 +115,7 @@ class TileMap{
 
     public function generateMap():Void {
         this._prepareTileMap();
+        // первое генерируется жидкость, так как она идет как cover для тайла. И в функции она не изменяет ground для тайла. 
         this._generateLiquids();
         this._generateSolids();
         this._spreadIndexesForWaterAndShallow();
@@ -375,6 +376,7 @@ class TileMap{
 
 
     private function _generateLiquidSolidRiver( params:LiquidSolidRiverConfig ):Void{
+        //TODO: SOLID RIVER!
         var floorTileDeployID:FloorTypeDeployID = this._deploy.getFloorTypeDeployID( params.FloorType );
         var floorTileConfig:Dynamic = this._deploy.floorTypeConfig[ floorTileDeployID ];
 
@@ -414,13 +416,14 @@ class TileMap{
                         continue;
 
                     var tile:Tile = this.tileStorage[ index ];
+                    trace( 'rivPoint: $riverPoint ; height: $height ; j: $j ; i: $i curWidth: $currentRiverWidth ; $params' );
                     tile.changeFloorType( floorTileConfig );
                 }
             }
         }else{
             var riverPoint:Int = Math.floor( currentRiverWidth + offset + Math.random()* ( this.width - currentRiverWidth - offset ));
             for( i in 0...this.height ){
-                riverPoint += Math.floor( -offset + Math.random()* ( offset*2 + 1 ));
+                riverPoint += Math.floor( -offset + Math.random() * ( offset*2 + 1 ));
                 currentRiverWidth += Math.floor( -widthOffset + Math.random()*( widthOffset*2 + 1 ));
                 
                 if( currentRiverWidth > widthMax )
@@ -434,6 +437,7 @@ class TileMap{
                         continue;
 
                     var tile:Tile = this.tileStorage[ index ];
+                    trace( 'rivPoint: $riverPoint ; height: $height ; j: $j ; i: $i curWidth: $currentRiverWidth ; $params' );
                     tile.changeFloorType( floorTileConfig );
                 }                
             }
@@ -441,9 +445,6 @@ class TileMap{
     }
 
     private function _generateLiquidSolid( params:LiquidSolidConfig ):Void{
-        var floorType:String = params.FloorType;
-        var groundType:String = params.GroundType;
-
         var groundTileDeployID:GroundTypeDeployID = null;
         var groundTileConfig:Dynamic = null;
         var floorTileConfigForNothing:Dynamic = null;
@@ -451,7 +452,7 @@ class TileMap{
         var floorTileDeployID:FloorTypeDeployID = null;
         var floorTileConfig:Dynamic = null;
 
-        if( floorType == null ){
+        if( params.FloorType == null ){
             groundTileDeployID= this._deploy.getGroundTypeDeployID( params.GroundType );
             groundTileConfig = this._deploy.groundTypeConfig[ groundTileDeployID ];
             floorTileConfigForNothing = this._deploy.floorTypeConfig[ FloorTypeDeployID( 300 ) ];
@@ -502,7 +503,7 @@ class TileMap{
                         continue;
 
                     var tile:Tile = this.tileStorage[ index ];
-                    if( floorType == null ){
+                    if( params.FloorType == null ){
                         tile.changeGroundType( groundTileConfig );
                         tile.changeFloorType( floorTileConfigForNothing );
                         this._createGroundEnvironment( tile );
@@ -529,7 +530,7 @@ class TileMap{
                         continue;
 
                     var tile:Tile = this.tileStorage[ index ];
-                    if( floorType == null ){
+                    if( params.FloorType == null ){
                         tile.changeGroundType( groundTileConfig );
                         tile.changeFloorType( floorTileConfigForNothing );
                         this._createGroundEnvironment( tile );
@@ -545,7 +546,7 @@ class TileMap{
         var tileGroundType:String = tile.groundType; // rock, sandrock
         var newTileConfig:Dynamic = null;
 
-        if( tileGroundType == "dirt" || tileGroundType == "dryEarth" || tileGroundType == "earth" )
+        if( tileGroundType == "dirt" || tileGroundType == "dryEarth" || tileGroundType == "earth" || tileGroundType == "rockEnvironment" || tileGroundType == "sandrockEnvironment" )
             return;
         
         switch( tileGroundType ){
@@ -692,8 +693,8 @@ class TileMap{
             //index 16; 1 bottom
             tile.floorTypeGraphicIndex = 16;
         }else if( !top && !left && !right && !bottom ){
-            //index 17; 0
-            tile.floorTypeGraphicIndex = 17;
+            //index 0; 0
+            tile.floorTypeGraphicIndex = 0;
         }else{
             throw 'Error in TileMpa._spreadIndexForTileFloor. Something wrong with function. Top: $top, Bot: $bottom, Left: $left, Right: $right .';
         }

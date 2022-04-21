@@ -43,7 +43,7 @@
                     "offsetY": 3,
                     "widthOffset": 2,
                     "heightOffset": 2,
-                    "groundType": "water"
+                    "floorType": "water"
                 }                
             }
         },
@@ -65,9 +65,15 @@
             }
         }, 
         "resources": {
-            "trees":{ "tree": 30, "bush": 5, "fertileBush": 1, "log": 6 },
-            "stones":{ "stone": 10, "steelStone": 5, "copperStone": 5 },
-            "ores":{ "copper": 30 }
+            "tree": 30,
+            "fertileTree": 1,
+            "bush": 5, 
+            "fertileBush": 1, 
+            "log": 6,
+            "stone": 10, 
+            "steelStone": 5, 
+            "copperStone": 5,
+            "copperOre": 3
         }
 
     },

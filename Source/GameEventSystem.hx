@@ -22,7 +22,7 @@ class GameEventSystem{
     }
 
     public function update( time:Int ):Void{
-        if( this._sceneEventsQueue.length > 1 )
+        if( this._sceneEventsQueue.length > 0 )
             this._updateSceneEvent( time, this._sceneEventsQueue[ 0 ] ); // Апдейт очереди ивентов. Апдейтится всегда 1-й ивент, потом удаляется.
 
         for( i in 0...this._sceneEvents.length ){

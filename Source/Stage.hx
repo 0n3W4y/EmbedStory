@@ -3,6 +3,7 @@ package;
 class Stage{
 
     public var nextScene:Scene;
+
     private var _parent:Game;
 
     public function new( parent:Game ):Void {

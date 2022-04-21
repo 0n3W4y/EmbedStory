@@ -1,6 +1,7 @@
 package;
 
 
+import Entity.EntityID;
 import haxe.EnumTools;
 import TileMap;
 import openfl.display.Sprite;
@@ -24,9 +25,7 @@ typedef SceneConfig = {
 typedef ObjectStorage = {
     var Rocks:Array<Entity>;
     var Trees:Array<Entity>;
-    var Bushes:Array<Entity>;
     var Stones:Array<Entity>;
-    var Logs:Array<Entity>;
     var Ores:Array<Entity>;
 }
 
@@ -55,6 +54,8 @@ class Scene {
     public var stuffGraphics:Sprite;
     public var characterGraphics:Sprite;
     public var effectGraphics:Sprite;
+    public var rockFog:Sprite;
+    public var lightingLayer1:Sprite;
 
     public var sceneName:String;
     public var sceneType:String;
@@ -64,12 +65,9 @@ class Scene {
     public var prepared:Bool;
     public var drawed:Bool;
 
-
     private var _sceneID:SceneID;
     private var _parent:SceneSystem;
     private var _sceneDeployID:SceneDeployID;
-
-    private var _deleteAfterHiding:Bool;
 
     public function new( parent:SceneSystem, params:SceneConfig ):Void{
         this._parent = parent;
@@ -80,7 +78,6 @@ class Scene {
 
         this.showed = false;
         this.prepared = false;
-        this.drawed = false;
 
         this.sceneGraphics = new Sprite();
         this.groundTileMapGraphics = new Sprite();
@@ -89,6 +86,8 @@ class Scene {
         this.stuffGraphics = new Sprite();
         this.characterGraphics = new Sprite();
         this.effectGraphics = new Sprite();
+        this.rockFog = new Sprite();
+        this.lightingLayer1 = new Sprite();
 
         this.sceneGraphics.addChild(  this.groundTileMapGraphics );
         this.sceneGraphics.addChild(  this.floorTileMapGraphics );
@@ -97,7 +96,7 @@ class Scene {
         this.sceneGraphics.addChild(  this.characterGraphics );
         this.sceneGraphics.addChild(  this.effectGraphics );
         
-        this.objectStorage = { Rocks: [], Trees: [], Stones: [], Ores: [], Bushes: [], Logs: [] };
+        this.objectStorage = { Rocks: [], Trees: [], Stones: [], Ores: [] };
         this.stuffStorage = {};
         this.effectStorage = {};
         this.characterStorage = { Player: null };
@@ -142,7 +141,18 @@ class Scene {
     }
 
     public function update( time:Int ):Void{
+        if( this.objectStorage != null )
+            this._updateObject( time );
 
+        if( this.stuffStorage != null )
+            this._updateStuff( time );
+
+        if( this.characterStorage != null )
+            this._updateCharacter( time );
+
+        if( this.effectStorage != null )
+            this._updateEffect( time );
+            
     }
 
     public function getParent():SceneSystem{
@@ -158,10 +168,44 @@ class Scene {
     }
 
     public function addEntity( entity:Entity ):Void{
+        var entityType:String = entity.entityType;
+        var container:Array<Entity> = null;
+        switch( entityType ){
+            case "rock": container = this.objectStorage.Rocks;
+            case "tree": container = this.objectStorage.Trees;
+            case "stone": container = this.objectStorage.Stones;
+            default: throw 'Error in Scene._createObject. can not find container with entity type: "$entityType".';
+        }
+
+        container.push( entity );
+    }
+
+    public function removeEntity( entity:Entity ):Void{
+        var entityType:String = entity.entityType;
+        var container:Array<Entity> = null;
+        switch( entityType ){
+            case "rock": container = this.objectStorage.Rocks;
+            case "tree": container = this.objectStorage.Trees;
+            case "stone": container = this.objectStorage.Stones;
+            default: throw 'Error in Scene._createObject. can not find container with entity type: "$entityType".';
+        }
+        var index:Int = null;
+        var oldEntityID:EntityID = entity.getID();
+        for( i in 0...container.length ){
+            var newEntity:Entity = container[ i ];
+            var newEntityID:EntityID = newEntity.getID();
+            if( EnumValueTools.equals( oldEntityID, newEntityID )){
+                index = i;
+                container.splice( index, 1 );
+                break;
+            }
+        }
+        if( index == null )
+            throw 'Error in Scene.removeEntity. Index is null for "$entityType" and "$oldEntityID".';
 
     }
 
-    public function removeEntity( entity:Entity ):Entity{
+    public function getEntityByID( ID:EntityID ):Entity{
         return null;
     }
 
@@ -213,25 +257,53 @@ class Scene {
 
         for( key in Reflect.fields( resourcesConfig )){
             var value:Dynamic = Reflect.getProperty( resourcesConfig, key );
+            trace( key );
             switch( key ){
-                case "trees": this._createTrees( value );
-                case "stones": this._createStones( value);
-                case "ores": this._createOres( value );
+                case "tree": this._createObject( "tree", "tree", value );
+                case "fertileTree": this._createObject( "tree", "fertileTree", value );
+                case "bush": this._createObject( "tree", "bush", value );
+                case "fertileBush": this._createObject( "tree", "fertileBush", value );
+                case "stone": this._createObject( "stone", "stone",  value);
+                case "log": this._createObject( "tree", "log", value );
+                case "steelStone": this._createObject( "stone", "steel", value );
+                case "copperStone": this._createObject( "stone", "copper", value );
+                case "copperOre": this._createOres( "rock", "copper", value );
                 default: throw 'Error in Scene._createResources. Can not create resources with key: $key';
             }
         }
     }
 
-    private function _createTrees( config:Dynamic):Void {
-        
+    private function _createObject( entityType:String, entitySubType:String, value:Int ):Void {
+        var tileStorage:Array<Tile> = this.tileMap.tileStorage;
+        var entitySystem:EntitySystem = this._parent.getParent().entitySystem;
+        for( i in 0...tileStorage.length ){
+            var tile:Tile = tileStorage[ i ];
+            var tileGround:String = tile.groundType;
+            var tileFloor:String = tile.floorType;
+            var tileObject:EntityID = tile.currentObject;
+            if( tileGround != "rock" && tileGround != "sandrock" && tileGround != "rockEnvironment" && tileGround != "sandrockEnvironment" ){
+                if( tileFloor == "nothing" || tileFloor == "grass" || tileFloor == "shallow" || tileFloor == "sand" || tileFloor == "snow" ){
+                    if( tileObject == null ){
+                        var num:Int = Math.floor( Math.random() * 100 ); // 0 - 99;
+                        if( value <= num ){
+                            var entity:Entity = entitySystem.createEntity( entityType, entitySubType );
+                            entity.init();
+                            entity.tileIndex = tile.getIndex();
+                            tile.currentObject = entity.getID();
+                            this.addEntity( entity );
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    private function _createStones( config:Dynamic ):Void{
+    private function _createOres( entityType:String, entitySubType:String, value:Int ):Void {
+        var rockObjects:Array<Entity> = this.objectStorage.Rocks;
+        for( i in 0...rockObjects.length ){
+            var rockEntity:Entity = rockObjects[ i ];
 
-    }
-
-    private function _createOres( config:Dynamic ):Void {
-        
+        }
     }
 
     private function _createRockObjects():Void{
@@ -253,7 +325,8 @@ class Scene {
             rockEntity.gridY = tile.gridY;
             rockEntity.tileIndex = tile.getIndex();
             rockEntity.init();
-            this.objectStorage.Rocks.push( rockEntity );       
+            tile.currentObject = rockEntity.getID();
+            this.addEntity( rockEntity );
         }
     }
 
@@ -271,7 +344,6 @@ class Scene {
 
     private function _spreadIndexForObject( entity:Entity ):Void{
         //for walls;
-        // maybe for water;
         var entityType:String = entity.entityType;
         var entitySubType:String = entity.entitySubType;
         var x:Int = entity.gridX;
@@ -316,6 +388,8 @@ class Scene {
         if( top && left && right && bottom ){
             //index 1; 4
             entity.graphicIndex = 1;
+            var tile:Tile = this.tileMap.getTileByIndex( entity.tileIndex );
+            tile.hasRockFog = true;
         }else if( top && left && right && !bottom ){
             //index 2; 3 top+left+right
             entity.graphicIndex = 2;
@@ -362,12 +436,30 @@ class Scene {
             //index 16; 1 bottom
             entity.graphicIndex = 16;
         }else if( !top && !left && !right && !bottom ){
-            //index 17; 0
-            entity.graphicIndex = 17;
+            //index 0; 0
+            entity.graphicIndex = 0;
         }else{
             throw 'Error in Scene._spreadIndexForRockObject. Something wrong with function. Top: $top, Bot: $bottom, Left: $left, Right: $right .';
         }
         
+    }
+
+    private function _updateObject( time:Int ):Void{
+        for( i in 0...this.objectStorage.Trees.length ){
+            this.objectStorage.Trees[ i ].update( time );
+        }
+    }
+
+    private function _updateStuff( time:Int ):Void{
+        
+    }
+
+    private function _updateCharacter( time:Int ):Void{
+
+    }
+
+    private function _updateEffect( time:Int ):Void{
+
     }
 
 
