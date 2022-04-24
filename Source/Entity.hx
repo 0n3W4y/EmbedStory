@@ -53,6 +53,16 @@ class Entity{
         this.entitySubType = config.EntitySubType;
         this._ID = config.EntityID;
         this.entityDeployID = config.DeployID;
+
+        if( config.AgeSystemConfig != null )
+            this.age = new EntityAgeSystem( this, config.AgeSystemConfig );
+
+        if( config.HPSystemConfig != null )
+            this.healthPoints = new EntityHealthPointsSystem( this, config.HPSystemConfig );
+
+        if( config.NameSystemConfig != null )
+            this.name = new EntityNameSystem( this, config.NameSystemConfig );
+        
         //this.canUse = false;
         //this.canDestroy = false;
     }
@@ -82,8 +92,9 @@ class Entity{
     }
 
     public function update( time:Int ):Void{
-        if( age != null )
-            age.update( time );
+        if( this.age != null ){
+            this.age.update( time );
+        }
     }
 
     public function getID():EntityID{

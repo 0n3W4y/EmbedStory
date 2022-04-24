@@ -33,42 +33,34 @@ class EntityAgeSystem{
 
     private var _phases:Array<Int>; // Индекс обозначает фазу, значение обозначает количество времени для этой фазы ( время будет исчислять в часах );
     private var _isPhaseLast:Bool;
+    private var _inited:Bool;
 
     public function new( parent:Entity, params:EntityAgeSystemConfig ):Void{
         this._parent = parent;
         this.currentTime = 0;
         this._phases = params.Phases;
 
+        this.year = params.Year;
+        this.month = params.Month;
+        this.day = params.Day;
+        this.hour = params.Hour;
+        this.minute = params.Minute;
+
         this._isPhaseLast = false;
-        this._calculatePhase();
+        this._inited = false;
     }
 
     public function init():Void{
         var msg:String = this._errMsg();
 
-        if( this._parent == null )
-            throw '$msg init. Parent is null';
+        if( this._inited )
+            throw '$msg. EntityAgeSystem already inited!';
 
-        if( this.currentTime == null )
-            throw '$msg init. Total Time is null';
+        if( this.year == -1 || this.month == -1 || this.day == -1 || this.hour == -1 || this.minute == -1 )
+            throw '$msg. Check agesystem config';
 
-        if( this.currentPhase == null )
-            throw '$msg init. Phase is null';
+        this._calculatePhase();
 
-        if( this.year == null )
-            throw '$msg init. Year is null';
-
-        if( this.day == null )
-            throw '$msg init. Day is null';
-
-        if( this.hour == null )
-            throw '$msg init. Hour is null';
-
-        if( this.month == null )
-            throw '$msg init. Month is null';
-        
-        if( this._phases == null )
-            throw '$msg init. Array with phases is null';
     }
 
     public function postInit():Void{
@@ -85,7 +77,6 @@ class EntityAgeSystem{
     }
 
     public function timeUp():Void{
-        trace( "timeUp");
         this.minute++;
         if( this.minute >= 60 ){
             this.minute = 0;
@@ -120,8 +111,6 @@ class EntityAgeSystem{
         if( this.currentPhase >= this._phases.length )
             this._isPhaseLast = true;
 
-        var msg:String = this._errMsg();
-        trace( '$msg is phase UPPED!');
         //change graphics;
     }
 
@@ -148,7 +137,7 @@ class EntityAgeSystem{
         var time:Int = this.year * 12 * 30 * 24 + this.month * 30 * 24 + this.day * 24 + this.hour;
         if( phase < this._phases.length ){
             var nextPhaseTime:Int = this._phases[ phase + 1 ];
-            if( nextPhaseTime == null ){
+            if( phase + 1 >= this._phases.length ){
                 this._isPhaseLast = true;
                 //change graphics;
             }

@@ -28,12 +28,12 @@
         "id": 304,
         "floorType": "water",
         "movementRatio": 30,
-        "isWalkable": 1,
-        "canPlaceFloor": 0,
-        "canRemoveFloor": 0,
-        "canCharacterStand": 1,
-        "canPlaceObjects": 0,
-        "canPlaceStaff": 0,
+        "isWalkable": true,
+        "canPlaceFloor": false,
+        "canRemoveFloor": false,
+        "canCharacterStand": true,
+        "canPlaceObjects": false,
+        "canPlaceStaff": false,
         "graphics": []
     },
     
@@ -48,12 +48,12 @@
         "id": 306,
         "floorType": "shallow",
         "movementRatio": 70,
-        "isWalkable": 1,
-        "canPlaceFloor": 0,
-        "canRemoveFloor": 0,
-        "canPlaceObjects": 0,
-        "canPlaceStaff": 0,
-        "canCharacterStand": 1,
+        "isWalkable": true,
+        "canPlaceFloor": false,
+        "canRemoveFloor": false,
+        "canPlaceObjects": false,
+        "canPlaceStaff": false,
+        "canCharacterStand": true,
         "graphics": []
     },
 
@@ -61,7 +61,7 @@
         "id": 320,
         "floorType": "woodenFloor",
         "movementRatio": 115,
-        "canPlaceFloor": 0,
+        "canPlaceFloor": false,
         "graphics": []
     },
 
@@ -69,7 +69,7 @@
         "id": 321,
         "floorType": "rockRoad",
         "movementRatio": 120,
-        "canPlaceFloor": 0,
+        "canPlaceFloor": false,
         "graphics": []
     }
 }

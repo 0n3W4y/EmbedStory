@@ -589,127 +589,117 @@ class EntityHealthPointsSystem{
     private function _configureHead( params:Dynamic ):Void{
         var msg:String = this._parent.errMsg();
         this.head = { Head: null, LeftEye: null, RightEye: null, Mouth: null, Brain: null, Nose: null }
-        var container:BodyPart = null;
         for( key in Reflect.fields( params )){
             var partParams:Dynamic = Reflect.getProperty( params, key );
             switch( key ){
-                case "head": container = this.head.Head;
-                case "leftEye": container = this.head.LeftEye;
-                case "rightEye": container = this.head.RightEye;
-                case "mouth": container = this.head.Mouth;
-                case "brain": container = this.head.Brain;
-                case "nose": container = this.head.Nose;
+                case "head": this.head.Head = this._addParamsToBodyPart( partParams );
+                case "leftEye": this.head.LeftEye = this._addParamsToBodyPart( partParams );
+                case "rightEye": this.head.RightEye = this._addParamsToBodyPart( partParams );
+                case "mouth": this.head.Mouth = this._addParamsToBodyPart( partParams );
+                case "brain": this.head.Brain = this._addParamsToBodyPart( partParams );
+                case "nose": this.head.Nose = this._addParamsToBodyPart( partParams );
                 default: throw '$msg. _configureHead. There is no "$key" in config';
             }
 
-            this._addParamsToBodyPart( container, partParams );
         }
     }
 
     private function _configureTorso( params:Dynamic ):Void{
         var msg:String = this._parent.errMsg();
-        this.torso = { Torso:null, LeftLung: null, RightLung: null, Heart: null };
-        var container:BodyPart = null;
+        this.torso = { Torso: null, LeftLung: null, RightLung: null, Heart: null };
         for( key in Reflect.fields( params )){
             var partParams:Dynamic = Reflect.getProperty( params, key );
             switch( key ){
-                case "torso": container = this.torso.Torso;
-                case "leftLung": container = this.torso.LeftLung;
-                case "rightLung": container = this.torso.RightLung;
-                case "heart": container = this.torso.Heart;
+                case "torso": this.torso.Torso = this._addParamsToBodyPart( partParams );
+                case "leftLung": this.torso.LeftLung = this._addParamsToBodyPart( partParams );
+                case "rightLung": this.torso.RightLung = this._addParamsToBodyPart( partParams );
+                case "heart": this.torso.Heart = this._addParamsToBodyPart( partParams );
                 default: throw '$msg _configureTorso. There is no "$key" in config.';
             }
-            this._addParamsToBodyPart( container, partParams );
         }
     }
 
     private function _configureLeftLeg( params:Dynamic ):Void{
         var msg:String = this._parent.errMsg();
         this.leftLeg = { Foot: null, Sole: null };
-        var container:BodyPart = null;
         for( key in Reflect.fields( params )){
             var partParams:Dynamic = Reflect.getProperty( params, key );
             switch( key ){
-                case "foot": container = this.leftLeg.Foot;
-                case "sole": container = this.leftLeg.Sole;
+                case "foot": this.leftLeg.Foot = this._addParamsToBodyPart( partParams );
+                case "sole": this.leftLeg.Sole = this._addParamsToBodyPart( partParams );
                 default: throw '$msg _configureLeftLeg. There is no "$key" in config.';
             }
-            this._addParamsToBodyPart( container, partParams );
         }
     }
 
     private function _configureRightLeg( params:Dynamic ):Void{
         var msg:String = this._parent.errMsg();
         this.rightLeg = { Foot: null, Sole: null };
-        var container:BodyPart = null;
         for( key in Reflect.fields( params )){
             var partParams:Dynamic = Reflect.getProperty( params, key );
             switch( key ){
-                case "foot": container = this.rightLeg.Foot;
-                case "sole": container = this.rightLeg.Sole;
+                case "foot": this.rightLeg.Foot = this._addParamsToBodyPart( partParams );
+                case "sole": this.rightLeg.Sole = this._addParamsToBodyPart( partParams );
                 default: throw '$msg _configureRightLeg. There is no "$key" in config.';
             }
-            this._addParamsToBodyPart( container, partParams );
         }
     }
 
     private function _configureLeftHand( params:Dynamic ):Void{
         var msg:String = this._parent.errMsg();
         this.leftHand = { Arm: null, Wrist: null };
-        var container:BodyPart = null;
         for( key in Reflect.fields( params )){
             var partParams:Dynamic = Reflect.getProperty( params, key );
             switch( key ){
-                case "arm": container = this.leftHand.Arm;
-                case "wrist": container = this.leftHand.Wrist;
+                case "arm": this.leftHand.Arm = this._addParamsToBodyPart( partParams );
+                case "wrist": this.leftHand.Wrist = this._addParamsToBodyPart( partParams );
                 default: throw '$msg _configureLeftHand. There is no "$key" in config.';
             }
-            this._addParamsToBodyPart( container, partParams );
         }
     }
 
     private function _configureRightHand( params:Dynamic ):Void{
         var msg:String = this._parent.errMsg();
         this.rightHand = { Arm: null, Wrist: null };
-        var container:BodyPart = null;
         for( key in Reflect.fields( params )){
             var partParams:Dynamic = Reflect.getProperty( params, key );
             switch( key ){
-                case "arm": container = this.rightHand.Arm;
-                case "wrist": container = this.rightHand.Wrist;
+                case "arm": this.rightHand.Arm = this._addParamsToBodyPart( partParams );
+                case "wrist": this.rightHand.Wrist = this._addParamsToBodyPart( partParams );
                 default: throw '$msg _configureRightHand. There is no "$key" in config.';
             }
-            this._addParamsToBodyPart( container, partParams );
         }
     }
 
-    private function _addParamsToBodyPart( container:BodyPart, config:Dynamic ):Void{
+    private function _addParamsToBodyPart( config:Dynamic ):BodyPart{
+        var bodyPart:BodyPart = { HP: null, CurrentHP: null, Status: null, PartType: null };
         var msg:String = this._parent.errMsg();
-
         var hp:Int = Reflect.getProperty( config, "hp" );
         var cHP:Int = Reflect.getProperty( config, "currentHP" );
         var partType:String = Reflect.getProperty( config, "partType" );
         var partStatus:String = Reflect.getProperty( config, "status" );
 
-        if( hp == null )
-            throw '$msg _addParamsToBodyPart. HP in NULL';
+        if( !Std.isOfType( hp, Int )) 
+            throw '$msg _addParamsToBodyPart. HP is not valid';
 
-        container.HP = HealthPoint( hp );
+        bodyPart.HP = HealthPoint( hp );
 
-        if( cHP == null )
-            container.CurrentHP = HealthPoint( hp );
+        if( !Math.isNaN( cHP) )
+            bodyPart.CurrentHP = HealthPoint( hp );
         else
-            container.CurrentHP = HealthPoint( cHP );
+            bodyPart.CurrentHP = HealthPoint( cHP );
 
         if( partType == null )
-            container.PartType = "natural";
+            bodyPart.PartType = "natural";
         else
-            container.PartType = partType;
+            bodyPart.PartType = partType;
 
         if( partStatus == null )
-            container.Status = "healthy";
+            bodyPart.Status = "healthy";
         else
-            container.Status = partStatus;
+            bodyPart.Status = partStatus;
+
+        return bodyPart;
     }
 
     private function _death():Void{

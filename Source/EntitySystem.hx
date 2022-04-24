@@ -102,7 +102,7 @@ class EntitySystem{
     }
 
     private function _createAgeSystemConfig( config:Dynamic ):EntityAgeSystemConfig{
-        var ageSystemConfig:EntityAgeSystemConfig = { Phases: null, Year: null, Month: null, Day: null, Hour: null, Minute: null };
+        var ageSystemConfig:EntityAgeSystemConfig = { Phases: [], Year: -1, Month: -1, Day: -1, Hour: -1, Minute: -1 };
         var generate:Int = 0;
         for( key in Reflect.fields( config )){
             switch( key ){

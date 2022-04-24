@@ -57,7 +57,7 @@ class SceneSystem {
 
         //TODO: check scene status;
         var sceneId:SceneID = scene.getSceneID();
-        var index:Int = null;
+        var index:Int = -1;
         for( i in 0...this.sceneStorage.length ){
             var storagedScene:Scene = this.sceneStorage[ i ];
             var storagedSceneId:SceneID = storagedScene.getSceneID();
@@ -67,7 +67,7 @@ class SceneSystem {
             }
         }
 
-        if( index == null )
+        if( index == -1 )
             throw 'Error in SceneSystem.deleteScene. Can not find scene with scene ID "$sceneId" in sce estorage.';
 
         this.sceneStorage.splice( index, 1 ); // удаляет сцену раз и навсегда и все ее объекты.

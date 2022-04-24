@@ -29,6 +29,12 @@ class GameTimeSystem{
         this._monthTimeLine = 12;
 
         this._currenTickTime = 0;
+
+        this.currentMinute = 0;
+        this.currentHour = 0;
+        this.currentDay = 0;
+        this.currentMonth = 0;
+        this.currentYear = 0;
     }
 
     public function update( time:Int ):Void{

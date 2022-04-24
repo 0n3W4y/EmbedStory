@@ -23,20 +23,30 @@ class EntityNameSystem {
         this.name = config.Name;
         this.surname = config.Surname;
         this.nickname = config.Nickname;
+
+        this._inited = false;
+        this._postInited = false;
     }
 
     public function init():Void{
         var msg:String = this._parent.errMsg();
 
-        if( !this._inited )
+        if( this._inited )
             throw '$msg EntityNameSystem already inited!';
 
         if( this.name == null && this.nickname == null && this.surname == null )
             throw '$msg EntityNameSystem.init. Name, nickname and surname is null';
+
+        this._inited = true;
     }
 
     public function postInit():Void{
+        var msg:String = this._parent.errMsg();
 
+        if( this._postInited )
+            throw '$msg EntityNameSystem. already post inited!';
+
+        this._postInited = true;
     }
 
     public function getFullName():String{

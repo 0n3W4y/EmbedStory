@@ -1,6 +1,6 @@
 package;
 
-import haxe.rtti.CType.Rights;
+
 import Tile;
 import Deploy;
 
@@ -79,17 +79,17 @@ class TileMap{
         if( this._init )
             return;
 
-        if( this.height == null )
-            throw '$errMsg Height is null';
+        if( !Std.isOfType( this.height, Int ) )
+            throw '$errMsg Height is not valid $height';
 
-        if( this.width == null )
-            throw '$errMsg Width is null';
+        if( !Std.isOfType( this.width, Int ) )
+            throw '$errMsg Width is not valid';
 
         if( this._parent == null )
             throw '$errMsg Parent is null';
 
-        if( this.tileSize == null )
-            throw '$errMsg Tile Size is null';
+        if( !Std.isOfType( this.tileSize, Int ))
+            throw '$errMsg Tile Size is not valid';
 
         if( this._deploy == null )
             throw '$errMsg Deploy is null';
@@ -347,7 +347,7 @@ class TileMap{
             Emerging: Reflect.getProperty( params, "emerging" ),
             WidthMax: Reflect.getProperty( params, "widthMax" ),
             WidthMin: Reflect.getProperty( params, "widthMin" ),
-            Offset: Reflect.getProperty( params, "offsetX" ),
+            Offset: Reflect.getProperty( params, "offset" ),
             WidthOffset: Reflect.getProperty( params, "widthOffset" ),
             RiverType: Reflect.getProperty( params, "riverType" ),
             FloorType: Reflect.getProperty( params, "floorType" ),
@@ -416,7 +416,6 @@ class TileMap{
                         continue;
 
                     var tile:Tile = this.tileStorage[ index ];
-                    trace( 'rivPoint: $riverPoint ; height: $height ; j: $j ; i: $i curWidth: $currentRiverWidth ; $params' );
                     tile.changeFloorType( floorTileConfig );
                 }
             }
@@ -437,7 +436,6 @@ class TileMap{
                         continue;
 
                     var tile:Tile = this.tileStorage[ index ];
-                    trace( 'rivPoint: $riverPoint ; height: $height ; j: $j ; i: $i curWidth: $currentRiverWidth ; $params' );
                     tile.changeFloorType( floorTileConfig );
                 }                
             }

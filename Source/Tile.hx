@@ -18,13 +18,13 @@ typedef TileConfig = {
     var TileSize:Int;
     var GroundType:String;
     var FloorType:String;
-    var IsWalkable:Int;
+    var IsWalkable:Bool;
     var MovementRatio:Int;
-    var CanPlaceFloor:Int;
-    var CanRemoveFloor:Int;
-    var CanPlaceObjects:Int;
-    var CanPlaceStaff:Int;
-    var CanCharacterStand:Int;
+    var CanPlaceFloor:Bool;
+    var CanRemoveFloor:Bool;
+    var CanPlaceObjects:Bool;
+    var CanPlaceStaff:Bool;
+    var CanCharacterStand:Bool;
     var Index:Int;
     var FloorDeployID: FloorTypeDeployID;
     var GroundDeployID: GroundTypeDeployID;
@@ -42,12 +42,12 @@ class Tile {
     public var graphY:Int;
 
     public var movementRatio:Int;
-    public var isWalkable:Int;
-    public var canPlaceFloor:Int;
-    public var canRemoveFloor:Int;
-    public var canPlaceObjects:Int;
-    public var canPlaceStaff:Int;
-    public var canCharacterStand:Int;
+    public var isWalkable:Bool;
+    public var canPlaceFloor:Bool;
+    public var canRemoveFloor:Bool;
+    public var canPlaceObjects:Bool;
+    public var canPlaceStaff:Bool;
+    public var canCharacterStand:Bool;
 
     public var currentObject:EntityID;
     public var currentStuff:EntityID;
@@ -103,47 +103,29 @@ class Tile {
         if( this._init )
             trace( 'Tile already inited' );
 
-        if( this.gridX == null )
-            throw '$errMsg GridX is null';
+        if( this.gridX == -1 )
+            throw '$errMsg GridX is not valid';
 
-        if( this.gridY == null )
-            throw '$errMsg GridY is null';
+        if( this.gridY == -1 )
+            throw '$errMsg GridY is not valid';
 
-        if( this.tileSize == null )
-            throw '$errMsg Tile Size is null';
+        if( this.tileSize == -1 )
+            throw '$errMsg Tile Size is not valid';
 
         if( this.groundType == null )
             throw '$errMsg Ground type is null';
 
-        if( this.isWalkable == null )
-            throw '$errMsg Is walkable is null';
-
         if( this.floorType == null )
             throw '$errMsg Floor type is null';
 
-        if( this.graphX == null )
-            throw '$errMsg Graphics X is null';
+        if( this.graphX == -1 )
+            throw '$errMsg Graphics X is not valid';
 
-        if( this.graphY == null )
-            throw '$errMsg Graphics Y is null';
+        if( this.graphY == -1 )
+            throw '$errMsg Graphics Y is not valid';
 
-        if( this.movementRatio == null )
-            throw '$errMsg Movement ratio is null';
-
-        if( this.canPlaceFloor == null )
-            throw '$errMsg can place floor is null';
-
-        if( this.canRemoveFloor == null )
-            throw '$errMsg can remove floor is null'; 
-
-        if( this.canPlaceObjects == null )
-            throw '$errMsg Can Place objects is null';
-
-        if( this.canCharacterStand == null )
-            throw '$errMsg Can player stand is null';
-
-        if( this.canPlaceStaff == null )
-            throw '$errMsg Can place staff is null';
+        if( this.movementRatio == -1 )
+            throw '$errMsg Movement ratio is not valid';
 
         if( this._floorTypeDeployID == null )
             throw '$errMsg Floor type deploy ID is null';
@@ -151,8 +133,8 @@ class Tile {
         if( this._groundTypeDeployID == null )
             throw '$errMsg Ground type deploy ID is null';
 
-        if( this._index == null )
-            throw '$errMsg Index is null';
+        if( !Std.isOfType( this._index, Int ))
+            throw '$errMsg Index is not valid';
 
         this._init = true;
     }

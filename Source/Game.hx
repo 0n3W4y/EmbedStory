@@ -3,6 +3,7 @@ package;
 import haxe.Timer;
 import openfl.system.System;
 import openfl.display.Sprite;
+import openfl.events.Event;
 
 import Deploy;
 
@@ -38,7 +39,7 @@ class Game {
         this.mainSprite = mainSprite;
 
         this.onPause = false;
-        this._lastTime = 0;
+        this._lastTime = Date.now().getTime();
 
         //create all systems;
         this._preStartGame();
@@ -49,7 +50,8 @@ class Game {
         this.gameStart = Date.now().getTime();
         this.calculateDelta();
 
-        this.startMainLoop();
+        //this.startMainLoop();
+        this.mainSprite.addEventListener(Event.ENTER_FRAME, this._tick);
         //sceneSystem.createScene( "startingScene" ); // new game, load game, options, exit;
     }
 
@@ -58,7 +60,7 @@ class Game {
         this.stopMainLoop();
         this.exit();
     }
-
+/*
     public function startMainLoop():Void {
         var time:Int = Std.int( Math.ffloor( this._delta ));
     
@@ -67,7 +69,7 @@ class Game {
             this._tick();
         };
     }
-    
+*/    
     public function stopMainLoop():Void {
         this.mainLoop.stop();
     }
@@ -83,17 +85,20 @@ class Game {
         System.exit( 0 );
     }
 
-    public function calculateDelta():Void
-    {
+    public function calculateDelta():Void{
         this._delta = Math.round( 1000 / this.fps );
         this._doubleDelta = this._delta * 2;
     }
 
-    private function _tick():Void
-    {
+    private function _tick( e:Event ):Void{
+        this._currentTime = Date.now().getTime();
+        this._update( this._delta );
+        this._lastTime = this._currentTime;
+    }
+/*
+    private function _tick():Void{
         this._currentTime = Date.now().getTime();
         var delta:Int = Std.int( this._currentTime - this._lastTime );
-
         if ( delta >= this._delta ){
             if( delta >= this._doubleDelta ){
                 delta = this._doubleDelta; // Защита от скачков времени вперед.
@@ -103,13 +108,13 @@ class Game {
         }
         this._sUpdate(); // special update; обновление дейсвтий мыши на графические объкты.
     }
-
+*/
     private function _update( time:Int ):Void {
         if( !onPause ) {
             this.gameTimeSystem.update( time );
             this.gameEventSystem.update( time );
             this.sceneSystem.update( time );
-        }
+        }        
     }
 
     private function _sUpdate():Void {

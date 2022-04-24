@@ -189,7 +189,7 @@ class Scene {
             case "stone": container = this.objectStorage.Stones;
             default: throw 'Error in Scene._createObject. can not find container with entity type: "$entityType".';
         }
-        var index:Int = null;
+        var index:Int = -1;
         var oldEntityID:EntityID = entity.getID();
         for( i in 0...container.length ){
             var newEntity:Entity = container[ i ];
@@ -200,7 +200,7 @@ class Scene {
                 break;
             }
         }
-        if( index == null )
+        if( index == -1 )
             throw 'Error in Scene.removeEntity. Index is null for "$entityType" and "$oldEntityID".';
 
     }
@@ -257,7 +257,6 @@ class Scene {
 
         for( key in Reflect.fields( resourcesConfig )){
             var value:Dynamic = Reflect.getProperty( resourcesConfig, key );
-            trace( key );
             switch( key ){
                 case "tree": this._createObject( "tree", "tree", value );
                 case "fertileTree": this._createObject( "tree", "fertileTree", value );
