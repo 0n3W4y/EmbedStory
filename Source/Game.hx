@@ -50,9 +50,11 @@ class Game {
         this.gameStart = Date.now().getTime();
         this.calculateDelta();
 
-        //this.startMainLoop();
-        this.mainSprite.addEventListener(Event.ENTER_FRAME, this._tick);
+        this.startMainLoop();
         //sceneSystem.createScene( "startingScene" ); // new game, load game, options, exit;
+        var scene:Scene = this.sceneSystem.createScene( 403 );
+        scene.prepare();
+        this.stage.changeSceneTo( scene );
     }
 
     public function stopGame():Void{
@@ -60,7 +62,7 @@ class Game {
         this.stopMainLoop();
         this.exit();
     }
-/*
+
     public function startMainLoop():Void {
         var time:Int = Std.int( Math.ffloor( this._delta ));
     
@@ -69,7 +71,7 @@ class Game {
             this._tick();
         };
     }
-*/    
+    
     public function stopMainLoop():Void {
         this.mainLoop.stop();
     }
@@ -90,12 +92,7 @@ class Game {
         this._doubleDelta = this._delta * 2;
     }
 
-    private function _tick( e:Event ):Void{
-        this._currentTime = Date.now().getTime();
-        this._update( this._delta );
-        this._lastTime = this._currentTime;
-    }
-/*
+
     private function _tick():Void{
         this._currentTime = Date.now().getTime();
         var delta:Int = Std.int( this._currentTime - this._lastTime );
@@ -108,7 +105,7 @@ class Game {
         }
         this._sUpdate(); // special update; обновление дейсвтий мыши на графические объкты.
     }
-*/
+
     private function _update( time:Int ):Void {
         if( !onPause ) {
             this.gameTimeSystem.update( time );
@@ -138,11 +135,6 @@ class Game {
         this.sceneSystem = new SceneSystem( this, spriteForScenes );
         this.ui = new UserInterface( this, spriteForUI );  
         
-
-
-        var scene:Scene = this.sceneSystem.createScene( 403 );
-        scene.prepare();
-        this.stage.changeSceneTo( scene );
     }
 
     private function _parseData():DeployConfig
