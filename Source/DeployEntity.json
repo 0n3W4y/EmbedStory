@@ -143,6 +143,24 @@
         }
     },
 
+    "1022":{
+        "id": 1022,
+        "type": "rock",
+        "subType": "copper",
+        "systems": {
+            "hp":{
+                "torso":{
+                    "torso":{
+                        "hp": 150
+                    }
+                }
+            },
+            "name":{
+                "name": "Copper Ore"
+            }
+        }
+    },
+
     "1030":{
         "id": 1030,
         "type": "stone",
@@ -214,6 +232,48 @@
             ,
             "name":{
                 "name": "Steel Stone"
+            }
+        }
+    },
+
+
+
+
+
+    "2000":{
+        "id": 2000,
+        "type": "animal",
+        "subType": "rabbit",
+        "systems": {
+            "hp":{
+                "torso":{ "leftLung":{ "hp": 10 }, "rightLung":{ "hp": 10 }, "torso":{ "hp": 10 }, "heart":{ "hp": 10 }},
+                "head":{ "head":{ "hp": 10 }, "leftEye":{ "hp": 10 }, "rightEye":{ "hp": 10 }, "nose":{ "hp": 10 }, "mouth":{ "hp": 10 }, "brain":{ "hp": 10 }},
+                "leftLeg":{ "foot":{ "hp": 10 }, "sole":{ "hp": 10 }},
+                "rightLeg":{ "foot":{ "hp": 10 }, "sole":{ "hp": 10 }},
+                "leftHand":{ "arm":{ "hp": 10 }, "wrist":{ "hp": 10 }},
+                "rightHand":{ "arm":{ "hp": 10 }, "wrist":{ "hp": 10 }}
+            },
+            "name":{
+                "name": "Rabbit"
+            }
+        }
+    },
+
+    "2001":{
+        "id":2100,
+        "type": "animal",
+        "subType": "lynx",
+        "systems":{
+            "hp":{
+                "torso":{ "leftLung":{ "hp": 40 }, "rightLung":{ "hp": 40 }, "torso":{ "hp": 40 }, "heart":{ "hp": 40 }},
+                "head":{ "head":{ "hp": 40 }, "leftEye":{ "hp": 40 }, "rightEye":{ "hp": 40 }, "nose":{ "hp": 40 }, "mouth":{ "hp": 40 }, "brain":{ "hp": 40 }},
+                "leftLeg":{ "foot":{ "hp": 40 }, "sole":{ "hp": 40 }},
+                "rightLeg":{ "foot":{ "hp": 40 }, "sole":{ "hp": 40 }},
+                "leftHand":{ "arm":{ "hp": 40 }, "wrist":{ "hp": 40 }},
+                "rightHand":{ "arm":{ "hp": 40 }, "wrist":{ "hp": 40 }}
+            },
+            "name":{
+                "name": "Lynx"
             }
         }
     }

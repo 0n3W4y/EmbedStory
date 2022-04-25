@@ -1,6 +1,5 @@
 package;
 
-import Entity.EntityID;
 import openfl.display.Sprite;
 
 
@@ -49,9 +48,9 @@ class Tile {
     public var canPlaceStaff:Bool;
     public var canCharacterStand:Bool;
 
-    public var currentObject:EntityID;
-    public var currentStuff:EntityID;
-    public var currentCharacter:EntityID;
+    public var currentObject:Entity;
+    public var currentStuff:Entity;
+    public var currentCharacter:Entity;
     public var currentEffect:Dynamic;
 
     public var hasRockFog:Bool;

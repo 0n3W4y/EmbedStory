@@ -564,20 +564,17 @@ class TileMap{
         var gridMultiplier:Int = randomNumber * 2 + 1;
 
         for( i in 0...gridMultiplier ){
-            var index:Int = ( y - randomNumber + i ) * height + ( x - randomNumber );
             for( j in 0...gridMultiplier ){
+                var index:Int = ( y - randomNumber + i ) * height + ( x - randomNumber + j );
                 if( index < 0 || index >= this._totalTiles ) // защита от значений не принадлежащих текущей карты
                     continue; 
 
                 var newTile:Tile = this.tileStorage[ index ];
                 var indexTileGroundType = newTile.groundType;
-                if( indexTileGroundType == tileGroundType ){ // защита от перезаписи существующих тайлов
-                    index++;
+                if( indexTileGroundType == tileGroundType ) // защита от перезаписи существующих тайлов для текущего значения тайла.
                     continue;
-                }
 
                 newTile.changeGroundType( newTileConfig );
-                index++;
             }
         }
     }

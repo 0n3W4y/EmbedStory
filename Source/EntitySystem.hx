@@ -1,5 +1,7 @@
 package;
 
+import EntityStatsSystem.EntityStatsSystemConfig;
+import EntityAISystem.EntityAISystemConfig;
 import EntityNameSystem.EntityNameSystemConfig;
 import EntityHealthPointsSystem.EntityHealthPointsSystemConfig;
 import EntityAgeSystem.EntityAgeSystemConfig;
@@ -58,6 +60,8 @@ class EntitySystem{
         var ageSystemConfig:EntityAgeSystemConfig = null;
         var hpSystemConfig:EntityHealthPointsSystemConfig = null;
         var nameSystemConfig:EntityNameSystemConfig = null;
+        var aISystemConfig:EntityAISystemConfig = null;
+        var statsSystemConfig:EntityStatsSystemConfig = null;
         
         var configSystems:Dynamic = Reflect.getProperty( params, "systems" );
 
@@ -67,6 +71,8 @@ class EntitySystem{
                 case "hp": hpSystemConfig = this._createHPSystemConfig( value );
                 case "age": ageSystemConfig = this._createAgeSystemConfig( value );
                 case "name": nameSystemConfig = this._createNameSystemConfig( value );
+                case "aI": aISystemConfig = this._createAISystemConfig( value );
+                case "stats": statsSystemConfig = this._createStatsSystemConfig( value );
                 default: throw 'Error in EntitySystem._createEntity. No system found with key "$key".';
             }
         }
@@ -78,12 +84,20 @@ class EntitySystem{
             DeployID: EntityDeployID( Reflect.getProperty( params, "id" )), 
             AgeSystemConfig: ageSystemConfig, 
             HPSystemConfig: hpSystemConfig, 
-            NameSystemConfig: nameSystemConfig 
+            NameSystemConfig: nameSystemConfig,
+            AISystemConfig: aISystemConfig,
+            StatsSystemConfig: statsSystemConfig
         };
         var entity:Entity = new Entity( entityConfig );
-
-
         return entity;
+    }
+
+    private function _createAISystemConfig( config:Dynamic ):EntityAISystemConfig{
+        return null;
+    }
+
+    private function _createStatsSystemConfig( config:Dynamic ):EntityStatsSystemConfig{
+        return null;
     }
 
     private function _createNameSystemConfig( config:Dynamic ):EntityNameSystemConfig{

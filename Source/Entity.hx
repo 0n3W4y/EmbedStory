@@ -1,5 +1,7 @@
 package;
 
+import EntityStatsSystem.EntityStatsSystemConfig;
+import EntityAISystem.EntityAISystemConfig;
 import Scene.SceneID;
 import EntityHealthPointsSystem.EntityHealthPointsSystemConfig;
 import EntityAgeSystem.EntityAgeSystemConfig;
@@ -15,6 +17,8 @@ typedef EntityConfig = {
     var AgeSystemConfig:EntityAgeSystemConfig;
     var NameSystemConfig:EntityNameSystemConfig;
     var HPSystemConfig:EntityHealthPointsSystemConfig;
+    var AISystemConfig:EntityAISystemConfig;
+    var StatsSystemConfig:EntityStatsSystemConfig;
 }
 
 enum EntityID{
@@ -40,6 +44,8 @@ class Entity{
     public var age:EntityAgeSystem;
     public var name:EntityNameSystem;
     public var healthPoints:EntityHealthPointsSystem;
+    public var stats:EntityStatsSystem;
+    public var aI:EntityAISystem;
     
 
     private var _ID:EntityID;
@@ -62,6 +68,12 @@ class Entity{
 
         if( config.NameSystemConfig != null )
             this.name = new EntityNameSystem( this, config.NameSystemConfig );
+
+        if( config.AISystemConfig != null )
+            this.aI = new EntityAISystem( this, config.AISystemConfig );
+
+        if( config.StatsSystemConfig != null )
+            this.stats = new EntityStatsSystem( this, config.StatsSystemConfig );
         
         //this.canUse = false;
         //this.canDestroy = false;
@@ -81,6 +93,12 @@ class Entity{
 
         if( this.healthPoints != null )
             this.healthPoints.init();
+
+        if( this.aI != null )
+            this.aI.init();
+
+        if( this.stats != null )
+            this.stats.init();
 
         this._inited = true;
 

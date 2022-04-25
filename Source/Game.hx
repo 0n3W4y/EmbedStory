@@ -55,6 +55,7 @@ class Game {
         var scene:Scene = this.sceneSystem.createScene( 403 );
         scene.prepare();
         this.stage.changeSceneTo( scene );
+        scene.traceScene();
     }
 
     public function stopGame():Void{

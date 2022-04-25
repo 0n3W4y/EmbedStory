@@ -39,6 +39,7 @@ typedef EffectStorage = {
 
 typedef CharacterStorage = {
     var Player: Entity;
+    var Animals: Array<Entity>;
 }
 
 class Scene {
@@ -99,7 +100,7 @@ class Scene {
         this.objectStorage = { Rocks: [], Trees: [], Stones: [], Ores: [] };
         this.stuffStorage = {};
         this.effectStorage = {};
-        this.characterStorage = { Player: null };
+        this.characterStorage = { Player: null, Animals: [] };
 
         //by default scene not visible and transperent;
         this.sceneGraphics.visible = false;
@@ -174,6 +175,7 @@ class Scene {
             case "rock": container = this.objectStorage.Rocks;
             case "tree": container = this.objectStorage.Trees;
             case "stone": container = this.objectStorage.Stones;
+            case "ore": container = this.objectStorage.Ores;
             default: throw 'Error in Scene._createObject. can not find container with entity type: "$entityType".';
         }
 
@@ -187,6 +189,7 @@ class Scene {
             case "rock": container = this.objectStorage.Rocks;
             case "tree": container = this.objectStorage.Trees;
             case "stone": container = this.objectStorage.Stones;
+            case "ore": container = this.objectStorage.Ores;
             default: throw 'Error in Scene._createObject. can not find container with entity type: "$entityType".';
         }
         var index:Int = -1;
@@ -196,17 +199,105 @@ class Scene {
             var newEntityID:EntityID = newEntity.getID();
             if( EnumValueTools.equals( oldEntityID, newEntityID )){
                 index = i;
-                container.splice( index, 1 );
                 break;
             }
         }
         if( index == -1 )
             throw 'Error in Scene.removeEntity. Index is null for "$entityType" and "$oldEntityID".';
 
+        container.splice( index, 1 ); 
     }
 
     public function getEntityByID( ID:EntityID ):Entity{
+        for( i in 0...this.objectStorage.Rocks.length ){
+            var entity:Entity = this.objectStorage.Rocks[ i ];
+            var eID:EntityID = entity.getID();
+            if( EnumValueTools.equals( ID, eID ))
+                return entity;
+        }
+
+        for( j in 0...this.objectStorage.Trees.length ){
+            var entity:Entity = this.objectStorage.Trees[ j ];
+            var eID:EntityID = entity.getID();
+            if( EnumValueTools.equals( ID, eID ))
+                return entity;
+        }
+
+        for( k in 0...this.objectStorage.Stones.length ){
+            var entity:Entity = this.objectStorage.Stones[ k ];
+            var eID:EntityID = entity.getID();
+            if( EnumValueTools.equals( ID, eID ))
+                return entity;
+        }
+
         return null;
+    }
+
+    public function traceScene():Void{
+        // this function must trace tile map and objects to console, without graphics;
+        //DELETE after add graphics;
+        var tileStorage:Array<Tile> = this.tileMap.tileStorage;
+        var height:Int = this.tileMap.height;
+        var width:Int = this.tileMap.width;
+        for( i in 0...height ){
+            var string:String = '';
+            for( j in 0...width ){
+                var index:Int = i*height + j;
+                var tile:Tile = tileStorage[ index ];
+                var object:Entity = tile.currentObject;
+                if( object != null ){
+                    var objectType:String = object.entityType;
+                    var objectSubType:String = object.entitySubType;
+                    switch( objectType ){
+                        case "tree":{
+                            switch( objectSubType ){
+                                case "tree": string += "T";
+                                case "fertileTree": string += "P";
+                                case "bush": string += "v";
+                                case "fertileBush": string += "w";
+                                case "log": string += "l";
+                            }
+                        }
+                        case "rock":{
+                            switch( objectSubType ){
+                                case "rock": string += "O";
+                                case "sandrock": string += "Q";
+                                case "copper": string += "C";
+                            }
+                        }
+                        case "stone":{
+                            switch( objectSubType ){
+                                case "stone": string += "r";
+                                case "copper": string += "c";
+                            }
+                        }
+                    }
+                }else{
+                    var tileFloorType:String = tile.floorType;
+                    if( tileFloorType != "nothing" ){
+                        switch( tileFloorType ){
+                            case "grass": string += 'm';
+                            case "sand": string += '~';
+                            case "water": string += '_';
+                            case "shallow": string += '-';
+                            case "ice": string += '=';
+                            case "rockRoad": string += 'R';
+                            case "woodenFloor": string += 'W';
+                        }
+                    }else{
+                        var tileGroundType:String = tile.groundType;
+                        switch( tileGroundType ){
+                            case "earth": string += 'x';
+                            case "dirt": string += '%';
+                            case "dryEarth": string += '^';
+                            case "rockEnvironment": string += 'o';
+                            case "sandrockEnvironment": string = "q";
+                        }
+                    }
+                }
+            }
+            trace( string );
+        }
     }
 
 
@@ -279,17 +370,17 @@ class Scene {
             var tile:Tile = tileStorage[ i ];
             var tileGround:String = tile.groundType;
             var tileFloor:String = tile.floorType;
-            var tileObject:EntityID = tile.currentObject;
+            var tileObject:Entity = tile.currentObject;
             if( tileGround != "rock" && tileGround != "sandrock" && tileGround != "rockEnvironment" && tileGround != "sandrockEnvironment" ){
                 if( tileFloor == "nothing" || tileFloor == "grass" || tileFloor == "shallow" || tileFloor == "sand" || tileFloor == "snow" ){
                     if( tileObject == null ){
                         var num:Int = Math.floor( Math.random() * 100 ); // 0 - 99;
-                        if( value <= num ){
+                        if( num < value ){
                             var entity:Entity = entitySystem.createEntity( entityType, entitySubType );
                             entity.init();
                             entity.tileIndex = tile.getIndex();
-                            tile.currentObject = entity.getID();
                             this.addEntity( entity );
+                            tile.currentObject = entity;                         
                         }
                     }
                 }
@@ -300,7 +391,24 @@ class Scene {
     private function _createOres( entityType:String, entitySubType:String, value:Int ):Void {
         var rockObjects:Array<Entity> = this.objectStorage.Rocks;
         for( i in 0...rockObjects.length ){
+            var randomNum:Int = Math.floor( Math.random()* 100 );
+            if( randomNum >= value )
+                continue;
+
             var rockEntity:Entity = rockObjects[ i ];
+            var x:Int = rockEntity.gridX;
+            var y:Int = rockEntity.gridY;
+            var graphicsIndex:Int = rockEntity.graphicIndex;
+            var tileIndex:Int = rockEntity.tileIndex;
+            var newEntity = this._parent.getParent().entitySystem.createEntity( entityType, entitySubType );
+            newEntity.gridX = x;
+            newEntity.gridY = y;
+            newEntity.graphicIndex = graphicsIndex;
+            newEntity.tileIndex = tileIndex;
+            this.addEntity( newEntity );
+            this.tileMap.tileStorage[ tileIndex ].currentObject = newEntity;
+            this.removeEntity( rockEntity );
+            
 
         }
     }
@@ -324,8 +432,9 @@ class Scene {
             rockEntity.gridY = tile.gridY;
             rockEntity.tileIndex = tile.getIndex();
             rockEntity.init();
-            tile.currentObject = rockEntity.getID();
             this.addEntity( rockEntity );
+            tile.currentObject = rockEntity;
+            
         }
     }
 
