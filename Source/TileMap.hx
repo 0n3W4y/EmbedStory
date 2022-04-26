@@ -236,6 +236,7 @@ class TileMap{
     }
 
     private function _fillTileMapWithAdditionalFloorType():Void{
+        // Создать генерацию дополнительного  покрытия пятнами через solidliquid функцию, с генерацией конфига.
         var biomeConfig:Dynamic = this._deploy.biomeConfig[ this._biomeDeployID ];
         var additionalFloorTypeConfig:Dynamic = Reflect.getProperty( biomeConfig, "additionalFloorType" );
 
@@ -541,7 +542,9 @@ class TileMap{
     }
 
     private function _createGroundEnvironment( tile:Tile ):Void{
+        // можно создать енвиронмент для воды, точно также, но будет песок генерироваться. 
         var tileGroundType:String = tile.groundType; // rock, sandrock
+        var tileFloorTypeConfig:Dynamic = this._deploy.floorTypeConfig[ FloorTypeDeployID( 300 )]; // config for nothing;
         var newTileConfig:Dynamic = null;
 
         if( tileGroundType == "dirt" || tileGroundType == "dryEarth" || tileGroundType == "earth" || tileGroundType == "rockEnvironment" || tileGroundType == "sandrockEnvironment" )
@@ -554,9 +557,10 @@ class TileMap{
         }
 
         //рандомно выбираем "подложку" 0 - 1 - 2 по умолчанию
-        var number:Int = 2; // радиус распространения подложки.
+        var number:Int = 2; // радиус распространения подложки. в теории можно вынести в конфиг.
         var randomNumber:Int = Math.floor( Math.random()*( number + 1 )); // 0 - 2;
-       
+        if( randomNumber == 0 )
+            return;
 
         var y:Int = tile.gridY;
         var x:Int = tile.gridX;
@@ -575,6 +579,8 @@ class TileMap{
                     continue;
 
                 newTile.changeGroundType( newTileConfig );
+                if( newTile.floorType == "grass" ) // заменяем только если покрытие это трава, снег и песок можно не заменять.
+                    newTile.changeFloorType( tileFloorTypeConfig );
             }
         }
     }

@@ -208,7 +208,7 @@ class Scene {
         container.splice( index, 1 ); 
     }
 
-    public function getEntityByID( ID:EntityID ):Entity{
+    public function getObjectByID( ID:EntityID ):Entity{
         for( i in 0...this.objectStorage.Rocks.length ){
             var entity:Entity = this.objectStorage.Rocks[ i ];
             var eID:EntityID = entity.getID();
@@ -254,7 +254,7 @@ class Scene {
                                 case "tree": string += "T";
                                 case "fertileTree": string += "P";
                                 case "bush": string += "v";
-                                case "fertileBush": string += "w";
+                                case "fertileBush": string += "u";
                                 case "log": string += "l";
                             }
                         }
@@ -276,20 +276,20 @@ class Scene {
                     var tileFloorType:String = tile.floorType;
                     if( tileFloorType != "nothing" ){
                         switch( tileFloorType ){
-                            case "grass": string += 'm';
+                            case "grass": string += '^';
                             case "sand": string += '~';
                             case "water": string += '_';
                             case "shallow": string += '-';
                             case "ice": string += '=';
-                            case "rockRoad": string += 'R';
-                            case "woodenFloor": string += 'W';
+                            case "rockRoad": string += '+';
+                            case "woodenFloor": string += '#';
                         }
                     }else{
                         var tileGroundType:String = tile.groundType;
                         switch( tileGroundType ){
-                            case "earth": string += 'x';
-                            case "dirt": string += '%';
-                            case "dryEarth": string += '^';
+                            case "earth": string += 'e';
+                            case "dirt": string += 'd';
+                            case "dryEarth": string += 's';
                             case "rockEnvironment": string += 'o';
                             case "sandrockEnvironment": string = "q";
                         }

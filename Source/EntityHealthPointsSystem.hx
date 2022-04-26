@@ -53,7 +53,7 @@ typedef BodyPart = {
     var HP:HealthPoint;
     var CurrentHP:HealthPoint;
     var PartType:String; // natural ( 100% ), wood( 75% ), steel( 90% ), carbon( 110% ), cybernetic( 150% );
-    var Status:String; // healthy ( 100% HP ), damaged( 50% HP), broken( 15% HP ), disrupted ( 0% HP );
+    var Status:String; // healthy ( 100% HP ), damaged( <40% HP), broken( <15% HP ), disrupted ( 0% HP );
 }
 
 class EntityHealthPointsSystem{
@@ -97,6 +97,9 @@ class EntityHealthPointsSystem{
         if( params.RightLeg != null )
             this._configureRightLeg( params.RightLeg );
 
+        this.updateTotalHP();
+        this.updateCurrentTotalHP();
+
     }
 
     public function init():Void{
@@ -138,7 +141,7 @@ class EntityHealthPointsSystem{
             if( this.head.Brain != null )
                 headBrain = switch( this.head.Brain.HP ){case HealthPoint(v): v;};
 
-            if( this.head.Head == null )
+            if( this.head.Head != null )
                 throw '$msg updateTotalHP. head.Head is NULL!!!';
 
             var headHead:Int = switch( this.head.Head.HP ){ case HealthPoint(v): v; };
@@ -684,7 +687,7 @@ class EntityHealthPointsSystem{
 
         bodyPart.HP = HealthPoint( hp );
 
-        if( !Math.isNaN( cHP) )
+        if( cHP < 0 || Math.isNaN( cHP ))
             bodyPart.CurrentHP = HealthPoint( hp );
         else
             bodyPart.CurrentHP = HealthPoint( cHP );
