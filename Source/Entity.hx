@@ -1,5 +1,7 @@
 package;
 
+import EntitySkillSystem.EntitySkillSystemConfig;
+import EntityRequirementSystem.EntityRequirementSystemConfig;
 import EntityStatsSystem.EntityStatsSystemConfig;
 import EntityAISystem.EntityAISystemConfig;
 import Scene.SceneID;
@@ -19,6 +21,8 @@ typedef EntityConfig = {
     var HPSystemConfig:EntityHealthPointsSystemConfig;
     var AISystemConfig:EntityAISystemConfig;
     var StatsSystemConfig:EntityStatsSystemConfig;
+    var RequirementSystemConfig:EntityRequirementSystemConfig;
+    var SkillSystemConfig: EntitySkillSystemConfig;
 }
 
 enum EntityID{
@@ -46,6 +50,8 @@ class Entity{
     public var healthPoints:EntityHealthPointsSystem;
     public var stats:EntityStatsSystem;
     public var aI:EntityAISystem;
+    public var requirement:EntityRequirementSystem;
+    public var skills: EntitySkillSystem;
     
 
     private var _ID:EntityID;
@@ -74,6 +80,13 @@ class Entity{
 
         if( config.StatsSystemConfig != null )
             this.stats = new EntityStatsSystem( this, config.StatsSystemConfig );
+
+        if( config.SkillSystemConfig != null )
+            this.skills = new EntitySkillSystem( this, config.SkillSystemConfig );
+
+        if( config.RequirementSystemConfig != null )
+            this.requirement = new EntityRequirementSystem( this, config.RequirementSystemConfig );
+
         
         //this.canUse = false;
         //this.canDestroy = false;
@@ -100,6 +113,12 @@ class Entity{
         if( this.stats != null )
             this.stats.init();
 
+        if( this.skills != null )
+            this.skills.init();
+
+        if( this.requirement != null )
+            this.requirement.init();
+
         this._inited = true;
 
     }
@@ -113,6 +132,9 @@ class Entity{
         if( this.age != null ){
             this.age.update( time );
         }
+
+        if( this.requirement != null )
+            this.requirement.update( time );
     }
 
     public function getID():EntityID{

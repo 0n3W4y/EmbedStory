@@ -1,5 +1,7 @@
 package;
 
+import EntityRequirementSystem.EntityRequirementSystemConfig;
+import EntitySkillSystem.EntitySkillSystemConfig;
 import EntityStatsSystem.EntityStatsSystemConfig;
 import EntityAISystem.EntityAISystemConfig;
 import EntityNameSystem.EntityNameSystemConfig;
@@ -49,7 +51,7 @@ class EntitySystem{
         return this._createEntity( config );
     }
 
-    public function generateEntity( type:String ):Entity{
+    public function generateEntityByType( type:String ):Entity {
         return null;
     }
 
@@ -62,6 +64,8 @@ class EntitySystem{
         var nameSystemConfig:EntityNameSystemConfig = null;
         var aISystemConfig:EntityAISystemConfig = null;
         var statsSystemConfig:EntityStatsSystemConfig = null;
+        var skillSystemConfig:EntitySkillSystemConfig = null;
+        var requirementSystemConfig:EntityRequirementSystemConfig = null;
         
         var configSystems:Dynamic = Reflect.getProperty( params, "systems" );
 
@@ -73,6 +77,8 @@ class EntitySystem{
                 case "name": nameSystemConfig = this._createNameSystemConfig( value );
                 case "aI": aISystemConfig = this._createAISystemConfig( value );
                 case "stats": statsSystemConfig = this._createStatsSystemConfig( value );
+                case "skills": skillSystemConfig = this._createSkillSystemConfig( value );
+                case "requirement": requirementSystemConfig = this._createRequirementSystemConfig( value );
                 default: throw 'Error in EntitySystem._createEntity. No system found with key "$key".';
             }
         }
@@ -86,17 +92,27 @@ class EntitySystem{
             HPSystemConfig: hpSystemConfig, 
             NameSystemConfig: nameSystemConfig,
             AISystemConfig: aISystemConfig,
-            StatsSystemConfig: statsSystemConfig
+            StatsSystemConfig: statsSystemConfig,
+            SkillSystemConfig: skillSystemConfig,
+            RequirementSystemConfig: requirementSystemConfig
         };
         var entity:Entity = new Entity( entityConfig );
         return entity;
     }
 
-    private function _createAISystemConfig( config:Dynamic ):EntityAISystemConfig{
+    private function _createAISystemConfig( config: Dynamic ):EntityAISystemConfig{
         return null;
     }
 
-    private function _createStatsSystemConfig( config:Dynamic ):EntityStatsSystemConfig{
+    private function _createStatsSystemConfig( config: Dynamic ):EntityStatsSystemConfig{
+        return null;
+    }
+
+    private function _createSkillSystemConfig( config: Dynamic ):EntitySkillSystemConfig{
+        return null;
+    }
+
+    private function _createRequirementSystemConfig( config: Dynamic ):EntityRequirementSystemConfig{
         return null;
     }
 
