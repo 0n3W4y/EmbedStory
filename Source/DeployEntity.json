@@ -274,6 +274,10 @@
             },
             "name":{
                 "name": "Lynx"
+            },
+            "requirement":{
+                "hunger": 1000,
+                "ratio": 1
             }
         }
     }

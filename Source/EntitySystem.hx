@@ -105,15 +105,38 @@ class EntitySystem{
     }
 
     private function _createStatsSystemConfig( config: Dynamic ):EntityStatsSystemConfig{
-        return null;
+        return { 
+            STR: Reflect.getProperty( config, "str" ), 
+            DEX: Reflect.getProperty( config, "dex" ),
+            END: Reflect.getProperty( config, "end" ),
+            INT: Reflect.getProperty( config, "int" ),
+            MATK: Reflect.getProperty( config, "matk" ),
+            RATK: Reflect.getProperty( config, "ratk" ),
+            KiRes: Reflect.getProperty( config, "kires" ),
+            FiRes: Reflect.getProperty( config, "fires" ), 
+            ElRes: Reflect.getProperty( config, "elres" ), 
+            PlRes: Reflect.getProperty( config, "plres" ), 
+            LaRes: Reflect.getProperty( config, "lares" ),
+            PoRes: Reflect.getProperty( config, "pores" ), 
+            KnRes: Reflect.getProperty( config, "knres" ), 
+            DiRes: Reflect.getProperty( config, "dires" ), 
+            BlRes: Reflect.getProperty( config, "blres" ),  
+        };
     }
 
     private function _createSkillSystemConfig( config: Dynamic ):EntitySkillSystemConfig{
-        return null;
+        var skillSystemConfig:EntitySkillSystemConfig = {
+            
+        };
+
+        return skillSystemConfig;
     }
 
     private function _createRequirementSystemConfig( config: Dynamic ):EntityRequirementSystemConfig{
-        return null;
+        return {
+            Hunger: Reflect.getProperty( config, "hunger" ),
+            Ratio: Reflect.getProperty( config, "ratio" )
+        };
     }
 
     private function _createNameSystemConfig( config:Dynamic ):EntityNameSystemConfig{
