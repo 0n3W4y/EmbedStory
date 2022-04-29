@@ -52,7 +52,7 @@ class Entity{
     public var aI:EntityAISystem;
     public var requirement:EntityRequirementSystem;
     public var skills: EntitySkillSystem;
-    
+    public var inventory:Dynamic;
 
     private var _ID:EntityID;
     private var _inited:Bool;

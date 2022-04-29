@@ -8,6 +8,7 @@ typedef EntityStatsSystemConfig = {
     var DEX:Int;
     var MATK:Int;
     var RATK:Int;
+    var Pain:Int;
     var KiRes:Int;
     var FiRes:Int;
     var ElRes:Int;
@@ -17,33 +18,37 @@ typedef EntityStatsSystemConfig = {
     var KnRes:Int;
     var DiRes:Int;
     var BlRes:Int;
+    var PaRes:Int;
 }
 
 typedef BaseStats = {
-    var STR:Int;
-    var END:Int;
-    var INT:Int;
-    var DEX:Int;
-    var MATK:Int;
-    var RATK:Int;
-    var KiRes:Int;
-    var FiRes:Int;
-    var ElRes:Int;
-    var PlRes:Int;
-    var LaRes:Int;
-    var PoRes:Int;
-    var KnRes:Int;
-    var DiRes:Int;
-    var BlRes:Int;
+    var Strength:Int;
+    var Endurance:Int;
+    var Intellect:Int;
+    var Dexterity:Int;
+    var MAttack:Int;
+    var RAttack:Int;
+    var Pain:Int;
+    var KineticRes:Int;
+    var FireRes:Int;
+    var ElectricRes:Int;
+    var PlasmaRes:Int;
+    var LaserRes:Int;
+    var PoisonRes:Int;
+    var KnockdownRes:Int;
+    var DiseaseRes:Int;
+    var BleedingRes:Int;
+    var PainRes:Int;
 }
 
 enum MainStats {
-    Strength( _:Int ); // сила рукопашной атаки и\или ближний бой урон. + переносимый вес + шанс нокаута в ближнем бою выше
+    Strength( _:Int ); // сила рукопашной атаки и\или ближний бой урон. + переносимый вес + шанс нокаута в ближнем бою выше, сопротивление нокауту
     Dexterity( _:Int ); // общая скорость увеличена + уворот от ближнего боя + обращение с оружием дальнего боя
-    Endurance( _:Int ); // HP + сопротивление болезням/ядам + сопротивление боль и споротивление нокауту
+    Endurance( _:Int ); // HP + сопротивление болезням/ядам + сопротивление боль и уменьшение времени нахождения в нокауте.
     Intellect( _:Int ); // множитель обучения скилам
     MeleeAttack( _:Int );
     RangeAttack( _:Int );
+    Pain( _:Int );
 }
 
 enum MainResists {
@@ -56,6 +61,7 @@ enum MainResists {
     KnockdownResistance( _:Int );
     DiseaseResistance( _:Int );
     BleedingResistance( _:Int );
+    PainResistance( _:Int );
 }
 
 class EntityStatsSystem {
@@ -68,6 +74,8 @@ class EntityStatsSystem {
     public var meleeAttack:MainStats;
     public var rangeAttack:MainStats;
 
+    public var pain:MainStats;
+
     public var kineticResistance:MainResists;
     public var fireResistance:MainResists;
     public var electricResistance:MainResists;
@@ -78,6 +86,7 @@ class EntityStatsSystem {
     public var knockdownResistance:MainResists;
     public var diseaseResistance:MainResists;
     public var bleedingResistance:MainResists;
+    public var painResistance:MainResists;
 
 
     private var _parent:Entity;
@@ -94,8 +103,11 @@ class EntityStatsSystem {
         this.dexterity = Dexterity( config.DEX );
         this.endurance = Endurance( config.END );
         this.intellect = Intellect( config.INT );
+
         this.meleeAttack = MeleeAttack( config.MATK );
         this.rangeAttack = RangeAttack( config.RATK );
+
+        this.pain = Pain( config.Pain );
         
         this.kineticResistance = KineticResistance( config.KiRes );
         this.fireResistance = FireResistance( config.FiRes );
@@ -106,12 +118,26 @@ class EntityStatsSystem {
         this.knockdownResistance = KnockdownResistance( config.KnRes );
         this.diseaseResistance = DiseaseResistance( config.DiRes );
         this.bleedingResistance = BleedingResistance( config.BlRes );
+        this.painResistance = PainResistance( config.PaRes );
 
         this._baseStats = { 
-            STR: config.STR, DEX: config.DEX, END: config.END, INT: config.INT, 
-            MATK: config.MATK, RATK: config.RATK, 
-            KiRes: config.KiRes, FiRes: config.FiRes, ElRes: config.ElRes, PlRes: config.PlRes, LaRes: config.LaRes,
-            PoRes: config.PoRes, KnRes: config.KnRes, DiRes: config.DiRes, BlRes: config.BlRes 
+            Strength: config.STR,
+            Dexterity: config.DEX,
+            Endurance: config.END,
+            Intellect: config.INT,
+            MAttack: config.MATK,
+            RAttack: config.RATK,
+            Pain: config.Pain,
+            KineticRes: config.KiRes,
+            FireRes: config.FiRes,
+            ElectricRes: config.ElRes,
+            PlasmaRes: config.PlRes,
+            LaserRes: config.LaRes,
+            PoisonRes: config.PoRes,
+            KnockdownRes: config.KnRes,
+            DiseaseRes: config.DiRes,
+            BleedingRes: config.BlRes,
+            PainRes: config.PaRes
         };
 
     }
@@ -123,50 +149,53 @@ class EntityStatsSystem {
         if( this._inited )
             throw '$msg already inited!';
 
-        if( this._baseStats.STR <= 0 || Math.isNaN( this._baseStats.STR ))
+        if( this._baseStats.Strength <= 0 || Math.isNaN( this._baseStats.Strength ))
             throw '$msg STR not valid';
 
-        if( this._baseStats.DEX <= 0 || Math.isNaN( this._baseStats.DEX ))
+        if( this._baseStats.Dexterity <= 0 || Math.isNaN( this._baseStats.Dexterity ))
             throw '$msg DEX not valid';
 
-        if( this._baseStats.END <= 0 || Math.isNaN( this._baseStats.END ))
+        if( this._baseStats.Endurance <= 0 || Math.isNaN( this._baseStats.Endurance ))
             throw '$msg END not valid';
 
-        if( this._baseStats.INT <= 0 || Math.isNaN( this._baseStats.INT ))
+        if( this._baseStats.Intellect <= 0 || Math.isNaN( this._baseStats.Intellect ))
             throw '$msg INT not valid';
 
-        if( this._baseStats.MATK <= 0 || Math.isNaN( this._baseStats.MATK ))
+        if( this._baseStats.MAttack <= 0 || Math.isNaN( this._baseStats.MAttack ))
             throw '$msg MATK not valid';
 
-        if( this._baseStats.RATK <= 0 || Math.isNaN( this._baseStats.RATK ))
+        if( this._baseStats.RAttack <= 0 || Math.isNaN( this._baseStats.RAttack ))
             throw '$msg RATK not valid';
 
-        if( this._baseStats.KiRes <= 0 || Math.isNaN( this._baseStats.KiRes ))
+        if( this._baseStats.KineticRes <= 0 || Math.isNaN( this._baseStats.KineticRes ))
             throw '$msg Kinetic Res not valid';
 
-        if( this._baseStats.FiRes <= 0 || Math.isNaN( this._baseStats.FiRes ))
+        if( this._baseStats.FireRes <= 0 || Math.isNaN( this._baseStats.FireRes ))
             throw '$msg Fire Res not valid';
 
-        if( this._baseStats.ElRes <= 0 || Math.isNaN( this._baseStats.ElRes ))
+        if( this._baseStats.ElectricRes <= 0 || Math.isNaN( this._baseStats.ElectricRes ))
             throw '$msg Electric Res not valid';
 
-        if( this._baseStats.PlRes <= 0 || Math.isNaN( this._baseStats.PlRes ))
+        if( this._baseStats.PlasmaRes <= 0 || Math.isNaN( this._baseStats.PlasmaRes ))
             throw '$msg Plasma Res not valid';
 
-        if( this._baseStats.LaRes <= 0 || Math.isNaN( this._baseStats.LaRes ))
+        if( this._baseStats.LaserRes <= 0 || Math.isNaN( this._baseStats.LaserRes ))
             throw '$msg Laser Res not valid';
 
-        if( this._baseStats.PoRes <= 0 || Math.isNaN( this._baseStats.PoRes ))
+        if( this._baseStats.PoisonRes <= 0 || Math.isNaN( this._baseStats.PoisonRes ))
             throw '$msg Poison Res not valid';
 
-        if( this._baseStats.KnRes <= 0 || Math.isNaN( this._baseStats.KnRes ))
+        if( this._baseStats.KnockdownRes <= 0 || Math.isNaN( this._baseStats.KnockdownRes ))
             throw '$msg Knockdown Res not valid';
 
-        if( this._baseStats.DiRes <= 0 || Math.isNaN( this._baseStats.DiRes ))
+        if( this._baseStats.DiseaseRes <= 0 || Math.isNaN( this._baseStats.DiseaseRes ))
             throw '$msg Disease Res not valid';
 
-        if( this._baseStats.BlRes <= 0 || Math.isNaN( this._baseStats.BlRes ))
+        if( this._baseStats.BleedingRes <= 0 || Math.isNaN( this._baseStats.BleedingRes ))
             throw '$msg Bleeding Res not valid';
+
+        if( this._baseStats.PainRes <= 0 || Math.isNaN( this._baseStats.PainRes ))
+            throw '$msg Pain Res not valid';
 
         this._inited = true;
     }
@@ -213,8 +242,14 @@ class EntityStatsSystem {
        
         switch( stat ){
             case "str": {
+                // от силы зависит: ближний бой. переносимый вес. шанс нокаута в ближнем бою, шанс получить нокаут;
                 var statValue:Int = this._getStatInt( this.strength ) + value;            
                 this.strength = Strength( statValue );
+                this._calculateStat( "matk" ); // ближний бой;
+                this._calculateStat( "knRes"); // сопротивление нокауту.
+                //переносимый вес в инвентаре
+                //шанс нокаута в скилах
+                
             };
             case "int": {
                 var statValue:Int = this._getStatInt( this.intellect ) + value;
@@ -274,31 +309,58 @@ class EntityStatsSystem {
             };
             default: throw 'Error in EntityStatsSystem.changeStat. Can not set stat "$stat"';
         }
-        //TODO change dependencies;
     }
 
     public function getBaseStat( stat:String ):Int{
         switch( stat ){
-            case "str": return this._baseStats.STR;
-            case "int": return this._baseStats.INT;
-            case "dex": return this._baseStats.DEX;
-            case "end": return this._baseStats.END;
-            case "matk": return this._baseStats.MATK;
-            case "ratk": return this._baseStats.RATK;
-            case "kinetic": return this._baseStats.KiRes;
-            case "fire": return this._baseStats.FiRes;
-            case "electric": return this._baseStats.ElRes;
-            case "plasma": return this._baseStats.PlRes;
-            case "laser": return this._baseStats.LaRes;
-            case "poison": return this._baseStats.PoRes;
-            case "knockdown": return this._baseStats.KnRes;
-            case "disease": return this._baseStats.DiRes;
-            case "bleeding": return this._baseStats.BlRes;
+            case "str": return this._baseStats.Strength;
+            case "int": return this._baseStats.Intellect;
+            case "dex": return this._baseStats.Dexterity;
+            case "end": return this._baseStats.Endurance;
+            case "matk": return this._baseStats.MAttack;
+            case "ratk": return this._baseStats.RAttack;
+            case "pain": return this._baseStats.Pain;            
             default: throw 'Error in EntityStatsSystem.getBaseStat. can not get stats "$stat"';
         }
     }
 
+    public function getBaseResist( resist:String ):Int{
+        switch( resist ){
+            case "kinetic": return this._baseStats.KineticRes;
+            case "fire": return this._baseStats.FireRes;
+            case "electric": return this._baseStats.ElectricRes;
+            case "plasma": return this._baseStats.PlasmaRes;
+            case "laser": return this._baseStats.LaserRes;
+            case "poison": return this._baseStats.PoisonRes;
+            case "knockdown": return this._baseStats.KnockdownRes;
+            case "disease": return this._baseStats.DiseaseRes;
+            case "bleeding": return this._baseStats.BleedingRes;
+            case "pain": return this._baseStats.PainRes;
+            default: throw 'Error in EntityStatsSystem.getBaseResist. can not get stats "$resist"';
+        }
+    }
 
+
+    private function _calculateStat( stat:String ):Void{
+        switch( stat ){
+            case "matk":{
+                // Урон в ближнем бою рассчитывается по формуле base melee attack + base melee attack % (str*5) + inventoryItems;
+                var mATKFromInventory:Int = 0;
+                if( this._parent.inventory != null ){
+                    //TODO: collectStatsFromInventory;
+                }
+                this.meleeAttack = MeleeAttack( this._baseStats.MAttack + Math.round( this._baseStats.MAttack * ( this._getStatInt( this.strength ) * 5 ) / 100 ) + mATKFromInventory );
+            }
+            case "knRes":{
+                // Споротивление нокауту рассчитывается по формуле base knockdown resist + str*2;
+                var knResFromInventory:Int = 0;
+                if( this._parent.inventory != null ){
+                    //TODO: collectStatsFromInventory;
+                }
+                this.knockdownResistance = KnockdownResistance( this._baseStats.KnockdownRes + this._getStatInt( this.strength ) * 2 );
+            }
+        }
+    }
 
     private function _getStatInt( container:MainStats ):Int{
         switch( container ){
@@ -308,6 +370,7 @@ class EntityStatsSystem {
             case Dexterity( v ): return v;
             case MeleeAttack( v ): return v;
             case RangeAttack( v ): return v;
+            case Pain( v ): return v;
         }
     }
 
@@ -322,6 +385,7 @@ class EntityStatsSystem {
             case KnockdownResistance( v ): return v;
             case DiseaseResistance( v ): return v;
             case BleedingResistance( v ): return v;
+            case PainResistance( v ): return v;
         }
     }
 }

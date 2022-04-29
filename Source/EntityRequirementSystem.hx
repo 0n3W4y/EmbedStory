@@ -46,7 +46,7 @@ class EntityRequirementSystem{
         if( this._parent == null )
             throw '$msg parent is null!';
 
-        if( this._fullHunger <= 0 || Math.isNaN( this._fullHunger ))
+        if( this._fullHunger < 0 || Math.isNaN( this._fullHunger ))
             throw '$msg Full hunger is null!';
 
 
@@ -77,9 +77,19 @@ class EntityRequirementSystem{
             this.currentHunger = Hunger( currentHungerInt );
             if( this.checkEmpty() ){
                 this.empty = true;
+                this.currentHunger = Hunger( 0 );
                 //degrade some skills;
+                var stats:EntityStatsSystem = this._parent.stats;
+                if( stats != null ){
+                    //убираем силу из-за голода.
+                    if( stats.canChangeStat( "str", 2 )){
+                        stats.changeStat( "str", 2 );
+                    }
+                    else{
+                        //можно использовать нокдаун, как обессилен - отправить в ближайший госпиталь и снять круглую сумму. 
+                    }
+                }
             }
-
             this._isHungry();
         }
     }
