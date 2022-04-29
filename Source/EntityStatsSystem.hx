@@ -167,6 +167,9 @@ class EntityStatsSystem {
         if( this._baseStats.RAttack <= 0 || Math.isNaN( this._baseStats.RAttack ))
             throw '$msg RATK not valid';
 
+        if( this._baseStats.Pain <= 0 || Math.isNaN( this._baseStats.Pain ))
+            throw '$msg Pain not valid';
+
         if( this._baseStats.KineticRes <= 0 || Math.isNaN( this._baseStats.KineticRes ))
             throw '$msg Kinetic Res not valid';
 
@@ -219,6 +222,7 @@ class EntityStatsSystem {
             case "end": statValue = this._getStatInt( this.endurance );
             case "matk": statValue = this._getStatInt( this.meleeAttack );
             case "ratk": statValue = this._getStatInt( this.rangeAttack );
+            case "pain": statValue = this._getStatInt( this.pain );
             case "kinetic": statValue = this._getResistInt( this.kineticResistance );
             case "fire": statValue = this._getResistInt( this.fireResistance );
             case "electric": statValue = this._getResistInt( this.electricResistance );
@@ -228,6 +232,7 @@ class EntityStatsSystem {
             case "knockdown": statValue = this._getResistInt( this.knockdownResistance );
             case "disease": statValue = this._getResistInt( this.diseaseResistance );
             case "bleeding": statValue = this._getResistInt( this.bleedingResistance );
+            case "painRes": statValue = this._getResistInt( this.painResistance );
             default: throw 'Error in EntityStatsSystem.canChangeStat. Can not check stat "$stat"';
         }
         if(( statValue + value ) <= 0 )
@@ -271,6 +276,10 @@ class EntityStatsSystem {
                 var statValue:Int = this._getStatInt( this.rangeAttack ) + value;
                 this.rangeAttack = RangeAttack( statValue );
             };
+            case "pain": {
+                var statValue:Int = this._getStatInt( this.pain ) + value;
+                this.pain = Pain( statValue );
+            }
             case "kinetic": {
                 var statValue:Int = this._getResistInt( this.kineticResistance ) + value;
                 this.kineticResistance = KineticResistance( statValue );
@@ -307,6 +316,10 @@ class EntityStatsSystem {
                 var statValue:Int = this._getResistInt( this.bleedingResistance ) + value;
                 this.bleedingResistance = BleedingResistance( statValue );
             };
+            case "painRes": {
+                var statValue:Int = this._getResistInt( this.painResistance ) + value;
+                this.painResistance = PainResistance( statValue );
+            }
             default: throw 'Error in EntityStatsSystem.changeStat. Can not set stat "$stat"';
         }
     }
@@ -335,7 +348,7 @@ class EntityStatsSystem {
             case "knockdown": return this._baseStats.KnockdownRes;
             case "disease": return this._baseStats.DiseaseRes;
             case "bleeding": return this._baseStats.BleedingRes;
-            case "pain": return this._baseStats.PainRes;
+            case "painRes": return this._baseStats.PainRes;
             default: throw 'Error in EntityStatsSystem.getBaseResist. can not get stats "$resist"';
         }
     }
