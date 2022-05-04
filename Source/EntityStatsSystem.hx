@@ -1,13 +1,10 @@
 package;
 
-
 typedef EntityStatsSystemConfig = {
     var STR:Int;
     var END:Int;
     var INT:Int;
     var DEX:Int;
-    var MATK:Int;
-    var RATK:Int;
     var KiRes:Int;
     var FiRes:Int;
     var ElRes:Int;
@@ -25,8 +22,6 @@ typedef BaseStats = {
     var Endurance:Int;
     var Intellect:Int;
     var Dexterity:Int;
-    var MAttack:Int;
-    var RAttack:Int;
     var Pain:Int;
     var KineticRes:Int;
     var FireRes:Int;
@@ -45,22 +40,20 @@ enum MainStats {
     Dexterity( _:Int ); // общая скорость увеличена + уворот от ближнего боя + обращение с оружием дальнего боя
     Endurance( _:Int ); // HP + сопротивление болезням/ядам + сопротивление боль и уменьшение времени нахождения в нокауте.
     Intellect( _:Int ); // множитель обучения скилам
-    MeleeAttack( _:Int ); // str + str/5;
-    RangeAttack( _:Int ); // dex + int/4;
     Pain( _:Int ); // боль. при росте боли, уменьшаем все статы. чем больше боль, тем ниже статы. максимаьное значение 1000;
 }
 
 enum MainResists {
-    KineticResistance( _:Int ); // str*2 + str/2;
-    FireResistance( _:Int ); // end/2;
-    ElectricResistance( _:Int ); // end/2 + str/4;
-    PlasmaResistance( _:Int ); //end/4 + str/4;
-    LaserResistance( _:Int ); // end/4 + str/4;
-    PoisonResistance( _:Int ); // end*2
-    KnockdownResistance( _:Int ); // str*2 + str/5
-    DiseaseResistance( _:Int ); // end*2
-    BleedingResistance( _:Int ); // end*2
-    PainResistance( _:Int ); // str*2 + end;
+    Kinetic( _:Int );
+    Fire( _:Int );
+    Electric( _:Int );
+    Plasma( _:Int );
+    Laser( _:Int );
+    Poison( _:Int ); // end*2
+    Knockdown( _:Int ); // str*2 + str/5
+    Disease( _:Int ); // end*2
+    Bleeding( _:Int ); // end*2
+    Pain( _:Int ); // str*2 + end;
 }
 
 class EntityStatsSystem {
@@ -69,9 +62,6 @@ class EntityStatsSystem {
     public var dexterity:MainStats;
     public var intellect:MainStats;
     public var endurance:MainStats;
-    
-    public var meleeAttack:MainStats;
-    public var rangeAttack:MainStats;
 
     public var pain:MainStats;
 
@@ -89,44 +79,27 @@ class EntityStatsSystem {
 
 
     private var _parent:Entity;
-    private var _inited:Bool;
-    private var _postInited:Bool;
+    private var _inited:Bool = false;
+    private var _postInited:Bool= false;
     private var _baseStats:BaseStats;
-    private var _maxValueForResistance:Int;
+    private var _maxValueForResistance:Int = 95;
+    private var _maxValueForStat:Int = 30;
 
     public function new( parent:Entity, config:EntityStatsSystemConfig ){
         this._parent = parent;
-        this._inited = false;
-        this._postInited = false;
 
         this.strength = Strength( config.STR );
         this.dexterity = Dexterity( config.DEX );
         this.endurance = Endurance( config.END );
         this.intellect = Intellect( config.INT );
 
-        this.meleeAttack = MeleeAttack( config.MATK );
-        this.rangeAttack = RangeAttack( config.RATK );
-
         this.pain = Pain( 0 );
         
-        this.kineticResistance = KineticResistance( config.KiRes );
-        this.fireResistance = FireResistance( config.FiRes );
-        this.electricResistance = ElectricResistance( config.ElRes );
-        this.plasmaResistance = PlasmaResistance( config.PlRes );
-        this.laserResistance = LaserResistance( config.LaRes );
-        this.poisonResistance = PoisonResistance( config.PoRes );
-        this.knockdownResistance = KnockdownResistance( config.KnRes );
-        this.diseaseResistance = DiseaseResistance( config.DiRes );
-        this.bleedingResistance = BleedingResistance( config.BlRes );
-        this.painResistance = PainResistance( config.PaRes );
-
         this._baseStats = { 
             Strength: config.STR,
             Dexterity: config.DEX,
             Endurance: config.END,
             Intellect: config.INT,
-            MAttack: config.MATK,
-            RAttack: config.RATK,
             Pain: 1000,
             KineticRes: config.KiRes,
             FireRes: config.FiRes,
@@ -140,8 +113,16 @@ class EntityStatsSystem {
             PainRes: config.PaRes
         };
 
-        this._maxValueForResistance = 100;
-
+        this.kineticResistance = Kinetic( config.KiRes );
+        this.fireResistance = Fire( config.FiRes );
+        this.electricResistance = Electric( config.ElRes );
+        this.plasmaResistance = Plasma( config.PlRes );
+        this.laserResistance = Laser( config.LaRes );
+        this.poisonResistance = Poison( this._calculateResist( "poisonRes" ));
+        this.knockdownResistance = Knockdown( this._calculateResist( "knockdownRes" ));
+        this.diseaseResistance = Disease( this._calculateResist( "diseaseRes" ));
+        this.bleedingResistance = Bleeding( this._calculateResist( "bleedingRes" ));
+        this.painResistance = Pain( this._calculateResist( "painRes" ));
     }
 
     public function init():Void{
@@ -162,12 +143,6 @@ class EntityStatsSystem {
 
         if( this._baseStats.Intellect <= 0 || Math.isNaN( this._baseStats.Intellect ))
             throw '$msg INT not valid';
-
-        if( this._baseStats.MAttack <= 0 || Math.isNaN( this._baseStats.MAttack ))
-            throw '$msg MATK not valid';
-
-        if( this._baseStats.RAttack <= 0 || Math.isNaN( this._baseStats.RAttack ))
-            throw '$msg RATK not valid';
 
         if( this._baseStats.Pain < 0 || Math.isNaN( this._baseStats.Pain ))
             throw '$msg Pain not valid';
@@ -216,111 +191,77 @@ class EntityStatsSystem {
     }
 
     public function canChangeStat( stat:String, value:Int ):Bool{
-        var statValue:Int;
-        switch( stat ){
-            case "str": statValue = this._getStatInt( this.strength );     
-            case "int": statValue = this._getStatInt( this.intellect );
-            case "dex": statValue = this._getStatInt( this.dexterity );
-            case "end": statValue = this._getStatInt( this.endurance );
-            case "matk": statValue = this._getStatInt( this.meleeAttack );
-            case "ratk": statValue = this._getStatInt( this.rangeAttack );
-            case "kinetic": statValue = this._getResistInt( this.kineticResistance );
-            case "fire": statValue = this._getResistInt( this.fireResistance );
-            case "electric": statValue = this._getResistInt( this.electricResistance );
-            case "plasma": statValue = this._getResistInt( this.plasmaResistance );
-            case "laser": statValue = this._getResistInt( this.laserResistance );
-            case "poison": statValue = this._getResistInt( this.poisonResistance );
-            case "knockdown": statValue = this._getResistInt( this.knockdownResistance );
-            case "disease": statValue = this._getResistInt( this.diseaseResistance );
-            case "bleeding": statValue = this._getResistInt( this.bleedingResistance );
-            case "painRes": statValue = this._getResistInt( this.painResistance );
-            default: throw 'Error in EntityStatsSystem.canChangeStat. Can not check stat "$stat"';
-        }
-        if(( statValue + value ) <= 0 )
+        var statValue:Int = this._getStatInt( stat ) + value;
+        if( statValue  <= 0 )
             return false;
         else
             return true;
     }
 
-    public function changeStat( stat:String, value:Int ):Bool {
+    public function changeStat( stat:String, value:Int ):Void {
+        var msg:String = this._parent.errMsg();
+        msg += 'EntityStatsSystem.changeStat. ';
+
         if( canChangeStat( stat, value ))
-            return false;
+            throw '$msg. Can not change "$stat" on "$value".';
        
         switch( stat ){
             case "str": {
                 // от силы зависит: ближний бой. переносимый вес. шанс нокаута в ближнем бою, шанс получить нокаут;
-                var statValue:Int = this._getStatInt( this.strength ) + value;          
+                var statValue:Int = this._getStatInt( stat ) + value;
+                if( statValue >= this._maxValueForStat )
+                    statValue = this._maxValueForStat;
+
                 this.strength = Strength( statValue );
-                this.meleeAttack = MeleeAttack( this._calculateStat( "matk" )); // ближний бой;
-                this.knockdownResistance = KnockdownResistance( this._calculateStat( "knRes" )); // сопротивление нокауту.
-                this.painResistance = PainResistance( this._calculateStat( "painRes" )); // сопротивление боли.
+                //calculate dependencies;
+                this.knockdownResistance = Knockdown( this._calculateResist( "knockdownRes" )); // сопротивление нокауту.
+                this.painResistance = Pain( this._calculateResist( "painRes" )); // сопротивление боли.
                 //переносимый вес в инвентаре
                 //шанс нокаута в скилах
                 
             };
             case "int": {
-                var statValue:Int = this._getStatInt( this.intellect ) + value;
+                var statValue:Int = this._getStatInt( stat ) + value;
+                if( statValue >= this._maxValueForStat )
+                    statValue = this._maxValueForStat;
+
                 this.intellect = Intellect( statValue );
+                //calculate dependencies;
             };
             case "dex": {
-                var statValue:Int = this._getStatInt( this.dexterity ) + value;
+                var statValue:Int = this._getStatInt( stat ) + value;
+                if( statValue >= this._maxValueForStat )
+                    statValue = this._maxValueForStat;
+
                 this.dexterity = Dexterity( statValue );
             };
             case "end": {
-                var statValue:Int = this._getStatInt( this.endurance ) + value;
+                var statValue:Int = this._getStatInt( stat ) + value;
+                if( statValue >= this._maxValueForStat )
+                    statValue = this._maxValueForStat;
+
                 this.endurance = Endurance( statValue );
             };
-            case "matk": {
-                var statValue:Int = this._getStatInt( this.meleeAttack ) + value;
-                this.meleeAttack = MeleeAttack( statValue );
-            };
-            case "ratk": {
-                var statValue:Int = this._getStatInt( this.rangeAttack ) + value;
-                this.rangeAttack = RangeAttack( statValue );
-            };
-            case "kinetic": {
-                var statValue:Int = this._getResistInt( this.kineticResistance ) + value;
-                this.kineticResistance = KineticResistance( statValue );
-            };
-            case "fire": {
-                var statValue:Int = this._getResistInt( this.fireResistance ) + value;
-                this.fireResistance = FireResistance( statValue );
-            };
-            case "electric": {
-                var statValue:Int = this._getResistInt( this.electricResistance ) + value;
-                this.electricResistance = ElectricResistance( statValue );
-            };
-            case "plasma": {
-                var statValue:Int = this._getResistInt( this.plasmaResistance ) + value;
-                this.plasmaResistance = PlasmaResistance( statValue );
-            };
-            case "laser": {
-                var statValue:Int = this._getResistInt( this.laserResistance ) + value;
-                this.laserResistance = LaserResistance( statValue );
-            };
-            case "poison": {
-                var statValue:Int = this._getResistInt( this.poisonResistance ) + value;
-                this.poisonResistance = PoisonResistance( statValue );
-            };
-            case "knockdown": {
-                var statValue:Int = this._getResistInt( this.knockdownResistance ) + value;
-                this.knockdownResistance = KnockdownResistance( statValue );
-            };
-            case "disease": {
-                var statValue:Int = this._getResistInt( this.diseaseResistance ) + value;
-                this.diseaseResistance = DiseaseResistance( statValue );
-            };
-            case "bleeding": {
-                var statValue:Int = this._getResistInt( this.bleedingResistance ) + value;
-                this.bleedingResistance = BleedingResistance( statValue );
-            };
-            case "painRes": {
-                var statValue:Int = this._getResistInt( this.painResistance ) + value;
-                this.painResistance = PainResistance( statValue );
-            }
-            default: throw 'Error in EntityStatsSystem.changeStat. Can not set stat "$stat"';
+            default: throw '$msg Can not set "$stat"';
         }
-        return true;
+    }
+
+    public function changeResist( stat:String, value:Int ):Void{
+        var statValue:Int = this._getResistInt( stat ) + value;
+        statValue = this._checkResistValue( statValue );
+        switch( stat ){
+            case "kinetic": this.kineticResistance = Kinetic( statValue );
+            case "fire": this.fireResistance = Fire( statValue );
+            case "electric": this.electricResistance = Electric( statValue );
+            case "plasma": this.plasmaResistance = Plasma( statValue );
+            case "laser": this.laserResistance = Laser( statValue );
+            case "poison": this.poisonResistance = Poison( statValue );
+            case "knockdown": this.knockdownResistance = Knockdown( statValue );
+            case "disease": this.diseaseResistance = Disease( statValue );
+            case "bleeding": this.bleedingResistance = Bleeding( statValue );
+            case "painRes": this.painResistance = Pain( statValue );
+            default: throw 'Error in EntityStatsSystem.changeResist. Can not change $stat on $value';
+        }
     }
 
     public function getBaseStat( stat:String ):Int{
@@ -329,8 +270,6 @@ class EntityStatsSystem {
             case "int": return this._baseStats.Intellect;
             case "dex": return this._baseStats.Dexterity;
             case "end": return this._baseStats.Endurance;
-            case "matk": return this._baseStats.MAttack;
-            case "ratk": return this._baseStats.RAttack;
             case "pain": return this._baseStats.Pain;            
             default: throw 'Error in EntityStatsSystem.getBaseStat. can not get stats "$stat"';
         }
@@ -353,7 +292,7 @@ class EntityStatsSystem {
     }
 
     public function increasePain( value:Int ) {
-        var currentValue:Int = this._getStatInt( this.pain );
+        var currentValue:Int = this._getStatInt( "pain" );
         var maxValue:Int = this.getBaseStat( "pain" );
         if( currentValue > maxValue )
             return;
@@ -365,17 +304,25 @@ class EntityStatsSystem {
         }else
             this.pain = Pain( currentValue );
 
+        // Каждые 100 пунктов боли уменьшаем оснвоные статы.
         if( currentValue%100 == 0 ){
-            this.changeStat( "str", -1 );
-            this.changeStat( "end", -1 );
-            this.changeStat( "int", -1 );
-            this.changeStat( "dex", -1 );
+            if( this.canChangeStat( "str", -1 ))
+                this.changeStat( "str", -1 );
+
+            if( this.canChangeStat( "end", -1 ))
+                this.changeStat( "end", -1 );
+
+            if( this.canChangeStat( "int", -1 ))
+                this.changeStat( "int", -1 );
+
+            if( this.canChangeStat( "dex", -1 ))
+                this.changeStat( "dex", -1 );
         }
         
     }
 
     public function decreasePain( value:Int ){
-        var currentValue:Int = this._getStatInt( this.pain );
+        var currentValue:Int = this._getStatInt( "pain" );
         if( currentValue == 0 )
             return ;
 
@@ -386,88 +333,137 @@ class EntityStatsSystem {
             this.pain = Pain( currentValue );
 
         if( currentValue%100 == 0 ){
-            //увеличиваем статы, когда боль спадает.
-            this.changeStat( "str", 1 );
-            this.changeStat( "end", 1 );
-            this.changeStat( "int", 1 );
-            this.changeStat( "dex", 1 );
+            //увеличиваем статы, когда боль спадает каждые 100 пунктов.
+            if( this.getFullStat( "str" ) < this._getStatInt( "str" ))
+                this.changeStat( "str", 1 );
+
+            if( this.getFullStat( "end" ) < this._getStatInt( "end" ))
+                this.changeStat( "end", 1 );
+
+            if( this.getFullStat( "int" ) < this._getStatInt( "int" ))
+                this.changeStat( "int", 1 );
+
+            if( this.getFullStat( "dex" ) < this._getStatInt( "dex" ))
+                this.changeStat( "dex", 1 );
         }
     }
 
-
-    private function _calculateStat( stat:String ):Int{
+    public function getFullStat( stat:String ):Int{
+        var inventory:EntityInventorySystem = this._parent.inventory;
+        var inventoryStatValue:Int = 0;
+        if( inventory != null ){
+           // inventoryStatValue = inventory.getStat( stat );
+        }
         var value:Int = -1;
         switch( stat ){
-            case "matk":{
-                // Урон в ближнем бою рассчитывается по формуле base melee attack + str + str/5 + inventoryItems;
-                var mATKBaseStat = this._baseStats.MAttack;
-                var strValue:Int = this._getStatInt( this.strength );
-                var mATKFromInventory:Int = 0;
-                if( this._parent.inventory != null ){
-                    //TODO: collectStatsFromInventory;
-                }
-
-                value = mATKBaseStat + strValue + Math.round( strValue/5 ) + mATKFromInventory;
-            }
-            case "knRes":{
-                // Споротивление нокауту рассчитывается по формуле base knockdown resist + str*2 + str/2 + inv;
-                var knResBaseStat:Int = this._baseStats.KnockdownRes;
-                var strValue:Int = this._getStatInt( this.strength );
-                var knResFromInventory:Int = 0;
-                if( this._parent.inventory != null ){
-                    //TODO: collectStatsFromInventory;
-                }
-
-                value = knResBaseStat + strValue * 2 + Math.round( strValue/2 ) + knResFromInventory;
-                if( value > _maxValueForResistance )
-                    value = 100;
-            }
-            case "painRes":{
-                //сопротивление боли рассчитывается по формуле base stat + str*2 + end + inventory;
-                var paResBaseStat:Int = this._baseStats.PainRes;
-                var strValue:Int = this._getStatInt( this.strength );
-                var endValue:Int = this._getStatInt( this.endurance );
-                var paResFromInventory:Int = 0;
-                if( this._parent.inventory != null ){
-
-                }
-
-                value = paResBaseStat + strValue * 2 + endValue + paResFromInventory;
-                if( value > this._maxValueForResistance )
-                    value = 100;
-            }
+            case "str": value = this.getBaseStat( "str" );
+            case "dex": value = this.getBaseStat( "dex" );
+            case "int": value = this.getBaseStat( "int" );
+            case "end": value = this.getBaseStat( "end" );
+            default: 'Can not get full stat "$stat"';
         }
 
-        if( value == -1 )
-            throw 'Error in EntityStatSystem._calculateStat. Can not calculate "$stat".';
-
+        value += inventoryStatValue;
         return value;
     }
 
-    private function _getStatInt( container:MainStats ):Int{
+
+    private function _calculateResist( stat:String ):Int{
+        var msg:String = this._parent.errMsg();
+        msg += 'EntityStatSystem._calculateResist. ';
+        var value:Int = -1;
+        switch( stat ){
+            case "knockdownRes":{
+                // Споротивление нокауту рассчитывается по формуле base + str*2 + str/2;
+                var knResBaseStat:Int = this._baseStats.KnockdownRes;
+                var strValue:Int = this._getStatInt( "str" );
+                value = knResBaseStat + strValue * 2 + Math.round( strValue/2 );
+            }
+            case "diseaseRes":{
+                //сопротивление болезням рассчитывается по формуле base + end*2;
+                var diseaseBaseStat:Int = this._baseStats.DiseaseRes;
+                var endValue:Int = this._getStatInt( "end" );
+                value = diseaseBaseStat + endValue * 2;
+            }
+            case "poisonRes":{
+                //сопротивление яду рассчитывается по формуле base + end*2;
+                var poResBaseStat:Int = this._baseStats.PoisonRes;
+                var endValue:Int = this._getStatInt( "end" );
+                value = poResBaseStat + endValue * 2 ;
+            }
+            case "bleedingRes":{
+                //сопротивление кровотечению рассчитывается по формуле base + end*2;
+                var blResBaseStat:Int = this._baseStats.BleedingRes;
+                var endValue:Int = this._getStatInt( "end" );
+                value = blResBaseStat + endValue * 2;
+            }
+            case "painRes":{
+                //сопротивление боли рассчитывается по формуле base + str*2 + end;
+                var paResBaseStat:Int = this._baseStats.PainRes;
+                var strValue:Int = this._getStatInt( "str" );
+                var endValue:Int = this._getStatInt( "end" );
+                value = paResBaseStat + strValue * 2 + endValue;
+            }
+        }
+        if( value <= -1 )
+            throw '$msg Can not calculate "$stat".';
+
+        value = this._checkResistValue( value );
+        return value;
+    }
+
+    private function _checkResistValue( value:Int ):Int{
+        if( value < 0 )
+            return 0;
+        else if( value >= this._maxValueForResistance )
+            return this._maxValueForResistance;
+        else
+            return value;
+    }
+
+    private function _getStatInt( stat:String ):Int{
+        var container:MainStats;
+        switch( stat ){
+            case "str": container = this.strength;
+            case "end": container = this.endurance;
+            case "dex": container = this.dexterity;
+            case "int": container = this.intellect;
+            default: throw 'Error in EntityStatsSystem._getStatInt. there is no stat "$stat"';
+        }
         switch( container ){
             case Strength( v ): return v;
             case Endurance( v ): return v;
             case Intellect( v ): return v;
             case Dexterity( v ): return v;
-            case MeleeAttack( v ): return v;
-            case RangeAttack( v ): return v;
             case Pain( v ): return v;
         }
     }
 
-    private function _getResistInt( container:MainResists ):Int{
+    private function _getResistInt( stat:String ):Int{
+        var container:MainResists;
+        switch( stat ){
+            case "kinetic": container = this.kineticResistance;
+            case "fire": container = this.fireResistance;
+            case "electcric": container = this.electricResistance;
+            case "plasma": container = this.plasmaResistance;
+            case "laser": container = this.laserResistance;
+            case "poison": container = this.poisonResistance;
+            case "knockdown": container = this.knockdownResistance;
+            case "disease": container = this.diseaseResistance;
+            case "bleeding": container = this.bleedingResistance;
+            case "pain": container = this.painResistance;
+        }
         switch( container ){
-            case KineticResistance( v ): return v;
-            case FireResistance( v ): return v;
-            case ElectricResistance( v ): return v;
-            case PlasmaResistance( v ): return v;
-            case LaserResistance( v ): return v;
-            case PoisonResistance( v ): return v;
-            case KnockdownResistance( v ): return v;
-            case DiseaseResistance( v ): return v;
-            case BleedingResistance( v ): return v;
-            case PainResistance( v ): return v;
+            case Kinetic( v ): return v;
+            case Fire( v ): return v;
+            case Electric( v ): return v;
+            case Plasma( v ): return v;
+            case Laser( v ): return v;
+            case Poison( v ): return v;
+            case Knockdown( v ): return v;
+            case Disease( v ): return v;
+            case Bleeding( v ): return v;
+            case Pain( v ): return v;
         }
     }
 }

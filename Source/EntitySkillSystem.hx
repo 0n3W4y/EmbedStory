@@ -4,8 +4,28 @@ typedef EntitySkillSystemConfig = {
 
 }
 
+enum Speed {
+    Movement( _:Int );
+    WeaponReload( _:Int );
+    MeleeAttack( _:Int );
+}
+
+enum Attack {
+    Melee( _:Int ); // str + str/5;
+    Range( _:Int ); // dex + int/4;
+}
+
 class EntitySkillSystem {
 
+    //speed;
+    public var movementSpeed:Speed;
+    public var weaponReloadSpeed:Speed;
+    public var meleeAttackSpeed:Speed;
+    public var rangeAttackSpeed:Speed;
+
+    //attack;
+    public var meleeAttack:Attack;
+    public var rangeAttack:Attack;
 
     private var _inited:Bool;
     private var _postInited:Bool;
@@ -26,6 +46,11 @@ class EntitySkillSystem {
         if( this._inited )
             throw '$msg. already inited.';
 
+        if( this._baseStats.MAttack <= 0 || Math.isNaN( this._baseStats.MAttack ))
+            throw '$msg MATK not valid';
+
+        if( this._baseStats.RAttack <= 0 || Math.isNaN( this._baseStats.RAttack ))
+            throw '$msg RATK not valid';
 
         this._inited = true;
     }
