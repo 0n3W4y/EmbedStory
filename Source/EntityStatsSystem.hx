@@ -102,9 +102,9 @@ class EntityStatsSystem {
     private var _inited:Bool = false;
     private var _postInited:Bool= false;
     private var _baseStats:BaseStats;
-    private var _maxValueForResistance:Int = 95;
-    private var _maxValueForStat:Int = 30;
-    private var _maxValueForPain:Int = 1000;
+    private var _resistanceMaxValue:Int = 95;
+    private var _statsMaxValue:Int = 30;
+    private var _painMaxValue:Int = 1000;
 
     public function new( parent:Entity, config:EntityStatsSystemConfig ){
         this._parent = parent;
@@ -231,8 +231,8 @@ class EntityStatsSystem {
             case "str": {
                 // от силы зависит: ближний бой. переносимый вес. шанс нокаута в ближнем бою, шанс получить нокаут;
                 var statValue:Int = this._getStatInt( stat ) + value;
-                if( statValue >= this._maxValueForStat )
-                    statValue = this._maxValueForStat;
+                if( statValue >= this._statsMaxValue )
+                    statValue = this._statsMaxValue;
 
                 this.strength = Strength( statValue );
                 //calculate dependencies;
@@ -244,8 +244,8 @@ class EntityStatsSystem {
             };
             case "int": {
                 var statValue:Int = this._getStatInt( stat ) + value;
-                if( statValue >= this._maxValueForStat )
-                    statValue = this._maxValueForStat;
+                if( statValue >= this._statsMaxValue )
+                    statValue = this._statsMaxValue;
 
                 this.intellect = Intellect( statValue );
                 //calculate dependencies;
@@ -255,16 +255,16 @@ class EntityStatsSystem {
             };
             case "dex": {
                 var statValue:Int = this._getStatInt( stat ) + value;
-                if( statValue >= this._maxValueForStat )
-                    statValue = this._maxValueForStat;
+                if( statValue >= this._statsMaxValue )
+                    statValue = this._statsMaxValue;
 
                 this.dexterity = Dexterity( statValue );
 
             };
             case "end": {
                 var statValue:Int = this._getStatInt( stat ) + value;
-                if( statValue >= this._maxValueForStat )
-                    statValue = this._maxValueForStat;
+                if( statValue >= this._statsMaxValue )
+                    statValue = this._statsMaxValue;
 
                 this.endurance = Endurance( statValue );
             };
@@ -360,18 +360,36 @@ class EntityStatsSystem {
         return value;
     }
 
+    public function getCalculatedExtraStat( stat:String ):Int{
+        switch( stat ){
+            case "meleeDamage":{};
+            case "rangeDamage":{};
+            case "movementSpeed":{};
+            default:{};
+        }
+    }
+
+    public function getCalculatedResistance( stat:String ):Int {
+        switch( stat ){
+            case "kinetic":{};
+            case "fire":{};
+            case "electric":{};
+            case "":{};
+            default:{};
+        }
+    }
 
 
 
 
     private function _increasePain( value:Int ):Void {
         var currentValue:Int = switch( this.pain ){case Pain( v ): v; };
-        if( currentValue > this._maxValueForPain )
+        if( currentValue > this._painMaxValue )
             return;
 
         currentValue += value;
-        if( currentValue > this._maxValueForPain ){
-            this.pain = Pain( this._maxValueForPain );
+        if( currentValue > this._painMaxValue ){
+            this.pain = Pain( this._painMaxValue );
             //knockdownEntity;
         }else
             this.pain = Pain( currentValue );
@@ -497,8 +515,8 @@ class EntityStatsSystem {
     private function _checkResistValue( value:Int ):Int{
         if( value < 0 )
             return 0;
-        else if( value >= this._maxValueForResistance )
-            return this._maxValueForResistance;
+        else if( value >= this._resistanceMaxValue )
+            return this._resistanceMaxValue;
         else
             return value;
     }
