@@ -82,12 +82,8 @@ class EntityRequirementSystem{
                 var stats:EntityStatsSystem = this._parent.stats;
                 if( stats != null ){
                     //убираем силу из-за голода.
-                    if( stats.canChangeStat( "str", 2 )){
-                        stats.changeStat( "str", 2 );
-                    }
-                    else{
-                        //можно использовать нокдаун, как обессилен - отправить в ближайший госпиталь и снять круглую сумму. 
-                    }
+                   this._decreaseStatsIfHungry();
+                    //можно использовать нокдаун, как обессилен - отправить в ближайший госпиталь и снять круглую сумму. 
                 }
             }
             this._isHungry();
@@ -104,6 +100,7 @@ class EntityRequirementSystem{
         this.currentHunger = Hunger( currentHungerInt );
         this.empty = false;
         this._curentTick = 0;
+        this._increaseStatsIfNotHungry();
         
         var msg:String = this._parent.errMsg();
         trace( '$msg is eating');
@@ -144,5 +141,28 @@ class EntityRequirementSystem{
         }
         else
             this.isHungry = false;
+    }
+
+    private function _decreaseStatsIfHungry():Void{
+        var stats:EntityStatsSystem = this._parent.stats;
+        if( stats.canChangeStat( "str", -2 ))
+            stats.changeStat( "str", -2 );
+
+        if( stats.canChangeStat( "int", -2 ))
+            stats.changeStat( "int", -2 );
+
+        if( stats.canChangeStat( "dex", -1 ))
+            stats.changeStat( "dex", -1 );
+
+        if( stats.canChangeStat( "end", -1 ))
+            stats.changeStat( "end", -1 );
+    }
+
+    private function _increaseStatsIfNotHungry():Void{
+        var stats:EntityStatsSystem = this._parent.stats;
+        stats.changeStat( "str", 2 );
+        stats.changeStat( "int", 2 );
+        stats.changeStat( "dex", 1 );
+        stats.changeStat( "end", 1 );
     }
 }

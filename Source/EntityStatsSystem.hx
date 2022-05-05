@@ -15,6 +15,9 @@ typedef EntityStatsSystemConfig = {
     var DiRes:Int;
     var BlRes:Int;
     var PaRes:Int;
+    var MATK:Int;
+    var RATK:Int;
+    var MoveSPD:Int;
 }
 
 typedef BaseStats = {
@@ -22,7 +25,6 @@ typedef BaseStats = {
     var Endurance:Int;
     var Intellect:Int;
     var Dexterity:Int;
-    var Pain:Int;
     var KineticRes:Int;
     var FireRes:Int;
     var ElectricRes:Int;
@@ -33,6 +35,9 @@ typedef BaseStats = {
     var DiseaseRes:Int;
     var BleedingRes:Int;
     var PainRes:Int;
+    var MeleeAttack:Int;
+    var RangeAttack:Int;
+    var MovementSpeed:Int;
 }
 
 enum MainStats {
@@ -40,6 +45,16 @@ enum MainStats {
     Dexterity( _:Int ); // общая скорость увеличена + уворот от ближнего боя + обращение с оружием дальнего боя
     Endurance( _:Int ); // HP + сопротивление болезням/ядам + сопротивление боль и уменьшение времени нахождения в нокауте.
     Intellect( _:Int ); // множитель обучения скилам
+    
+}
+
+enum ExtraStats {
+    MovementSpeed( _:Int ); // dex*15;
+    MeleeDamage( _:Int ); // str + str/4;
+    RangeDamage( _:Int ); // dex/2 + int/2;
+}
+
+enum Pain {
     Pain( _:Int ); // боль. при росте боли, уменьшаем все статы. чем больше боль, тем ниже статы. максимаьное значение 1000;
 }
 
@@ -63,7 +78,12 @@ class EntityStatsSystem {
     public var intellect:MainStats;
     public var endurance:MainStats;
 
-    public var pain:MainStats;
+    
+    public var pain:Pain;
+
+    public var movementSpeed:ExtraStats;
+    public var meleeDamage:ExtraStats;
+    public var rangeDamage:ExtraStats;
 
     public var kineticResistance:MainResists;
     public var fireResistance:MainResists;
@@ -84,6 +104,7 @@ class EntityStatsSystem {
     private var _baseStats:BaseStats;
     private var _maxValueForResistance:Int = 95;
     private var _maxValueForStat:Int = 30;
+    private var _maxValueForPain:Int = 1000;
 
     public function new( parent:Entity, config:EntityStatsSystemConfig ){
         this._parent = parent;
@@ -100,7 +121,6 @@ class EntityStatsSystem {
             Dexterity: config.DEX,
             Endurance: config.END,
             Intellect: config.INT,
-            Pain: 1000,
             KineticRes: config.KiRes,
             FireRes: config.FiRes,
             ElectricRes: config.ElRes,
@@ -110,7 +130,10 @@ class EntityStatsSystem {
             KnockdownRes: config.KnRes,
             DiseaseRes: config.DiRes,
             BleedingRes: config.BlRes,
-            PainRes: config.PaRes
+            PainRes: config.PaRes,
+            MeleeAttack: config.MATK,
+            RangeAttack: config.RATK,
+            MovementSpeed: config.MoveSPD
         };
 
         this.kineticResistance = Kinetic( config.KiRes );
@@ -143,9 +166,6 @@ class EntityStatsSystem {
 
         if( this._baseStats.Intellect <= 0 || Math.isNaN( this._baseStats.Intellect ))
             throw '$msg INT not valid';
-
-        if( this._baseStats.Pain < 0 || Math.isNaN( this._baseStats.Pain ))
-            throw '$msg Pain not valid';
 
         if( this._baseStats.KineticRes < 0 || Math.isNaN( this._baseStats.KineticRes ))
             throw '$msg Kinetic Res not valid';
@@ -204,6 +224,8 @@ class EntityStatsSystem {
 
         if( canChangeStat( stat, value ))
             throw '$msg. Can not change "$stat" on "$value".';
+
+        var skillSystem:EntitySkillSystem = this._parent.skills;
        
         switch( stat ){
             case "str": {
@@ -227,6 +249,9 @@ class EntityStatsSystem {
 
                 this.intellect = Intellect( statValue );
                 //calculate dependencies;
+                skillSystem.skillGrowupMultiplier = Math.round( statValue / 3 );
+                
+                
             };
             case "dex": {
                 var statValue:Int = this._getStatInt( stat ) + value;
@@ -234,6 +259,7 @@ class EntityStatsSystem {
                     statValue = this._maxValueForStat;
 
                 this.dexterity = Dexterity( statValue );
+
             };
             case "end": {
                 var statValue:Int = this._getStatInt( stat ) + value;
@@ -243,6 +269,15 @@ class EntityStatsSystem {
                 this.endurance = Endurance( statValue );
             };
             default: throw '$msg Can not set "$stat"';
+        }
+    }
+
+    public function changeExtraStat( stat:String, value:Int ):Void{
+        switch( stat ){
+            case "movementSpeed":{};
+            case "meleeDamage":{};
+            case "rangeDamage":{};
+            default: throw 'Error in EntityStatsSystem.changeExtraStat. Can not change stat "$stat".';
         }
     }
 
@@ -259,9 +294,16 @@ class EntityStatsSystem {
             case "knockdown": this.knockdownResistance = Knockdown( statValue );
             case "disease": this.diseaseResistance = Disease( statValue );
             case "bleeding": this.bleedingResistance = Bleeding( statValue );
-            case "painRes": this.painResistance = Pain( statValue );
+            case "pain": this.painResistance = Pain( statValue );
             default: throw 'Error in EntityStatsSystem.changeResist. Can not change $stat on $value';
         }
+    }
+
+    public function changePain( value:Int ):Void{
+        if( value < 0 )
+            this._decreasePain( value );
+        else
+            this._increasePain( value );
     }
 
     public function getBaseStat( stat:String ):Int{
@@ -269,9 +311,17 @@ class EntityStatsSystem {
             case "str": return this._baseStats.Strength;
             case "int": return this._baseStats.Intellect;
             case "dex": return this._baseStats.Dexterity;
-            case "end": return this._baseStats.Endurance;
-            case "pain": return this._baseStats.Pain;            
+            case "end": return this._baseStats.Endurance;          
             default: throw 'Error in EntityStatsSystem.getBaseStat. can not get stats "$stat"';
+        }
+    }
+
+    public function getBaseExtraStat( stat:String ):Int{
+        switch( stat ){
+            case "movementSpeed": return this._baseStats.MovementSpeed;
+            case "meleeDamage": return this._baseStats.MeleeAttack;
+            case "rangeDamage": return this._baseStats.RangeAttack;
+            default: throw 'Error in EntityStatsSystem.getBaseExtraStat. Can not get stat "$stat".';
         }
     }
 
@@ -291,15 +341,37 @@ class EntityStatsSystem {
         }
     }
 
-    public function increasePain( value:Int ) {
-        var currentValue:Int = this._getStatInt( "pain" );
-        var maxValue:Int = this.getBaseStat( "pain" );
-        if( currentValue > maxValue )
+    public function getFullStat( stat:String ):Int{
+        var inventory:EntityInventorySystem = this._parent.inventory;
+        var inventoryStatValue:Int = 0;
+        if( inventory != null ){
+            inventoryStatValue = inventory.getFullStat( stat );
+        }
+        var value:Int = -1;
+        switch( stat ){
+            case "str": value = this.getBaseStat( "str" );
+            case "dex": value = this.getBaseStat( "dex" );
+            case "int": value = this.getBaseStat( "int" );
+            case "end": value = this.getBaseStat( "end" );
+            default: 'Can not get full stat "$stat"';
+        }
+
+        value += inventoryStatValue;
+        return value;
+    }
+
+
+
+
+
+    private function _increasePain( value:Int ):Void {
+        var currentValue:Int = switch( this.pain ){case Pain( v ): v; };
+        if( currentValue > this._maxValueForPain )
             return;
 
         currentValue += value;
-        if( currentValue > maxValue ){
-            this.pain = Pain( maxValue );
+        if( currentValue > this._maxValueForPain ){
+            this.pain = Pain( this._maxValueForPain );
             //knockdownEntity;
         }else
             this.pain = Pain( currentValue );
@@ -321,12 +393,12 @@ class EntityStatsSystem {
         
     }
 
-    public function decreasePain( value:Int ){
-        var currentValue:Int = this._getStatInt( "pain" );
+    private function _decreasePain( value:Int ):Void {
+        var currentValue:Int = switch( this.pain ){case Pain( v ): v; };
         if( currentValue == 0 )
             return ;
 
-        currentValue -= value;
+        currentValue += value;
         if( currentValue < 0 )
             this.pain = Pain( 0 );
         else
@@ -348,29 +420,39 @@ class EntityStatsSystem {
         }
     }
 
-    public function getFullStat( stat:String ):Int{
-        var inventory:EntityInventorySystem = this._parent.inventory;
-        var inventoryStatValue:Int = 0;
-        if( inventory != null ){
-           // inventoryStatValue = inventory.getStat( stat );
-        }
+    private function _calculateExtraStat( stat:String ):Int{
+        var msg:String = this._errMsg();
+        msg += '_calculateExtraStat. Can not calculate "$stat".';
         var value:Int = -1;
+        var baseStat:Int = this._getExtraStatInt( stat );
         switch( stat ){
-            case "str": value = this.getBaseStat( "str" );
-            case "dex": value = this.getBaseStat( "dex" );
-            case "int": value = this.getBaseStat( "int" );
-            case "end": value = this.getBaseStat( "end" );
-            default: 'Can not get full stat "$stat"';
+            case "meleeDamage":{
+                //str + str/4;                
+                var strValue:Int = this._getStatInt( "str" );
+                value = baseStat + strValue + Math.round( strValue / 4 );
+            }
+            case "rangeDamage":{
+                // dex/2 + int/2;
+                var dexValue:Int = this._getStatInt( "dex" );
+                var intValue:Int = this._getStatInt( "int" );
+                value = baseStat + Math.round( dexValue / 2  + intValue / 2 );
+            }
+            case "movementSpeed":{
+                var dexValue:Int = this._getStatInt( "dex" );
+                value = baseStat + dexValue * 15;
+            }
+            default: throw '$msg';
         }
+        if( value <= 0 )
+            throw '$msg, value: "$value".';
 
-        value += inventoryStatValue;
         return value;
     }
 
 
     private function _calculateResist( stat:String ):Int{
-        var msg:String = this._parent.errMsg();
-        msg += 'EntityStatSystem._calculateResist. ';
+        var msg:String = this._errMsg();
+        msg += '_calculateResist. Can not calculate "$stat".';
         var value:Int = -1;
         switch( stat ){
             case "knockdownRes":{
@@ -406,7 +488,7 @@ class EntityStatsSystem {
             }
         }
         if( value <= -1 )
-            throw '$msg Can not calculate "$stat".';
+            throw '$msg';
 
         value = this._checkResistValue( value );
         return value;
@@ -422,20 +504,38 @@ class EntityStatsSystem {
     }
 
     private function _getStatInt( stat:String ):Int{
+        var msg:String = this._errMsg();
+        msg += '_getStatInt. there is no stat "$stat"';
         var container:MainStats;
         switch( stat ){
             case "str": container = this.strength;
             case "end": container = this.endurance;
             case "dex": container = this.dexterity;
             case "int": container = this.intellect;
-            default: throw 'Error in EntityStatsSystem._getStatInt. there is no stat "$stat"';
+            default: throw '$msg';
         }
         switch( container ){
             case Strength( v ): return v;
             case Endurance( v ): return v;
             case Intellect( v ): return v;
             case Dexterity( v ): return v;
-            case Pain( v ): return v;
+        }
+    }
+
+    private function _getExtraStatInt( stat:String ):Int{
+        var msg:String = this._errMsg();
+        msg += '_getExtraStatInt. There is no stat "$stat".';
+        var container:ExtraStats;
+        switch( stat ){
+            case "movementSpeed": container = this.movementSpeed;
+            case "meleeDamage": container = this.meleeDamage;
+            case "rangeDamage": container = this.rangeDamage;
+            default: throw '$msg';
+        }
+        switch( container ){
+            case MovementSpeed( v ): return v;
+            case MeleeDamage( v ): return v;
+            case RangeDamage( v ): return v;
         }
     }
 
@@ -465,5 +565,11 @@ class EntityStatsSystem {
             case Bleeding( v ): return v;
             case Pain( v ): return v;
         }
+    }
+
+    private function _errMsg():String{
+        var msg:String = this._parent.errMsg();
+        msg += "EntityStatSystem.";
+        return msg;
     }
 }

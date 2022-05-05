@@ -5,31 +5,29 @@ typedef EntitySkillSystemConfig = {
 }
 
 enum Speed {
-    Movement( _:Int );
-    WeaponReload( _:Int );
     MeleeAttack( _:Int );
-}
-
-enum Attack {
-    Melee( _:Int ); // str + str/5;
-    Range( _:Int ); // dex + int/4;
+    RangeAttack( _:Int );
 }
 
 class EntitySkillSystem {
 
     //speed;
-    public var movementSpeed:Speed;
-    public var weaponReloadSpeed:Speed;
-    public var meleeAttackSpeed:Speed;
+    public var meleeAttackSpeed:Speed; // weaponspeed - (multiplier*weaponspeed/4); multiplier = 0.0004*meleeAttackSpeed-2; [-2;+2];
     public var rangeAttackSpeed:Speed;
 
-    //attack;
-    public var meleeAttack:Attack;
-    public var rangeAttack:Attack;
+    public var evade:Int;
+    public var block:Int;
+
+
+
+    //special;
+    public var skillGrowupMultiplier:Int; // множитель для увелечения скилов, зависит от INT. ( формула int/3 );
 
     private var _inited:Bool;
     private var _postInited:Bool;
     private var _parent:Entity;
+
+    private var _maxValueForSkill:Int = 10000;
 
 
     public function new( parent: Entity, config:EntitySkillSystemConfig ):Void{
@@ -38,6 +36,7 @@ class EntitySkillSystem {
 
         this._inited = false;
         this._postInited = false;
+
     }
 
     public function init():Void{
@@ -46,11 +45,7 @@ class EntitySkillSystem {
         if( this._inited )
             throw '$msg. already inited.';
 
-        if( this._baseStats.MAttack <= 0 || Math.isNaN( this._baseStats.MAttack ))
-            throw '$msg MATK not valid';
 
-        if( this._baseStats.RAttack <= 0 || Math.isNaN( this._baseStats.RAttack ))
-            throw '$msg RATK not valid';
 
         this._inited = true;
     }
@@ -59,7 +54,8 @@ class EntitySkillSystem {
         
     }
 
-    public function changeSkillValue( skill:String, value:Int ):Void{
+    public function increaseSkillExperience( skill:String, value:Int ):Void{
+        //this.skillGrowupMultiplier;
         switch( skill ){
             case "": {
                 

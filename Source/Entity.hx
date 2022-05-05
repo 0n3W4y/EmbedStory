@@ -78,11 +78,12 @@ class Entity{
         if( config.AISystemConfig != null )
             this.aI = new EntityAISystem( this, config.AISystemConfig );
 
+        //IMPORTANT! Stat system before skill system;
         if( config.StatsSystemConfig != null )
-            this.stats = new EntityStatsSystem( this, config.StatsSystemConfig );
+            this.stats = new EntityStatsSystem( this, config.StatsSystemConfig ); 
 
         if( config.SkillSystemConfig != null )
-            this.skills = new EntitySkillSystem( this, config.SkillSystemConfig );
+            this.skills = new EntitySkillSystem( this, config.SkillSystemConfig );               
 
         if( config.RequirementSystemConfig != null )
             this.requirement = new EntityRequirementSystem( this, config.RequirementSystemConfig );
