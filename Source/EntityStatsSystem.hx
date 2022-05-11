@@ -176,6 +176,8 @@ class EntityStatsSystem {
         if( this.getStatValueInt( "painResistance", "base" ) < 0 || Math.isNaN( this.getStatValueInt( "painResistance", "base" )))
             throw '$msg Pain Res not valid';
 
+        this._parent.healthPoints.changeHPModifierForAllBodyParts( this.getModifierForBodyPart() );
+
         this._inited = true;
     }
 
@@ -273,7 +275,7 @@ class EntityStatsSystem {
             return;
 
         this._setValueToStat( stat, "current", calculatedValue );
-        this._autoCalculateDependincies( stat, value );
+        this._autoCalculateDependencies( stat, value );
     }
 
     public function changeStatBaseValue( stat:String, value:Int ):Void{
@@ -289,7 +291,7 @@ class EntityStatsSystem {
 
         var calculatedValue:Int = this._calculateStatValue( stat );
         this._setValueToStat( stat, "current", calculatedValue);
-        this._autoCalculateDependincies( stat, value );
+        this._autoCalculateDependencies( stat, value );
     }
 
     public function changePain( value:Int ):Void {
@@ -306,7 +308,7 @@ class EntityStatsSystem {
         else
             this.pain = Pain( currentValue );
 
-        // Каждые 100 пунктов боли уменьшаем оснвоные статы.
+        // Каждые 200 пунктов боли уменьшаем оснвоные статы.
         var statModifier = 1;
         if( value < 0 )
             statModifier = -1;
@@ -327,7 +329,7 @@ class EntityStatsSystem {
 
 
 
-    private function _autoCalculateDependincies( stat:String, value:Int ):Void{
+    private function _autoCalculateDependencies( stat:String, value:Int ):Void{
         switch( stat ){
             case "strength": {
                 // от силы зависит: ближний бой. переносимый вес. шанс нокаута в ближнем бою, шанс получить нокаут;
