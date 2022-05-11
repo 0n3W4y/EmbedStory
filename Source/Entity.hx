@@ -38,9 +38,6 @@ class Entity{
     public var sceneID:SceneID;
     public var entityDeployID:EntityDeployID;
 
-    public var canUse:Bool;
-    public var canDestroy:Bool;
-
     public var gridX:Int;
     public var gridY:Int;
     public var graphicIndex:Int;
@@ -88,9 +85,6 @@ class Entity{
         if( config.RequirementSystemConfig != null )
             this.requirement = new EntityRequirementSystem( this, config.RequirementSystemConfig );
 
-        
-        //this.canUse = false;
-        //this.canDestroy = false;
     }
 
     public function init():Void{

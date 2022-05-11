@@ -225,6 +225,11 @@ class EntityStatsSystem {
         return this._getIntFromStats( container );
     }
 
+
+    public function getModifierForBodyPart():Int{
+        return this._getIntFromStats( this.endurance.Current ) * 2;
+    }
+
     public function canChangeStatValue( stat:String, place:String, value:Int ):Bool {
         var statValue:Int;
 
@@ -263,8 +268,12 @@ class EntityStatsSystem {
         this._setValueToStat( stat, "modifier", statModifierValue );
 
         var calculatedValue:Int = this._calculateStatValue( stat );
+        var container:Stat = this._getStatContainer( stat );
+        if( this._getIntFromStats( container.Current ) == calculatedValue )
+            return;
+
         this._setValueToStat( stat, "current", calculatedValue );
-        this._autoCalculateDependincies( stat );
+        this._autoCalculateDependincies( stat, value );
     }
 
     public function changeStatBaseValue( stat:String, value:Int ):Void{
@@ -279,7 +288,8 @@ class EntityStatsSystem {
         this._setValueToStat( stat, "base", statBaseValue );
 
         var calculatedValue:Int = this._calculateStatValue( stat );
-        this._setValueToStat( stat, "current", calculatedValue);     
+        this._setValueToStat( stat, "current", calculatedValue);
+        this._autoCalculateDependincies( stat, value );
     }
 
     public function changePain( value:Int ):Void {
@@ -317,7 +327,7 @@ class EntityStatsSystem {
 
 
 
-    private function _autoCalculateDependincies( stat:String ):Void{
+    private function _autoCalculateDependincies( stat:String, value:Int ):Void{
         switch( stat ){
             case "strength": {
                 // от силы зависит: ближний бой. переносимый вес. шанс нокаута в ближнем бою, шанс получить нокаут;
@@ -341,6 +351,8 @@ class EntityStatsSystem {
                 this.diseaseResistance.Current = DiseaseResistance( this._calculateStatValue( "diseaseResistance" ));
                 this.bleedingResistance.Current = BleedingResistance( this._calculateStatValue( "bleedingResistance" ));
                 this.painResistance.Current = PainResistance( this._calculateStatValue( "painResistance" ));
+                var newValue:Int = value * 2;
+                this._parent.healthPoints.changeHPModifierForAllBodyParts( newValue ); // увеличиваем или уменьшаем модифер для ХП системы.
             };
         }
     }
@@ -550,6 +562,32 @@ class EntityStatsSystem {
                     case "base": this.knockdownResistance.Base = KnockdownResistance( value );
                 }
             };
+            default: throw '$msg';
+        }
+    }
+
+    private function _getStatContainer( stat:String ):Stat{
+        var msg:String = this._errMsg();
+        msg += '_getStatContainer. "$stat" is not valid!';
+
+        switch( stat ){
+            case "strength": return this.strength;
+            case "endurance": return this.endurance;
+            case "dexterity": return this.dexterity;
+            case "intellect": return this.intellect;
+            case "meleeDamage": return this.meleeDamage;
+            case "rangedDamage": return this.rangedDamage;
+            case "movementSpeed": return this.movementSpeed;
+            case "kineticResistance": return this.kineticResistance;
+            case "electricresistance": return this.electricResistance;
+            case "laserResistance": return this.laserResistance;
+            case "plasmaResistance": return this.plasmaResistance;
+            case "fireResistance": return this.fireResistance;
+            case "poisonResistance": return this.poisonResistance;
+            case "diseaseResistance": return this.poisonResistance;
+            case "knockdownResistance": return this.knockdownResistance;
+            case "bleedingResistance": return this.bleedingResistance;
+            case "painResistance": return this.painResistance;
             default: throw '$msg';
         }
     }
