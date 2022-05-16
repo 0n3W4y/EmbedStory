@@ -140,65 +140,135 @@ class EntityHealthPointsSystem{
         this.updateCurrentTotalHP();
     }
 
-    public function canChangeBodyPartModifier():Bool{
+    public function canChangeBodyPartModifier( place:String, value:Int ):Bool{
+        var container:BodyPart = this._getBodyPartContainer( place );
+        if( container == null )
+            return false;
 
+        var currentHP:Int = this._calculateCurrentHealthPointsChildBodyPartInt( container );
+        var difference:Int  = currentHP + value;
+        if( difference <= 0 )
+            return false;
+
+        return true;
     }
 
-    public function canChangeBodyPartBase():Bool{
+    public function canChangeBodyPartBase( place:String, value:Int ):Bool{
+        var container:BodyPart = this._getBodyPartContainer( place );
+        if( container == null )
+            return false;
 
+        var baseValue:Int = this._getHealthPointsFromContainerInt( container, "base" ) + value;
+        if( baseValue <= 0 )
+            return false;
+
+        return true;
     }
 
     public function changeBodyPartHP( place:String, target:String, value:Int ):Void{
         var container:BodyPart = this._getBodyPartContainer( place );
         var msg:String = this._parent.errMsg();
         msg = '$msg in changeBodyPartHP. ';
-        if( container == null )
-            throw '$msg "$place" not valid';
 
-        switch( place ){
-            case "head", "leftEye", "rightEye", "nose", "mouth", "brain": {
-                if( this.head == null ) 
-                    throw '$msg head does not exist'; 
-            };
-            case "leftArm", "leftWrist": {
-                if( this.leftHand == null ) 
-                    throw '$msg Left hand does not exist'; 
-            };
-            case "rightArm", "rightWrist": {
-                if( this.rightHand == null ) 
-                    throw '$msg Right Hand does not exist'; 
-            };
-            case "leftFoot", "leftSole": {
-                if( this.leftLeg == null ) 
-                    throw '$msg Left Leg does not exist'; 
-            };
-            case "rightFoot", "rightSole": {
-                if( this.rightLeg == null ) 
-                    throw '$msg Right Leg does not exist'; 
-            };
-            case "torso", "leftLung", "rightLung", "heart": {
-                if( this.torso == null ) 
-                    throw '$msg torso does not exist'; 
-            };
-            default: throw '$msg. Can not change "$place".';
+        switch( target ){
+            case "current":{
+                var bodyPartStatus:String = container.Status;
+                if( bodyPartStatus == "disrupted" || bodyPartStatus == "removed" )
+                    throw '$msg "$place" already disrupted or removed';
+            }
+            case "modifier":{
+                if( !this.canChangeBodyPartModifier( place, value ))
+                    throw '$msg "$place" Can not change MODIFIER value with "$value"';
+            }
+            case "base":{
+                if( !this.canChangeBodyPartBase( place, value ))
+                    throw '$msg "$place" Can not change BASE value with "$value"';
+            }
         }
+
         this._changeBodyPartHP( place, target, container, value );
+    }
+
+    public function canRemoveBodyPart( place:String ):Bool{
+        var bodyPart:BodyPart = this._getBodyPartContainer( place );
+        if( bodyPart == null )
+            return false;
+
+        if( bodyPart.Status == "removed" )
+            return false;
+
+        return true;
     }
 
     public function removeBodyPart( place:String ):Void{
         var bodyPart:BodyPart = this._getBodyPartContainer( place );
-        if( bodyPart == null )
-            throw 'Error in EntityHealthPointsSystem.removeBodyPart. Can not remove "$place", not exist.';
+        if( !this.canRemoveBodyPart( place ))
+            throw 'Error in EntityHealthPointsSystem.removeBodyPart. Can not remove "$place".';
         
         this._setHealthPointsToCointainer( bodyPart, "current", 0 );
         this._setStatusToBodyPart( bodyPart, "removed" );
-               
+        //TODO: calculate dependecies...
+    }
+
+    public function canAddBodyPart( place:String ):Bool{
+        var container:BodyPart = this._getBodyPartContainer( place );
+        if( container == null ){
+            switch( place ){
+                case "leftWrist":{
+                    var bodyPart:BodyPart = this._getBodyPartContainer( "leftArm" );
+                    if( bodyPart == null )
+                        return false;
+
+                    var bodyPartStatus:String = bodyPart.Status;
+                    if( bodyPartStatus == "removed" || bodyPartStatus == "disrupted" )
+                        return false;
+                        
+                };
+                case "rightWrist":{
+                    var bodyPart:BodyPart = this._getBodyPartContainer( "rightArm" );
+                    if( bodyPart == null )
+                        return false;
+
+                    var bodyPartStatus:String = bodyPart.Status;
+                    if( bodyPartStatus == "removed" || bodyPartStatus == "disrupted" )
+                        return false;
+                };
+                case "leftSole":{
+                    var bodyPart:BodyPart = this._getBodyPartContainer( "leftFoot" );
+                    if( bodyPart == null )
+                        return false;
+
+                    var bodyPartStatus:String = bodyPart.Status;
+                    if( bodyPartStatus == "removed" || bodyPartStatus == "disrupted" )
+                        return false;
+                };
+                case "rightSole":{
+                    var bodyPart:BodyPart = this._getBodyPartContainer( "rightFoot" );
+                    if( bodyPart == null )
+                        return false;
+
+                    var bodyPartStatus:String = bodyPart.Status;
+                    if( bodyPartStatus == "removed" || bodyPartStatus == "disrupted" )
+                        return false;
+                };
+                case "leftEye", "rightEye", "nose", "mouth", "brain":{
+                    if( this.head == null )
+                        return false;
+                }
+                case "head", "torso", "leftLung", "rightLung", "heart": return true;
+                default: throw 'Error in EntityHealthPointsSystem.canAddBodyPart."$place" not valid.';
+            }
+        }else{
+            var containerStatus:String = container.Status;
+            if( containerStatus != "removed" )
+                return false;
+        }
+        return true;            
     }
 
     public function addBodyPart( place:String, config:Dynamic ):Void{
-        var container:BodyPart = this._getBodyPartContainer( place );
-        if( container != null )
-            throw 'Error in EntityHealthPointsSystem.addBodyPart. Can not add body part to "$place", already have a part.';
+        if( !this.canAddBodyPart( place ))
+            throw 'Error in EntityHealthPointsSystem.addBodyPart. Can not add body part to "$place".';
 
         switch( place ){
             case "leftEye": this.head.LeftEye = this._addParamsToBodyPart( config );
@@ -206,13 +276,33 @@ class EntityHealthPointsSystem{
             case "mouth": this.head.Mouth = this._addParamsToBodyPart( config );
             case "nose": this.head.Nose = this._addParamsToBodyPart( config );
             case "brain": this.head.Brain = this._addParamsToBodyPart( config );
-            case "head": this.head.Head = this._addParamsToBodyPart( config );
-            case "leftArm": this.leftHand.Arm = this._addParamsToBodyPart( config );
-            case "rightArm": this.rightHand.Arm = this._addParamsToBodyPart( config );
+            case "head": {
+                if( this.head == null )
+                    this.head = { Head: null, LeftEye: null, RightEye: null, Mouth: null, Brain: null, Nose: null };
+                this.head.Head = this._addParamsToBodyPart( config );
+            }
+            case "leftArm":{
+                if( this.leftHand == null )
+                    this.leftHand = { Arm: null, Wrist: null };
+                this.leftHand.Arm = this._addParamsToBodyPart( config );
+            }
+            case "rightArm": {
+                if( this.rightHand == null )
+                    this.rightHand = { Arm: null, Wrist: null };
+                this.rightHand.Arm = this._addParamsToBodyPart( config );
+            }
             case "leftWrist": this.leftHand.Wrist = this._addParamsToBodyPart( config );
             case "rightWrist": this.rightHand.Wrist = this._addParamsToBodyPart( config );
-            case "leftFoot": this.leftLeg.Foot = this._addParamsToBodyPart( config );
-            case "rightFoot": this.rightLeg.Foot = this._addParamsToBodyPart( config );
+            case "leftFoot": {
+                if( this.leftLeg == null )
+                    this.leftLeg = { Foot: null, Sole: null };
+                this.leftLeg.Foot = this._addParamsToBodyPart( config );
+            };
+            case "rightFoot": {
+                if( this.rightLeg == null )
+                    this.rightLeg = { Foot: null, Sole: null };
+                this.rightLeg.Foot = this._addParamsToBodyPart( config );
+            }
             case "leftSole": this.leftLeg.Sole = this._addParamsToBodyPart( config );
             case "rightSole": this.rightLeg.Sole = this._addParamsToBodyPart( config );
             case "torso": this.torso.Torso = this._addParamsToBodyPart( config );
@@ -234,7 +324,47 @@ class EntityHealthPointsSystem{
         this._setHealthPointsToCointainer( newContainer, "modifier", statModifier );
         var currentHP:Int = this._calculateCurrentHealthPointsChildBodyPartInt( newContainer );
         this._setHealthPointsToCointainer( newContainer, "current", currentHP );
-        //TODO: do changes into stats and skills if needed;        
+
+        this.updateTotalHP();
+        this.updateCurrentTotalHP();
+        //TODO: do changes into stats and skills if needed;     
+    }
+
+    public function getBodyParts():Array<String>{
+        var array:Array<String> = [];
+        if( this.head != null ){
+            if( this.head.Head != null )
+                array.push( "head" );
+
+            if( this.head.LeftEye != null )
+                array.push( "leftEye" );
+
+            if( this.head.RightEye != null )
+                array.push( "rightEye" );
+
+            if( this.head.Nose != null )
+                array.push( "nose" );
+
+            if( this.head.Mouth != null )
+                array.push( "mouth" );
+        }
+
+        if( this.leftLeg != null ){
+
+        }
+
+        if( this.leftHand !+ null ){
+
+        }
+
+        if( this.rightLeg != null ){
+
+        }
+
+        if( this.rightHand != null ){
+
+        }
+        return array;
     }
 
 
@@ -252,9 +382,6 @@ class EntityHealthPointsSystem{
         switch( target ){
             case "current":{
                 // direct damage to part
-                if( this._getBodyPartStatus( bodyPart ) == "disrupted" )
-                    throw '$msg "$place" already disrupted';
-
                 var currentHP:Int = this._getHealthPointsFromContainerInt( bodyPart, target );
                 var calculatedCurrentHP:Int = this._calculateCurrentHealthPointsChildBodyPartInt( bodyPart );
                 var modifiedCurrentHP:Int = currentHP + value;
@@ -270,7 +397,7 @@ class EntityHealthPointsSystem{
                 totalCurrentHP += diffirenceHP;
                 this.currentHP = HealthPoint( totalCurrentHP );
 
-                var currentStatus:String = this._getBodyPartStatus( bodyPart );
+                var currentStatus:String = bodyPart.Status;
                 var status:String = this._calculateStatusForBodyPart( bodyPart );
                 if( currentStatus != status ){
                     if( this._checkForDeath( place ))
@@ -286,7 +413,7 @@ class EntityHealthPointsSystem{
                 this._setHealthPointsToCointainer( bodyPart, target, modifierValue );
                 var newCurrentHP:Int = this._calculateCurrentHealthPointsChildBodyPartInt( bodyPart ) + value;
 
-                if( this._getBodyPartStatus( bodyPart ) != "disrupted" && newCurrentHP <= 0 )
+                if( bodyPart.Status != "disrupted" && newCurrentHP <= 0 )
                     newCurrentHP = 1; // проверяем отрицательное значение, если вдруг модификатор пришел отрицательный, а часть тела была уже повреждена до минимума.
 
                 this._setHealthPointsToCointainer( bodyPart, "current", newCurrentHP );
@@ -298,8 +425,8 @@ class EntityHealthPointsSystem{
 
                 this._setHealthPointsToCointainer( bodyPart, target, baseValue );
                 var newCurrentHP:Int = this._calculateCurrentHealthPointsChildBodyPartInt( bodyPart ) + value;
-
-                if( this._getBodyPartStatus( bodyPart ) != "disrupted" && newCurrentHP <= 0  )
+                var bodyPartStatus:String = bodyPart.Status;
+                if(( bodyPartStatus != "disrupted" || bodyPartStatus != "removed" ) && newCurrentHP <= 0  )
                     newCurrentHP = 1;
 
                 this._setHealthPointsToCointainer( bodyPart, "current", newCurrentHP );
@@ -309,12 +436,13 @@ class EntityHealthPointsSystem{
 
     private function _calulateDependencies( place:String ):Void{
         //TODO: decrease skills and stats value;
+        //TODO: Add pain to stats;
+        //TODO: if mouth destroyed - we can't eat;
         this._checkAndChangeBodyPartsDependense( place );
     }
 
     private function _checkAndChangeBodyPartsDependense( place:String ):Void{
-        var bodyPart:BodyPart = this._getBodyPartContainer( place );
-        var status:String = this._getBodyPartStatus( bodyPart );
+        var status:String = this._getBodyPartStatus( place );
         var container:BodyPart;
         switch( place ){
             case "leftArm":{
@@ -340,8 +468,7 @@ class EntityHealthPointsSystem{
     }
 
     private function _checkForDeath( place ):Bool{
-        var bodyPart:BodyPart = this._getBodyPartContainer( place );
-        var status:String = this._getBodyPartStatus( bodyPart ); 
+        var status:String = this._getBodyPartStatus( place ); 
         if( status == "disrupted" ){
             if( place == "heart" || place == "torso" || place == "head" || place == "brain" )
                 return true;
@@ -437,7 +564,8 @@ class EntityHealthPointsSystem{
                     var headNose:Int = this._getHealthPointsFromContainerInt( this.head.Nose, "current" );
                     var headMouth:Int = this._getHealthPointsFromContainerInt( this.head.Mouth, "current" );
                     var headBrain:Int = this._getHealthPointsFromContainerInt( this.head.Brain, "current" );
-                    return headLeftEye + headRightEye + headNose + headMouth + headBrain;
+                    var headHead:Int = this._getHealthPointsFromContainerInt( this.head.Head, "current" );
+                    return headLeftEye + headRightEye + headNose + headMouth + headBrain + headHead;
                 }else{
                     return 0;
                 }
@@ -468,7 +596,7 @@ class EntityHealthPointsSystem{
                 var leftLung:Int = this._getHealthPointsFromContainerInt( this.torso.LeftLung, "current" );
                 var rightLung:Int = this._getHealthPointsFromContainerInt( this.torso.RightLung, "current" );
                 var heart:Int = this._getHealthPointsFromContainerInt( this.torso.Heart, "current" );
-                var torso:Int = this._getHealthPointsFromContainerInt( this.torso.LeftLung, "current" );
+                var torso:Int = this._getHealthPointsFromContainerInt( this.torso.Torso, "current" );
                 return leftLung + rightLung + heart + torso;
             };
             case "leftHand":{
@@ -596,7 +724,11 @@ class EntityHealthPointsSystem{
         }
     }
 
-    private inline function _getBodyPartStatus( bodyPart:BodyPart ):String{
+    private inline function _getBodyPartStatus( place:String ):String{
+        var bodyPart:BodyPart = this._getBodyPartContainer( place );
+        if( bodyPart == null )
+            return "n/a";
+
         return bodyPart.Status;
     }
 

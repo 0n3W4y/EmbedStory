@@ -16,6 +16,9 @@ class EntityRequirementSystem{
 
     public var empty:Bool;
     public var isHungry:Bool;
+    public var canEat:Bool;
+
+    public var hasMouth:Bool;
 
 
     private var _curentTick:Int;
@@ -35,6 +38,8 @@ class EntityRequirementSystem{
         this._curentTick = 0;
         this.empty = false;
         this.isHungry = false;
+        this.canEat = false;
+        this.hasMouth = true;
     }
 
     public function init():Void{
@@ -86,16 +91,23 @@ class EntityRequirementSystem{
                     //можно использовать нокдаун, как обессилен - отправить в ближайший госпиталь и снять круглую сумму. 
                 }
             }
+            
+            this._canEat();
             this._isHungry();
         }
     }
 
     public function eat( value:Int ):Void{
+        if( !this.canEat )
+            return;
+
         var fullHungerInt:Int = this._fullHunger;
         var currentHungerInt:Int = switch( this.currentHunger ){ case Hunger( v ): v; };
         currentHungerInt += value;
-        if( currentHungerInt >= fullHungerInt )
+        if( currentHungerInt >= fullHungerInt ){
             currentHungerInt = fullHungerInt;
+            this.canEat = false;
+        }
 
         this.currentHunger = Hunger( currentHungerInt );
         this.empty = false;
@@ -107,14 +119,7 @@ class EntityRequirementSystem{
         this._isHungry();
     }
 
-    public function canEat():Bool{
-        var currentHungerInt:Int = switch( this.currentHunger ){ case Hunger( v ): v; };
-        var fullHungerInt:Int = this._fullHunger;
-        if( fullHungerInt > currentHungerInt )
-            return true;
-
-        return false;
-    }
+    
 
     public function checkEmpty():Bool{
         var currentHungerInt:Int = switch( this.currentHunger ){ case Hunger( v ): v; };
@@ -129,6 +134,22 @@ class EntityRequirementSystem{
     }
 
 
+
+
+
+
+    private function _canEat():Void{
+        if( !this.hasMouth )
+            return;
+
+        if( this.canEat )
+            return;
+
+        var currentHungerInt:Int = switch( this.currentHunger ){ case Hunger( v ): v; };
+        var fullHungerInt:Int = this._fullHunger;
+        if( fullHungerInt > currentHungerInt )
+            this.canEat = true;
+    }
 
     private function _isHungry():Void{
         var currentHunger:Int = switch( this.currentHunger ){ case Hunger( v ): v; };
@@ -145,24 +166,17 @@ class EntityRequirementSystem{
 
     private function _decreaseStatsIfHungry():Void{
         var stats:EntityStatsSystem = this._parent.stats;
-        if( stats.canChangeStat( "str", -2 ))
-            stats.changeStat( "str", -2 );
-
-        if( stats.canChangeStat( "int", -2 ))
-            stats.changeStat( "int", -2 );
-
-        if( stats.canChangeStat( "dex", -1 ))
-            stats.changeStat( "dex", -1 );
-
-        if( stats.canChangeStat( "end", -1 ))
-            stats.changeStat( "end", -1 );
+        stats.changeStatModifierValue( "str", -3 );
+        stats.changeStatModifierValue( "int", -1 );
+        stats.changeStatModifierValue( "dex", -2 );
+        stats.changeStatModifierValue( "end", -1 );
     }
 
     private function _increaseStatsIfNotHungry():Void{
         var stats:EntityStatsSystem = this._parent.stats;
-        stats.changeStat( "str", 2 );
-        stats.changeStat( "int", 2 );
-        stats.changeStat( "dex", 1 );
-        stats.changeStat( "end", 1 );
+        stats.changeStatModifierValue( "str", 3 );
+        stats.changeStatModifierValue( "int", 1 );
+        stats.changeStatModifierValue( "dex", 2 );
+        stats.changeStatModifierValue( "end", 1 );
     }
 }

@@ -279,14 +279,9 @@ class EntityStatsSystem {
     }
 
     public function changeStatBaseValue( stat:String, value:Int ):Void{
-        var msg:String = this._errMsg();
-        msg += 'changeStatValue. Can not change "$stat" in "modifier" on "$value"';
-
-        if( !this.canChangeStatValue( stat, "modifier", value ))
-            throw '$msg';
-
+        //change "base" in stat and calculating "current";
         var statBaseValue:Int = this.getStatValueInt( stat, "base" );
-        statBaseValue += value;        
+        statBaseValue += value;
         this._setValueToStat( stat, "base", statBaseValue );
 
         var calculatedValue:Int = this._calculateStatValue( stat );
