@@ -67,6 +67,9 @@ class EntityHealthPointsSystem{
     private var _parent:Entity;
     private var _percentToBrokenPart:Float = 0.15;
     private var _percentToDamagedPart:Float = 0.70;
+    private var _painGeneratorForDamagedPart:Int = 23;
+    private var _painGeneratorForBrokenPart:Int = 58;
+    private var _painGeneratorForDisruptedOrRemovedPart:Int = 92;
 
     public function new( parent:Entity, params:EntityHealthPointsSystemConfig ):Void{
         this._parent = parent;
@@ -207,7 +210,7 @@ class EntityHealthPointsSystem{
         
         this._setHealthPointsToCointainer( bodyPart, "current", 0 );
         this._setStatusToBodyPart( bodyPart, "removed" );
-        //TODO: calculate dependecies...
+        this._calculateDependencies( place );
     }
 
     public function canAddBodyPart( place:String ):Bool{
@@ -267,9 +270,6 @@ class EntityHealthPointsSystem{
     }
 
     public function addBodyPart( place:String, config:Dynamic ):Void{
-        if( !this.canAddBodyPart( place ))
-            throw 'Error in EntityHealthPointsSystem.addBodyPart. Can not add body part to "$place".';
-
         switch( place ){
             case "leftEye": this.head.LeftEye = this._addParamsToBodyPart( config );
             case "rightEye": this.head.RightEye = this._addParamsToBodyPart( config );
@@ -333,36 +333,65 @@ class EntityHealthPointsSystem{
     public function getBodyParts():Array<String>{
         var array:Array<String> = [];
         if( this.head != null ){
-            if( this.head.Head != null )
+            var head:BodyPart = this.head.Head;
+            if( head != null && ( head.Status != "disrupted" || head.Status != "removed" ))
                 array.push( "head" );
 
-            if( this.head.LeftEye != null )
+            var leftEye:BodyPart = this.head.LeftEye;
+            if( leftEye != null && ( leftEye.Status != "disrupted" || leftEye.Status != "removed" ))
                 array.push( "leftEye" );
 
-            if( this.head.RightEye != null )
+            var rightEye:BodyPart = this.head.RightEye;
+            if( rightEye != null && ( rightEye.Status != "disrupted" || rightEye.Status != "removed" ))
                 array.push( "rightEye" );
 
-            if( this.head.Nose != null )
+            var nose:BodyPart = this.head.Nose;
+            if( nose != null && ( nose.Status != "disrupted" || nose.Status != "removed" ))
                 array.push( "nose" );
 
-            if( this.head.Mouth != null )
+            var mouth:BodyPart = this.head.Mouth;
+            if( mouth != null && ( mouth.Status != "disrupted" || mouth.Status != "removed" ))
                 array.push( "mouth" );
         }
 
         if( this.leftLeg != null ){
-
+            var leftFoot:BodyPart = this.leftLeg.Foot;
+            if( leftFoot != null && ( leftFoot.Status != "disrupted" || leftFoot.Status != "removed" ))
+                array.push( "leftFoot" );
+            
+            var leftSole:BodyPart = this.leftLeg.Sole;
+            if( leftSole != null && ( leftSole.Status != "disrupted" || leftSole.Status != "removed" ))
+                array.push( "leftSole" );
         }
 
-        if( this.leftHand !+ null ){
+        if( this.leftHand != null ){
+            var leftArm:BodyPart = this.leftHand.Arm;
+            if( leftArm != null && ( leftArm.Status != "disrupted" || leftArm.Status != "removed" ))
+                array.push( "leftArm" );
 
+            var leftWrist:BodyPart = this.leftHand.Wrist;
+            if( leftWrist != null && ( leftWrist.Status != "disrupted" || leftWrist.Status != "removed" ))
+                array.push( "leftWrist" );
         }
 
         if( this.rightLeg != null ){
+            var rightFoot:BodyPart = this.rightLeg.Foot;
+            if( rightFoot != null && ( rightFoot.Status != "disrupted" || rightFoot.Status != "removed" ))
+                array.push( "rightFoot" );
 
+            var rightSole:BodyPart = this.rightLeg.Sole;
+            if( rightSole != null && ( rightSole.Status != "disrupted" || rightSole.Status != "removed" ))
+                array.push( "rightSole" );
         }
 
         if( this.rightHand != null ){
+            var rightArm:BodyPart = this.rightHand.Arm;
+            if( rightArm != null && ( rightArm.Status != "disrupted" || rightArm.Status != "removed" ))
+                array.push( "rightArm" );
 
+            var rightWrist:BodyPart = this.rightHand.Wrist;
+            if( rightWrist != null && ( rightWrist.Status != "disrupted" || rightWrist.Status != "removed" ))
+                array.push( "rightWrist" );
         }
         return array;
     }
@@ -403,7 +432,7 @@ class EntityHealthPointsSystem{
                     if( this._checkForDeath( place ))
                         this._death();
                     else{
-                        this._calulateDependencies( place );
+                        this._calculateDependencies( place );
                     }
                 }
             };
@@ -434,7 +463,48 @@ class EntityHealthPointsSystem{
         }
     }
 
-    private function _calulateDependencies( place:String ):Void{
+    private function _calculateDependencies( place:String ):Void{
+        var bodyPart:BodyPart = this._getBodyPartContainer( place );
+        var status:String = bodyPart.Status;
+        switch( place ){
+            case "mouth": {
+                var requirement:EntityRequirementSystem = this._parent.requirement;
+                var stats:EntityStatsSystem = this._parent.stats;
+                if( status == "disrupted" || status == "removed" ){
+                    requirement.canEat = false;
+                    requirement.hasMouth = false;
+                    stats.changePain( this._painGeneratorForDisruptedOrRemovedPart );
+                    //eatingSpeed == 0;
+                }else if( status == "damaged" ){
+                    requirement.canEat = true;
+                    requirement.hasMouth = true;
+                    stats.changePain( this._painGeneratorForDamagedPart );
+                    //eating speed 75%
+                }else if( status == "broken" ){
+                    requirement.canEat = true;
+                    requirement.hasMouth = true;
+                    stats.changePain( this._painGeneratorForBrokenPart );
+                    //eating speed 25%
+                }else{
+                    requirement.canEat = true;
+                    requirement.hasMouth = true;
+                    //eating speed = 100%;
+                }
+            }
+            case "nose":{};
+            case "leftEye":{};
+            case "rightEye":{};
+            case "leftLung":{};
+            case "rightLung": {};
+            case "leftWrist":{};
+            case "leftArm":{};
+            case "rightWrist":{};
+            case "rightArm":{};
+            case "leftFoot":{};
+            case "leftSole":{};
+            case "rightFoot":{};
+            case "rightSole":{};
+        }
         //TODO: decrease skills and stats value;
         //TODO: Add pain to stats;
         //TODO: if mouth destroyed - we can't eat;
@@ -444,27 +514,40 @@ class EntityHealthPointsSystem{
     private function _checkAndChangeBodyPartsDependense( place:String ):Void{
         var status:String = this._getBodyPartStatus( place );
         var container:BodyPart;
+        var newPlace:String = "";
         switch( place ){
             case "leftArm":{
-                if( status == "disrupted" )
+                if( status == "disrupted" ){
                     container = this.leftHand.Wrist;
+                    newPlace = "leftWrist";
+                }
             };
             case "rightArm":{
-                if( status == "disrupted" )
+                if( status == "disrupted" ){
                     container = this.rightHand.Wrist;
+                    newPlace = "rightWrist";
+                }
             };
             case "leftFoot":{
-                if( status == "disrupted" )
+                if( status == "disrupted" ){
                     container =  this.leftLeg.Sole;
+                    newPlace = "leftSole";
+                }
             };
             case "rightFoot":{
-                if( status == "disrupted" )
+                if( status == "disrupted" ){
                     container = this.rightLeg.Sole;
+                    newPlace = "rightSole";
+                }
             }
             default: return;
         }
+        if( container == null )
+            return;
+
         this._setStatusToBodyPart( container, status );
         this._setHealthPointsToCointainer( container, "current", 0 );
+        this._calculateDependencies( newPlace );
     }
 
     private function _checkForDeath( place ):Bool{
