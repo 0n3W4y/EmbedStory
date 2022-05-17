@@ -25,13 +25,17 @@ typedef Stat = {
     var Modifier:Stats;
     var Base:Stats;
 };
-
+ TODO: new stats!
 enum Stats {
     Strength( _:Int ); // сила рукопашной атаки и\или ближний бой урон. + переносимый вес + шанс нокаута в ближнем бою выше, сопротивление нокауту
     Dexterity( _:Int ); // общая скорость увеличена + уворот от ближнего боя + обращение с оружием дальнего боя
     Endurance( _:Int ); // HP + сопротивление болезням/ядам + сопротивление боль и уменьшение времени нахождения в нокауте.
     Intellect( _:Int ); // множитель обучения скилам
     MovementSpeed( _:Int ); // dex*15;
+    EatingSpeed( _:Int );
+    FirstAidSpeed( _:Int );
+    BandagingSpeed( _:Int );
+    DoctorSpeed( _:Int );
     MeleeDamage( _:Int ); // str + str/4;
     RangedDamage( _:Int ); // dex/2 + int/2;
     KineticResistance( _:Int );
@@ -58,6 +62,11 @@ class EntityStatsSystem {
     public var endurance:Stat;
 
     public var movementSpeed:Stat;
+    public var firstAidSpeed:Stat;
+    public var doctorSpeed:Stat;
+    public var bandagingSpeed:Stat;
+    public var eatingSpeed:Stat;
+
     public var meleeDamage:Stat;
     public var rangedDamage:Stat;
 
@@ -596,6 +605,10 @@ class EntityStatsSystem {
             case Endurance( v ):{ return v;};
             case Intellect( v ):{ return v;};
             case MovementSpeed( v ):{ return v;};
+            case EatingSpeed( v ):{ return v;};
+            case FirstAidSpeed( v ):{ return v;};
+            case DoctorSpeed( v ):{ return v;};
+            case BandagingSpeed( v ):{ return v;};
             case MeleeDamage( v ):{ return v;};
             case RangedDamage( v ):{ return v;};
             case KineticResistance( v ):{ return v;};
