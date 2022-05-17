@@ -70,6 +70,9 @@ class EntityHealthPointsSystem{
     private var _painForDamagedPart:Int = 23;
     private var _painForBrokenPart:Int = 58;
     private var _painForDisruptedOrRemovedPart:Int = 92;
+    private var _eatingSpeedDamagedPart:Int = 250;
+    private var _eatingSpeedBrokenPart:Int = 500;
+
 
     public function new( parent:Entity, params:EntityHealthPointsSystemConfig ):Void{
         this._parent = parent;
@@ -342,7 +345,7 @@ class EntityHealthPointsSystem{
         
     }
 
-    private function _calculateStatusDependencies( place:String ):Void{
+    private function _calculateStatusDependencies( place:String, oldStatus:String ):Void{
         var bodyPart:BodyPart = this._getBodyPartContainer( place );
         var status:String = bodyPart.Status;
         var requirement:EntityRequirementSystem = this._parent.requirement;
@@ -352,18 +355,32 @@ class EntityHealthPointsSystem{
                 if( status == "disrupted" || status == "removed" ){
                     requirement.canEat = false;
                     requirement.hasMouth = false;
+                    switch( oldStatus ){
+                        case "broken":{};
+                        case "healthy":{};
+                        case "damaged":{};
+                    }
                     stats.changePain( this._painForDisruptedOrRemovedPart );
-                    //eatingSpeed == 0;
                 }else if( status == "damaged" ){
                     requirement.canEat = true;
                     requirement.hasMouth = true;
-                    stats.changePain( this._painForDamagedPart );
-                    //eating speed 75%
+                    if( oldStatus == "broken" ){
+                        stats.changePain( this._painForDamagedPart );
+                        //eating speed 75%
+                    }else if( oldStatus == "healthy" ){
+                        stats.changePain( this._painForDamagedPart + this._painForBrokenPart );
+                    }else{
+
+                    }
+    
                 }else if( status == "broken" ){
                     requirement.canEat = true;
                     requirement.hasMouth = true;
-                    stats.changePain( this._painForBrokenPart );
-                    //eating speed 25%
+                    if( oldStatus == "healthy" ){
+                        stats.changePain( this._painForBrokenPart );
+                        //eating speed 25%
+                    }
+                    
                 }else{
                     requirement.canEat = true;
                     requirement.hasMouth = true;
@@ -386,10 +403,10 @@ class EntityHealthPointsSystem{
         }
         //TODO: decrease skills and stats value;
         //TODO: Add pain to stats;
-        this._checkAndChangeBodyPartsDependense( place );
+        this._checkAndChangeBodyPartsStatusDependense( place );
     }
 
-    private function _checkAndChangeBodyPartsDependense( place:String ):Void{
+    private function _checkAndChangeBodyPartsStatusDependense( place:String ):Void{
         var status:String = this._getBodyPartStatus( place );
         var container:BodyPart;
         var newPlace:String = "n/a";
@@ -425,7 +442,7 @@ class EntityHealthPointsSystem{
 
         this._setStatusToBodyPart( container, status );
         this._setHealthPointsToCointainer( container, "current", 0 );
-        this._calculateDependencies( newPlace );
+        this._calculateStatusDependencies( newPlace );
     }
 
     private function _checkForDeath( place ):Bool{

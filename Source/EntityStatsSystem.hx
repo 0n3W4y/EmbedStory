@@ -32,7 +32,7 @@ enum Stats {
     Endurance( _:Int ); // HP + сопротивление болезням/ядам + сопротивление боль и уменьшение времени нахождения в нокауте.
     Intellect( _:Int ); // множитель обучения скилам
     MovementSpeed( _:Int ); // dex*15;
-    EatingSpeed( _:Int );
+    EatingSpeed( _:Int ); // 1000 / currentSkillInt * item using speed;
     FirstAidSpeed( _:Int );
     BandagingSpeed( _:Int );
     DoctorSpeed( _:Int );
@@ -303,7 +303,10 @@ class EntityStatsSystem {
         if( currentValue == this._painMaxValue || currentValue == 0 )
             return;
 
-        currentValue += value;
+        if( value > 0 )
+            currentValue += value  - Math.round( value / 100 * this.getStatValuInt( "painResistance" ));
+        else
+            currentValue += value;
         if( currentValue > this._painMaxValue ){
             this.pain = Pain( this._painMaxValue );
             //knockdown effect add;
