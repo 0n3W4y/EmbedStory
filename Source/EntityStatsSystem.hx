@@ -62,10 +62,10 @@ class EntityStatsSystem {
     public var endurance:Stat;
 
     public var movementSpeed:Stat;
-    public var firstAidSpeed:Stat;
-    public var doctorSpeed:Stat;
-    public var bandagingSpeed:Stat;
-    public var eatingSpeed:Stat;
+    public var firstAidSpeed:Stat; // first aid - damaged parts restore;
+    public var doctorSpeed:Stat; // do doctor things;
+    public var bandagingSpeed:Stat; // do bandages for stop bleeding;
+    public var eatingSpeed:Stat; // eat some food;
 
     public var meleeDamage:Stat;
     public var rangedDamage:Stat;
@@ -299,14 +299,21 @@ class EntityStatsSystem {
     }
 
     public function changePain( value:Int ):Void {
+        if( value = 0 )
+            return;
+
         var currentValue:Int = switch( this.pain ){case Pain( v ): v; };
-        if( currentValue == this._painMaxValue || currentValue == 0 )
+        if( currentValue == this._painMaxValue && value > 0 )
+            return;
+
+        if( currentValue == 0 && value < 0 )
             return;
 
         if( value > 0 )
-            currentValue += value  - Math.round( value / 100 * this.getStatValuInt( "painResistance" ));
+            currentValue += value  - Math.round( value / 100 * this.getStatValueInt( "painResistance" ));
         else
             currentValue += value;
+
         if( currentValue > this._painMaxValue ){
             this.pain = Pain( this._painMaxValue );
             //knockdown effect add;
