@@ -16,7 +16,7 @@
             "hp":{
                 "torso": { 
                     "torso": {
-                        "hp": 100
+                        "baseHP": 1000
                     }
                 }
             },
@@ -43,7 +43,7 @@
             "hp":{
                 "torso":{
                     "torso":{
-                        "hp": 95
+                        "baseHP": 950
                     }
                 }
             },
@@ -70,7 +70,7 @@
             "hp":{
                 "torso": { 
                     "torso": {
-                        "hp": 50
+                        "baseHP": 500
                     }
                 }
             },
@@ -97,7 +97,7 @@
             "hp":{
                 "torso": { 
                     "torso": {
-                        "hp": 45
+                        "baseHP": 450
                     }
                 }
             },
@@ -115,7 +115,7 @@
             "hp":{
                 "torso": { 
                     "torso": {
-                        "hp": 200
+                        "baseHP": 2000
                     }
                 }
             },
@@ -133,7 +133,7 @@
             "hp":{
                 "torso":{
                     "torso":{
-                        "hp": 190
+                        "baseHP": 1900
                     }
                 }
             },
@@ -151,7 +151,7 @@
             "hp":{
                 "torso":{
                     "torso":{
-                        "hp": 150
+                        "baseHP": 1500
                     }
                 }
             },
@@ -169,7 +169,7 @@
             "hp":{
                 "torso": { 
                     "torso": {
-                        "hp": 125
+                        "baseHP": 1250
                     }
                 }
             },
@@ -187,7 +187,7 @@
             "hp":{
                 "torso": { 
                     "torso": {
-                        "hp": 90
+                        "baseHP": 900
                     }
                 }
             }
@@ -206,7 +206,7 @@
             "hp":{
                 "torso": { 
                     "torso": {
-                        "hp": 110
+                        "baseHP": 1100
                     }
                 }
             }
@@ -225,7 +225,7 @@
             "hp":{
                 "torso": { 
                     "torso": {
-                        "hp": 110
+                        "baseHP": 1100
                     }
                 }
             }
@@ -240,18 +240,48 @@
 
 
 
-    "2000":{
-        "id": 2000,
+    "5000":{
+        "id": 5000,
         "type": "animal",
         "subType": "rabbit",
         "systems": {
             "hp":{
-                "torso":{ "leftLung":{ "hp": 10 }, "rightLung":{ "hp": 10 }, "torso":{ "hp": 10 }, "heart":{ "hp": 10 }},
-                "head":{ "head":{ "hp": 10 }, "leftEye":{ "hp": 10 }, "rightEye":{ "hp": 10 }, "nose":{ "hp": 10 }, "mouth":{ "hp": 10 }, "brain":{ "hp": 10 }},
-                "leftLeg":{ "foot":{ "hp": 10 }, "sole":{ "hp": 10 }},
-                "rightLeg":{ "foot":{ "hp": 10 }, "sole":{ "hp": 10 }},
-                "leftHand":{ "arm":{ "hp": 10 }, "wrist":{ "hp": 10 }},
-                "rightHand":{ "arm":{ "hp": 10 }, "wrist":{ "hp": 10 }}
+                "torso":{ "leftLung":{ "baseHP": 100 }, "rightLung":{ "baseHP": 100 }, "torso":{ "baseHP": 100 }, "heart":{ "baseHP": 100 }},
+                "head":{ "head":{ "baseHP": 100 }, "leftEye":{ "baseHP": 100 }, "rightEye":{ "baseHP": 100 }, "nose":{ "baseHP": 100 }, "mouth":{ "baseHP": 100 }, "brain":{ "baseHP": 100 }},
+                "leftLeg":{ "foot":{ "baseHP": 100 }, "sole":{ "baseHP": 100 }},
+                "rightLeg":{ "foot":{ "baseHP": 100 }, "sole":{ "baseHP": 100 }},
+                "leftHand":{ "arm":{ "baseHP": 100 }, "wrist":{ "baseHP": 100 }},
+                "rightHand":{ "arm":{ "baseHP": 100 }, "wrist":{ "baseHP": 100 }}
+            },
+            "stats":{
+                "generate": 1,
+                "str": 2,
+                "dex": 4,
+                "end": 2,
+                "int": 2,
+                "mAtk": 2,
+                "rAtk": 1,
+                "moveSpd": 100,
+                "eatSpd": 100,
+                "firstAidSpd": 100,
+                "bandagSpd": 100,
+                "docSpd": 100,
+                "equipSpd": 100,
+                "changeWeaponSpd": 100,
+                "blockRD": 0,
+                "blockMD": 0,
+                "evadeRD": 0,
+                "evadeMD": 5,
+                "kiRes": 2,
+                "fiRes": -15,
+                "elRes": 0,
+                "plRes": 0, 
+                "laRes": 0,
+                "poRes": 10,
+                "knRes": 0,
+                "diRes": 5,
+                "blRes": 5,
+                "paRes": 5
             },
             "name":{
                 "name": "Rabbit"
@@ -259,25 +289,55 @@
         }
     },
 
-    "2001":{
-        "id":2100,
+    "5100":{
+        "id":5100,
         "type": "animal",
         "subType": "lynx",
         "systems":{
             "hp":{
-                "torso":{ "leftLung":{ "hp": 40 }, "rightLung":{ "hp": 40 }, "torso":{ "hp": 40 }, "heart":{ "hp": 40 }},
-                "head":{ "head":{ "hp": 40 }, "leftEye":{ "hp": 40 }, "rightEye":{ "hp": 40 }, "nose":{ "hp": 40 }, "mouth":{ "hp": 40 }, "brain":{ "hp": 40 }},
-                "leftLeg":{ "foot":{ "hp": 40 }, "sole":{ "hp": 40 }},
-                "rightLeg":{ "foot":{ "hp": 40 }, "sole":{ "hp": 40 }},
-                "leftHand":{ "arm":{ "hp": 40 }, "wrist":{ "hp": 40 }},
-                "rightHand":{ "arm":{ "hp": 40 }, "wrist":{ "hp": 40 }}
+                "torso":{ "leftLung":{ "baseHP": 100 }, "rightLung":{ "baseHP": 100 }, "torso":{ "baseHP": 600 }, "heart":{ "baseHP": 200 }},
+                "head":{ "head":{ "baseHP": 300 }, "leftEye":{ "baseHP": 100 }, "rightEye":{ "baseHP": 100 }, "nose":{ "baseHP": 100 }, "mouth":{ "baseHP": 100 }, "brain":{ "baseHP": 100 }},
+                "leftLeg":{ "foot":{ "baseHP": 400 }, "sole":{ "baseHP": 400 }},
+                "rightLeg":{ "foot":{ "baseHP": 400 }, "sole":{ "baseHP": 400 }},
+                "leftHand":{ "arm":{ "baseHP": 400 }, "wrist":{ "baseHP": 400 }},
+                "rightHand":{ "arm":{ "baseHP": 400 }, "wrist":{ "baseHP": 400 }}
+            },
+            "stats":{
+                "generate": 1,
+                "str": 10,
+                "dex": 10,
+                "end": 6,
+                "int": 4,
+                "mAtk": 20,
+                "rAtk": 1,
+                "moveSpd": 100,
+                "eatSpd": 100,
+                "firstAidSpd": 100,
+                "bandagSpd": 100,
+                "docSpd": 100,
+                "equipSpd": 100,
+                "changeWeaponSpd": 100,
+                "blockRD": 0,
+                "blockMD": 0,
+                "evadeRD": 0,
+                "evadeMD": 0,
+                "kiRes": 10,
+                "fiRes": -10,
+                "elRes": 0,
+                "plRes": 0, 
+                "laRes": 0,
+                "poRes": 25,
+                "knRes": 10,
+                "diRes": 10,
+                "blRes": 5,
+                "paRes": 10
             },
             "name":{
                 "name": "Lynx"
             },
             "requirement":{
                 "hunger": 1000,
-                "ratio": 1
+                "ratio": 10
             }
         }
     }

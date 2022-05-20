@@ -176,6 +176,7 @@ class Scene {
             case "tree": container = this.objectStorage.Trees;
             case "stone": container = this.objectStorage.Stones;
             case "ore": container = this.objectStorage.Ores;
+            case "animal": container = this.characterStorage.Animals;
             default: throw 'Error in Scene._createObject. can not find container with entity type: "$entityType".';
         }
 
@@ -563,7 +564,8 @@ class Scene {
     }
 
     private function _updateCharacter( time:Int ):Void{
-
+        for( i in 0...this.characterStorage.Animals.length )
+            this.characterStorage.Animals[ i ].update( time );
     }
 
     private function _updateEffect( time:Int ):Void{

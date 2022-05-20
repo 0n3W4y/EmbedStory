@@ -55,7 +55,13 @@ class Game {
         var scene:Scene = this.sceneSystem.createScene( 403 );
         scene.prepare();
         this.stage.changeSceneTo( scene );
-        scene.traceScene();
+        //scene.traceScene();
+        var rabbit:Entity = this.entitySystem.createEntity( "animal", "rabbit" );
+        rabbit.stats.traceStats();
+        var lynx:Entity = this.entitySystem.createEntity( "animal", "lynx" );
+        lynx.stats.traceStats();
+        scene.addEntity( rabbit );
+        scene.addEntity( lynx);
     }
 
     public function stopGame():Void{

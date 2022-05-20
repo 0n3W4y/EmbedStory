@@ -25,12 +25,11 @@ class EntityRequirementSystem{
     private var _inited:Bool;
     private var _postInited:Bool;
     private var _parent:Entity;
-    private var _fullHunger: Int;
+    private var _fullHunger:Int = 1000; // by default;
     private var _hungryTriggerPercent:Int;
 
     public function new( parent:Entity, config:EntityRequirementSystemConfig ):Void{
         this._parent = parent;
-        this._fullHunger =  config.Hunger;
         this.currentHunger = Hunger( config.Hunger );
         this.hungerRatio = config.Ratio;
         this._hungryTriggerPercent = 15;
@@ -73,7 +72,6 @@ class EntityRequirementSystem{
     public function update( time:Int ):Void {
         if( this.empty )
             return;
-
         this._curentTick += time;
         if( this._curentTick >= 1000 ){ // тикаем по секунде
             this._curentTick -= 1000;
@@ -139,11 +137,11 @@ class EntityRequirementSystem{
 
 
     private function _canEat():Void{
-        if( !this.hasMouth )
-            return;
-
         if( this.canEat )
             return;
+
+        if( !this.hasMouth )
+            return;        
 
         var currentHungerInt:Int = switch( this.currentHunger ){ case Hunger( v ): v; };
         var fullHungerInt:Int = this._fullHunger;
@@ -155,7 +153,7 @@ class EntityRequirementSystem{
         var currentHunger:Int = switch( this.currentHunger ){ case Hunger( v ): v; };
         var fullHunger:Int = this._fullHunger;
         var value:Int = Math.round( fullHunger * this._hungryTriggerPercent / 100 );
-        if( value <= currentHunger ){
+        if( value >= currentHunger ){
             this.isHungry = true;
             var msg:String = this._parent.errMsg();
             trace( '$msg is HUNGRY!');
@@ -166,17 +164,17 @@ class EntityRequirementSystem{
 
     private function _decreaseStatsIfHungry():Void{
         var stats:EntityStatsSystem = this._parent.stats;
-        stats.changeStatModifierValue( "str", -3 );
-        stats.changeStatModifierValue( "int", -1 );
-        stats.changeStatModifierValue( "dex", -2 );
-        stats.changeStatModifierValue( "end", -1 );
+        stats.changeStatModifierValue( "strength", -3 );
+        stats.changeStatModifierValue( "intellect", -1 );
+        stats.changeStatModifierValue( "dexterity", -2 );
+        stats.changeStatModifierValue( "endurance", -1 );
     }
 
     private function _increaseStatsIfNotHungry():Void{
         var stats:EntityStatsSystem = this._parent.stats;
-        stats.changeStatModifierValue( "str", 3 );
-        stats.changeStatModifierValue( "int", 1 );
-        stats.changeStatModifierValue( "dex", 2 );
-        stats.changeStatModifierValue( "end", 1 );
+        stats.changeStatModifierValue( "strength", 3 );
+        stats.changeStatModifierValue( "intellect", 1 );
+        stats.changeStatModifierValue( "dexterity", 2 );
+        stats.changeStatModifierValue( "endurance", 1 );
     }
 }

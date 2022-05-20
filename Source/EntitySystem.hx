@@ -105,24 +105,76 @@ class EntitySystem{
     }
 
     private function _createStatsSystemConfig( config: Dynamic ):EntityStatsSystemConfig{
+        var str:Int = Reflect.getProperty( config, "str" );
+        var end:Int = Reflect.getProperty( config, "end" );
+        var dex:Int = Reflect.getProperty( config, "dex" );
+        var int:Int = Reflect.getProperty( config, "int" );
+        var mAtk:Int = Reflect.getProperty( config, "mAtk" );
+        var rAtk:Int = Reflect.getProperty( config, "rAtk" );
+        var moveSpd:Int = Reflect.getProperty( config, "moveSpd" );
+        var eatSpd:Int = Reflect.getProperty( config, "eatSpd" );
+        var fASpd:Int = Reflect.getProperty( config, "firstAidSpd" );
+        var bandagSpd:Int = Reflect.getProperty( config, "bandagSpd" );
+        var docSpd:Int = Reflect.getProperty( config, "docSpd" );
+        var equipISpd:Int = Reflect.getProperty( config, "equipSpd" );
+        var chnageWSpd:Int = Reflect.getProperty( config, "changeWeaponSpd" );
+        var blockMD:Int = Reflect.getProperty( config, "blockRD" );
+        var evadeMD:Int = Reflect.getProperty( config, "evadeMD" );
+        var blockRD:Int = Reflect.getProperty( config, "blockRD" );
+        var evadeRD:Int = Reflect.getProperty( config, "evadeMD" );
+        var kiRes:Int = Reflect.getProperty( config, "kiRes" );
+        var fiRes:Int = Reflect.getProperty( config, "fiRes" );
+        var elRes:Int = Reflect.getProperty( config, "elRes" );
+        var plRes:Int = Reflect.getProperty( config, "plRes" );
+        var laRes:Int = Reflect.getProperty( config, "laRes" );
+        var poRes:Int = Reflect.getProperty( config, "poRes" );
+        var knRes:Int = Reflect.getProperty( config, "knRes" );
+        var diRes:Int = Reflect.getProperty( config, "diRes" );
+        var blRes:Int = Reflect.getProperty( config, "blRes" );
+        var paRes:Int = Reflect.getProperty( config, "paRes" );
+
+        if( Reflect.getProperty( config, "generate" ) == 1 ){
+            str = Math.floor( 1 + Math.random() * str );
+            end = Math.floor( 1 + Math.random() * end );
+            int = Math.floor( 1 + Math.random() * int );
+            dex = Math.floor( 1 + Math.random() * dex );
+            moveSpd = Math.floor( 1000 + Math.random() * moveSpd );
+            eatSpd = Math.floor( 1000 + Math.random() * eatSpd );
+            fASpd = Math.floor( 1000 + Math.random() * fASpd );
+            bandagSpd = Math.floor( 1000 + Math.random() * bandagSpd );
+            docSpd = Math.floor( 1000 + Math.random() * docSpd );
+            equipISpd = Math.floor( 1000 + Math.random() * equipISpd );
+            chnageWSpd = Math.floor( 1000 + Math.random() * chnageWSpd );
+        }
+        
         return { 
-            STR: Reflect.getProperty( config, "str" ), 
-            DEX: Reflect.getProperty( config, "dex" ),
-            END: Reflect.getProperty( config, "end" ),
-            INT: Reflect.getProperty( config, "int" ),
-            MATK: Reflect.getProperty( config, "matk" ),
-            RATK: Reflect.getProperty( config, "ratk" ),
-            Pain: Reflect.getProperty( config, "pain" ),
-            KiRes: Reflect.getProperty( config, "kires" ),
-            FiRes: Reflect.getProperty( config, "fires" ), 
-            ElRes: Reflect.getProperty( config, "elres" ), 
-            PlRes: Reflect.getProperty( config, "plres" ), 
-            LaRes: Reflect.getProperty( config, "lares" ),
-            PoRes: Reflect.getProperty( config, "pores" ), 
-            KnRes: Reflect.getProperty( config, "knres" ), 
-            DiRes: Reflect.getProperty( config, "dires" ), 
-            BlRes: Reflect.getProperty( config, "blres" ),
-            PaRes: Reflect.getProperty( config, "pares" ) 
+            STR: str, 
+            DEX: dex,
+            END: end,
+            INT: int,
+            MATK: mAtk,
+            RATK: rAtk,
+            MoveSPD: moveSpd,
+            EatingSPD: eatSpd,
+            FirstAidSPD: fASpd,
+            BandagingSPD: bandagSpd,
+            DoctorSDP: docSpd,
+            EquipItemSPD: equipISpd,
+            ChangeWeaponSPD: chnageWSpd,
+            BlockRD: blockRD,
+            BlockMD: blockMD,
+            EvadeRD: evadeRD,
+            EvadeMD: evadeMD,
+            KiRes: kiRes,
+            FiRes: fiRes, 
+            ElRes: elRes, 
+            PlRes: plRes, 
+            LaRes: laRes,
+            PoRes: poRes, 
+            KnRes: knRes, 
+            DiRes: diRes, 
+            BlRes: blRes,
+            PaRes: paRes
         };
     }
 

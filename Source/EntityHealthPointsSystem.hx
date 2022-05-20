@@ -53,7 +53,7 @@ typedef BodyPart = {
 
 class EntityHealthPointsSystem{
 
-    public var totalHp:HealthPoint;
+    public var totalHP:HealthPoint;
     public var currentHP:HealthPoint;
     public var isDead:Bool;
 
@@ -110,7 +110,7 @@ class EntityHealthPointsSystem{
         if( currentTotalHP <= 0 )
             throw '$msg Current Total HP is not valid!';
 
-        var totalHP:Int = switch( this.totalHp ){ case HealthPoint( v ): v;}
+        var totalHP:Int = switch( this.totalHP ){ case HealthPoint( v ): v;}
         if( totalHP <= 0 )
             throw '$msg Total HP is not valid!';
     }
@@ -290,7 +290,8 @@ class EntityHealthPointsSystem{
         var rightLegHP:Int = this._calculateTotalHealthPointsBodyPart( "rightLeg" );
         var torsoHP:Int = this._calculateTotalHealthPointsBodyPart( "torso" );
 
-        this.totalHp = HealthPoint( headHP + leftHandHP + rightHandHP + leftLegHP + rightLegHP + torsoHP );
+        this.totalHP = HealthPoint( headHP + leftHandHP + rightHandHP + leftLegHP + rightLegHP + torsoHP );
+        trace( totalHP );
     }
 
     private function _updateCurrentTotalHP():Void{
@@ -302,6 +303,7 @@ class EntityHealthPointsSystem{
         var torsoHP:Int = this._calculateCurrentTotalHealthPointsBodyPart( "torso" );
 
         this.currentHP = HealthPoint( headHP + leftHandHP + rightHandHP + leftLegHP + rightLegHP + torsoHP );
+        trace( currentHP );
     }
 
     private function _calculatePartTypeDependencies( place:String, oldPartType:String ):Void {
@@ -336,20 +338,20 @@ class EntityHealthPointsSystem{
 
         var status:String = this._getBodyPartStatus( place );
         switch( place ){
-            case "mouth": this._calculateDependenciesForMouth( status, oldStatus );
-            case "nose": this._calculateDependenciesForNose( status, oldStatus );
-            case "leftEye": this._calculateDependenciesForEye( status, oldStatus );
-            case "rightEye": this._calculateDependenciesForEye( status, oldStatus );
-            case "leftLung": this._calculateDependenciesForLung( status, oldStatus );
-            case "rightLung": this._calculateDependenciesForLung( status, oldStatus );
-            case "leftWrist": this._calculateDependenciesForWrist( status, oldStatus );
-            case "leftArm": this._calculateDependenciesForArm( status, oldStatus );
-            case "rightWrist":this._calculateDependenciesForWrist( status, oldStatus );
-            case "rightArm": this._calculateDependenciesForArm( status, oldStatus );
-            case "leftFoot": this._calculateDependenciesForFoot( status, oldStatus );
-            case "leftSole": this._calculateDependenciesForSole( status, oldStatus );
-            case "rightFoot": this._calculateDependenciesForFoot( status, oldStatus );
-            case "rightSole": this._calculateDependenciesForSole( status, oldStatus );
+            case "mouth": this._calculateStatusDependenciesForMouth( status, oldStatus );
+            case "nose": this._calculateStatusDependenciesForNose( status, oldStatus );
+            case "leftEye": this._calculateStatusDependenciesForEye( status, oldStatus );
+            case "rightEye": this._calculateStatusDependenciesForEye( status, oldStatus );
+            case "leftLung": this._calculateStatusDependenciesForLung( status, oldStatus );
+            case "rightLung": this._calculateStatusDependenciesForLung( status, oldStatus );
+            case "leftWrist": this._calculateStatusDependenciesForWrist( status, oldStatus );
+            case "leftArm": this._calculateStatusDependenciesForArm( status, oldStatus );
+            case "rightWrist":this._calculateStatusDependenciesForWrist( status, oldStatus );
+            case "rightArm": this._calculateStatusDependenciesForArm( status, oldStatus );
+            case "leftFoot": this._calculateStatusDependenciesForFoot( status, oldStatus );
+            case "leftSole": this._calculateStatusDependenciesForSole( status, oldStatus );
+            case "rightFoot": this._calculateStatusDependenciesForFoot( status, oldStatus );
+            case "rightSole": this._calculateStatusDependenciesForSole( status, oldStatus );
         }
         this._checkAndChangeBodyPartsStatusDependense( place );
     }
@@ -453,7 +455,6 @@ class EntityHealthPointsSystem{
     private function _configureLeg( params:Dynamic, place:String ):Void{
         var msg:String = this._errMsg();
         var container:Leg;
-        var newPlace:String = place;
         if( place == "left" ){
             this.leftLeg = { Foot: null, Sole: null };
             container = this.leftLeg;
@@ -464,6 +465,7 @@ class EntityHealthPointsSystem{
 
         for( key in Reflect.fields( params )){
             var partParams:Dynamic = Reflect.getProperty( params, key );
+            var newPlace:String = place;
             switch( key ){
                 case "foot": {
                     container.Foot = this._createBodyPart();
@@ -483,7 +485,6 @@ class EntityHealthPointsSystem{
     private function _configureHand( params:Dynamic, place:String ):Void{
         var msg:String = this._errMsg();
         var container:Hand;
-        var newPlace:String = place;
         if( place == "left" ){
             this.leftHand = { Arm: null, Wrist: null };
             container = this.leftHand;
@@ -494,6 +495,7 @@ class EntityHealthPointsSystem{
 
         for( key in Reflect.fields( params )){
             var partParams:Dynamic = Reflect.getProperty( params, key );
+            var newPlace:String = place;
             switch( key ){
                 case "arm": {
                     container.Arm = this._createBodyPart();
@@ -548,21 +550,38 @@ class EntityHealthPointsSystem{
                 if( this.torso.Torso == null )
                     throw 'Error in EntityHealthPointsSystem._calculateCurrentTotalHealthPointsBodyPart. Torso.Torso == NULL!!';
 
-                var leftLung:Int = this._getHealthPointsFromBodyPart( "leftLung", "current" );
-                var rightLung:Int = this._getHealthPointsFromBodyPart( "rightLung", "current" );
-                var heart:Int = this._getHealthPointsFromBodyPart( "heart", "current" );
+                var leftLung:Int = 0;
+                var rightLung:Int = 0;
+                var heart:Int = 0;
+                if( this.torso.LeftLung != null )
+                    leftLung = this._getHealthPointsFromBodyPart( "leftLung", "current" );
+
+                if( this.torso.RightLung != null )
+                    rightLung = this._getHealthPointsFromBodyPart( "rightLung", "current" );
+
+                if( this.torso.Heart != null )
+                    heart = this._getHealthPointsFromBodyPart( "heart", "current" );
+
                 var torso:Int = this._getHealthPointsFromBodyPart( "torso", "current" );
                 return leftLung + rightLung + heart + torso;
             };
             case "leftHand":{
-                var armHP:Int = this._getHealthPointsFromBodyPart( "leftArm", "current" );
-                var wristHP:Int = this._getHealthPointsFromBodyPart( "leftWrist", "current" );
-                return armHP + wristHP;
+                if( this.leftHand != null ){
+                    var armHP:Int = this._getHealthPointsFromBodyPart( "leftArm", "current" );
+                    var wristHP:Int = this._getHealthPointsFromBodyPart( "leftWrist", "current" );
+                    return armHP + wristHP;
+                }else{
+                    return 0;
+                }    
             };
             case "rightHand":{
-                var armHP:Int = this._getHealthPointsFromBodyPart( "rightArm", "current" );
-                var wristHP:Int = this._getHealthPointsFromBodyPart( "rightWrist", "current" );
-                return armHP + wristHP;
+                if( this.rightHand != null ){
+                    var armHP:Int = this._getHealthPointsFromBodyPart( "rightArm", "current" );
+                    var wristHP:Int = this._getHealthPointsFromBodyPart( "rightWrist", "current" );
+                    return armHP + wristHP;
+                }else{
+                    return 0;
+                } 
             };
             default: throw 'Error in EntityHealthPointsSystem._calculateCurrentHealthPointsBodyPartInt. "$place" is not valid.';
         }
@@ -590,7 +609,7 @@ class EntityHealthPointsSystem{
             };
             case "torso":{
                 if( this.torso.Torso == null )
-                    throw 'Error in EntityHealthPointsSystem._calculateTotalHealthPointsBodyPartInt. Torso.Torso == NULL!!';
+                    throw 'Error in EntityHealthPointsSystem._calculateTotalHealthPointsBodyPart. Torso.Torso == NULL!!';
 
                 var leftLung:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftLung" );
                 var rightLung:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightLung" );
@@ -599,20 +618,16 @@ class EntityHealthPointsSystem{
                 return leftLung + rightLung + heart + torso;
             };
             case "leftHand":{
-                if( this.leftHand != null ){
                     var armHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftArm" );
                     var wristHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftWrist" );
                     return armHP + wristHP;
-                }else{
-                    return 0;
-                }
             };
-            case "rihtHand":{
+            case "rightHand":{
                 var armHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightArm" );
                 var wristHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightWrist" );
                 return armHP + wristHP;
             };
-            default: throw 'Error in EntityHealthPointsSystem._calculateTotalHealthPointsBodyPartInt. "$place" is not valid.';
+            default: throw 'Error in EntityHealthPointsSystem._calculateTotalHealthPointsBodyPart. "$place" is not valid.';
         }
     }
 
@@ -671,7 +686,7 @@ class EntityHealthPointsSystem{
     }
 
     private function _getHealthPointsFromBodyPart( place:String, target:String ):Int{
-        var msg:String = this._errMsg + "_getHealthPointsFromBodyPartInt.";
+        var msg:String = this._errMsg + "_getHealthPointsFromBodyPart.";
         var container:BodyPart = this._getBodyPartContainer( place );
         if( container == null )
             throw '$msg "$place" does not exist.';
@@ -813,7 +828,7 @@ class EntityHealthPointsSystem{
         var partStatus:String = Reflect.getProperty( config, "status" );
 
         if( Math.isNaN( baseHP ) || baseHP < 0 ) 
-            throw '$msg EntityHealthPointsSystem._addParamsToBodyPart. HP "$baseHP" is not valid';
+            throw '$msg EntityHealthPointsSystem._setParamsToBodyPart. HP "$baseHP" is not valid';
 
         this._setHealthPointsToBodyPart( place, "base", baseHP );
         if( currentHP <= -1 || Math.isNaN( currentHP ))
@@ -832,7 +847,7 @@ class EntityHealthPointsSystem{
 
     }
 
-    private function _calculateDependenciesForMouth( status:String, oldStatus:String ):Void{
+    private function _calculateStatusDependenciesForMouth( status:String, oldStatus:String ):Void{
         var requirement:EntityRequirementSystem = this._parent.requirement;
         var stats:EntityStatsSystem = this._parent.stats;
         var inventory:EntityInventorySystem = this._parent.inventory;
@@ -877,7 +892,7 @@ class EntityHealthPointsSystem{
         }
     }
 
-    private function _calculateDependenciesForNose( status:String, oldStatus:String ):Void{
+    private function _calculateStatusDependenciesForNose( status:String, oldStatus:String ):Void{
         switch( status ){
             case "disrupted", "removed":{
                 switch( oldStatus ){
@@ -904,28 +919,166 @@ class EntityHealthPointsSystem{
         }
     }
 
-    private function _calculateDependenciesForEye( status:String, oldStatus:String ):Void{
-
+    private function _calculateStatusDependenciesForEye( status:String, oldStatus:String ):Void{
+        switch( status ){
+            case "disrupted", "removed":{
+                switch( oldStatus ){
+                    case "broken":{};
+                    case "damaged":{};
+                    case "healthy":{};
+                }
+            };
+            case "broken":{
+                switch( oldStatus ){
+                    case "disrupted", "removed":{};
+                    case "damaged":{};
+                    case "healthy":{};
+                }
+            };
+            case "damaged":{
+                switch( oldStatus ){
+                    case "disrupted", "removed":{};
+                    case "broken":{};
+                    case "healthy":{};
+                }
+            };
+            case "healthy":{};
+        }
     }
 
-    private function _calculateDependenciesForLung( status:String, oldStatus:String ):Void{
-
+    private function _calculateStatusDependenciesForLung( status:String, oldStatus:String ):Void{
+        switch( status ){
+            case "disrupted", "removed":{
+                switch( oldStatus ){
+                    case "broken":{};
+                    case "damaged":{};
+                    case "healthy":{};
+                }
+            };
+            case "broken":{
+                switch( oldStatus ){
+                    case "disrupted", "removed":{};
+                    case "damaged":{};
+                    case "healthy":{};
+                }
+            };
+            case "damaged":{
+                switch( oldStatus ){
+                    case "disrupted", "removed":{};
+                    case "broken":{};
+                    case "healthy":{};
+                }
+            };
+            case "healthy":{};
+        }
     }
 
-    private function _calculateDependenciesForArm( status:String, oldStatus:String ):Void{
-        
+    private function _calculateStatusDependenciesForArm( status:String, oldStatus:String ):Void{
+        switch( status ){
+            case "disrupted", "removed":{
+                switch( oldStatus ){
+                    case "broken":{};
+                    case "damaged":{};
+                    case "healthy":{};
+                }
+            };
+            case "broken":{
+                switch( oldStatus ){
+                    case "disrupted", "removed":{};
+                    case "damaged":{};
+                    case "healthy":{};
+                }
+            };
+            case "damaged":{
+                switch( oldStatus ){
+                    case "disrupted", "removed":{};
+                    case "broken":{};
+                    case "healthy":{};
+                }
+            };
+            case "healthy":{};
+        }
     }
 
-    private function _calculateDependenciesForWrist( status:String, oldStatus:String ):Void{
-
+    private function _calculateStatusDependenciesForWrist( status:String, oldStatus:String ):Void{
+        switch( status ){
+            case "disrupted", "removed":{
+                switch( oldStatus ){
+                    case "broken":{};
+                    case "damaged":{};
+                    case "healthy":{};
+                }
+            };
+            case "broken":{
+                switch( oldStatus ){
+                    case "disrupted", "removed":{};
+                    case "damaged":{};
+                    case "healthy":{};
+                }
+            };
+            case "damaged":{
+                switch( oldStatus ){
+                    case "disrupted", "removed":{};
+                    case "broken":{};
+                    case "healthy":{};
+                }
+            };
+            case "healthy":{};
+        }
     }
 
-    private function _calculateDependenciesForFoot( status:String, oldStatus:String ):Void{
-
+    private function _calculateStatusDependenciesForFoot( status:String, oldStatus:String ):Void{
+        switch( status ){
+            case "disrupted", "removed":{
+                switch( oldStatus ){
+                    case "broken":{};
+                    case "damaged":{};
+                    case "healthy":{};
+                }
+            };
+            case "broken":{
+                switch( oldStatus ){
+                    case "disrupted", "removed":{};
+                    case "damaged":{};
+                    case "healthy":{};
+                }
+            };
+            case "damaged":{
+                switch( oldStatus ){
+                    case "disrupted", "removed":{};
+                    case "broken":{};
+                    case "healthy":{};
+                }
+            };
+            case "healthy":{};
+        }
     }
 
-    private function _calculateDependenciesForSole( status:String, oldStatus:String ):Void{
-
+    private function _calculateStatusDependenciesForSole( status:String, oldStatus:String ):Void{
+        switch( status ){
+            case "disrupted", "removed":{
+                switch( oldStatus ){
+                    case "broken":{};
+                    case "damaged":{};
+                    case "healthy":{};
+                }
+            };
+            case "broken":{
+                switch( oldStatus ){
+                    case "disrupted", "removed":{};
+                    case "damaged":{};
+                    case "healthy":{};
+                }
+            };
+            case "damaged":{
+                switch( oldStatus ){
+                    case "disrupted", "removed":{};
+                    case "broken":{};
+                    case "healthy":{};
+                }
+            };
+            case "healthy":{};
+        }
     }
 
     private function _createBodyPart():BodyPart{
