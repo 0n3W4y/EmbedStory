@@ -144,8 +144,12 @@ class EntityHealthPointsSystem{
                     return false;
             }
             case "base":{
+                var status:String = this._getBodyPartStatus( place );
                 var baseValue:Int = this._getHealthPointsFromBodyPart( place, "base" ) + value;
                 if( baseValue <= 0 )
+                    return false;
+
+                if( status == "disrupted" || status == "removed" )
                     return false;
             }
             case "current":{
@@ -183,6 +187,7 @@ class EntityHealthPointsSystem{
                     if( this._checkForDeath( place ))
                         this._death();
                     else{
+                        this._setBodyPartStatus( place, status );
                         this._calculateStatusDependencies( place, currentStatus );
                     }
                 }
@@ -190,24 +195,39 @@ class EntityHealthPointsSystem{
             case "modifier":{
                 // modifed from stat or inventory items or effects;
                 var modifierValue:Int = this._getHealthPointsFromBodyPart( place, target ) + value;
+                var oldCurrentHP:Int = this._getHealthPointsFromBodyPart( place, "current" );
                 this._setHealthPointsToBodyPart( place, target, modifierValue );
-                var newCurrentHP:Int = this._calculateCurrentHealthPointsChildBodyPart( place ) + value;
-                if(( currentStatus != "disrupted" || currentStatus != "removed" ) && newCurrentHP <= 0 )
-                    newCurrentHP = 1; // проверяем отрицательное значение, если вдруг модификатор пришел отрицательный, а часть тела была уже повреждена до минимума.
+                if(currentStatus == "disrupted" || currentStatus == "removed" )
+                    return;
 
-                this._setHealthPointsToBodyPart( place, "current", newCurrentHP );
+                var differenceHP:Int = oldCurrentHP + value;
+                if(( currentStatus != "disrupted" || currentStatus != "removed" ) && differenceHP <= 0 )
+                    differenceHP = 1; // проверяем отрицательное значение, если вдруг модификатор пришел отрицательный, а часть тела была уже повреждена до минимума.
+
+                this._setHealthPointsToBodyPart( place, "current", differenceHP );
+                var oldTotalHP:Int = switch( this.totalHP ){ case HealthPoint( v ): v;};
+                this.totalHP = HealthPoint( oldTotalHP + value );
+                var oldCurentTotalHP:Int = switch( this.currentHP ){ case HealthPoint( v ): v;};
+                this.currentHP = HealthPoint( oldCurentTotalHP - oldCurrentHP + differenceHP );
             };
             case "base":{
-                var baseValue:Int = this._getHealthPointsFromBodyPart( place, target ) + value;
-                if( baseValue < 0 )
-                    baseValue = 0;
+                var baseValue:Int = this._getHealthPointsFromBodyPart( place, target );
+                var difference:Int = baseValue + value;
+                if( difference < 0 )
+                    difference = 0;
 
-                this._setHealthPointsToBodyPart( place, target, baseValue );
-                var newCurrentHP:Int = this._calculateCurrentHealthPointsChildBodyPart( place ) + value;
-                if(( currentStatus != "disrupted" || currentStatus != "removed" ) && newCurrentHP <= 0  )
-                    newCurrentHP = 1;
+                this._setHealthPointsToBodyPart( place, target, difference );
+                //var newCurrentHP:Int = this._calculateCurrentHealthPointsChildBodyPart( place );
+                var oldCurrentHP:Int = this._getHealthPointsFromBodyPart( place, "current" );
+                var differenceCurrent:Int = oldCurrentHP + value;
+                if(( currentStatus != "disrupted" || currentStatus != "removed" ) && differenceCurrent <= 0  )
+                    differenceCurrent = 1;
 
-                this._setHealthPointsToBodyPart( place, "current", newCurrentHP );
+                this._setHealthPointsToBodyPart( place, "current", differenceCurrent );
+                var oldTotalHP:Int = switch( this.totalHP ){ case HealthPoint( v ): v;};
+                var oldCurentTotalHP:Int = switch( this.currentHP ){ case HealthPoint( v ): v;};
+                this.totalHP = HealthPoint( oldTotalHP - baseValue + difference );
+                this.currentHP = HealthPoint( oldCurentTotalHP - oldCurrentHP + differenceCurrent );
             };
         }
     }
@@ -225,9 +245,9 @@ class EntityHealthPointsSystem{
 
     public function removeBodyPart( place:String ):Void{      
         this._setHealthPointsToBodyPart( place, "current", 0 );
+        this._setHealthPointsToBodyPart( place, "base", 0 );
         var status:String = this._getBodyPartStatus( place );
         this._changeStatusInBodyPart( place, "removed" );
-        this._calculateStatusDependencies( place, status );
     }
 
     public function canAddBodyPart( place:String ):Bool{
@@ -246,17 +266,19 @@ class EntityHealthPointsSystem{
         var currentHP:Int = Reflect.getProperty( config, "currentHP" );
         var status:String = Reflect.getProperty( config, "status" );
         var partType:String = Reflect.getProperty( config, "partType" );
-
         this._setHealthPointsToBodyPart( place, "base", baseHP );
         if( currentHP <= 0 )
-            currentHP = this._calculateCurrentHealthPointsChildBodyPart( place );
+            currentHP = this._getHealthPointsFromBodyPart( place, "base" ) + this._getHealthPointsFromBodyPart( place, "modifier" );
 
         this._setHealthPointsToBodyPart( place, "current", currentHP );
-        this._updateTotalHP();
-        this._updateCurrentTotalHP();
+
+        if( status == "n/a" )
+            status = this._calculateStatusForBodyPart( place );
 
         this._changeStatusInBodyPart( place, status );
         this._changePartTypeInBodyPart( place, partType );
+        this._updateTotalHP();
+        this._updateCurrentTotalHP();
     }
 
     public function getAvailableBodyParts():Array<String>{
@@ -275,6 +297,66 @@ class EntityHealthPointsSystem{
         return result;
     }
 
+    public function traceInfo():String{
+        var curLeftEye:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftEye" );
+        var curRightEye:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightEye" );
+        var curNose:Int = this._calculateCurrentHealthPointsChildBodyPart( "nose" );
+        var curMouth:Int = this._calculateCurrentHealthPointsChildBodyPart( "mouth" );
+        var curBrain:Int = this._calculateCurrentHealthPointsChildBodyPart( "brain" );
+        var curHead:Int = this._calculateCurrentHealthPointsChildBodyPart( "head" );
+        var curlfootHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftFoot" );
+        var curlsoleHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftSole" );
+        var currfootHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightFoot" );
+        var currsoleHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightSole" );
+        var curleftLung:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftLung" );
+        var currightLung:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightLung" );
+        var curHeart:Int = this._calculateCurrentHealthPointsChildBodyPart( "heart" );
+        var curTorso:Int = this._calculateCurrentHealthPointsChildBodyPart( "torso" );
+        var curlarmHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftArm" );
+        var curlwristHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftWrist" );
+        var currarmHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightArm" );
+        var currwristHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightWrist" );
+
+        var headLeftEye:Int = this._getHealthPointsFromBodyPart( "leftEye", "current" );
+        var headRightEye:Int = this._getHealthPointsFromBodyPart( "rightEye", "current" );
+        var headNose:Int = this._getHealthPointsFromBodyPart( "nose", "current" );
+        var headMouth:Int = this._getHealthPointsFromBodyPart( "mouth", "current" );
+        var headBrain:Int = this._getHealthPointsFromBodyPart( "brain", "current" );
+        var head:Int = this._getHealthPointsFromBodyPart( "head", "current" );
+        var lfootHP:Int = this._getHealthPointsFromBodyPart( "leftFoot", "current" );
+        var lsoleHP:Int = this._getHealthPointsFromBodyPart( "leftSole", "current" );
+        var rfootHP:Int = this._getHealthPointsFromBodyPart( "rightFoot", "current" );
+        var rsoleHP:Int = this._getHealthPointsFromBodyPart( "rightSole", "current" );
+        var leftLung = this._getHealthPointsFromBodyPart( "leftLung", "current" );
+        var rightLung = this._getHealthPointsFromBodyPart( "rightLung", "current" );
+        var heart = this._getHealthPointsFromBodyPart( "heart", "current" );
+        var torso:Int = this._getHealthPointsFromBodyPart( "torso", "current" );
+        var larmHP:Int = this._getHealthPointsFromBodyPart( "leftArm", "current" );
+        var lwristHP:Int = this._getHealthPointsFromBodyPart( "leftWrist", "current" );
+        var rarmHP:Int = this._getHealthPointsFromBodyPart( "rightArm", "current" );
+        var rwristHP:Int = this._getHealthPointsFromBodyPart( "rightWrist", "current" );
+
+        var total:Int =  headLeftEye+headRightEye+headNose+headMouth+headBrain+head+rarmHP+rwristHP+larmHP+lwristHP+leftLung+rightLung+heart+torso+rfootHP+rsoleHP+lfootHP+lsoleHP;
+        var curtotal:Int = curLeftEye+curRightEye+curNose+curMouth+curBrain+curHead+curlfootHP+curlsoleHP+currfootHP+currsoleHP+curleftLung+currightLung+curHeart+curTorso+curlarmHP+curlwristHP+currarmHP+currwristHP;
+
+        return 'Current: $total; Total: $curtotal;
+        //CURRENT:
+        Right Foot: $rfootHP; Right Sole: $rsoleHP;
+        Left Foot: $lfootHP; Left Sole: $lsoleHP;
+        Left Arm: $larmHP; Left Wrist: $lwristHP;
+        Right Arm: $rarmHP; Right Wrist: $rwristHP;
+        Head: $head; Left Eye: $headLeftEye; Right Eye: $headRightEye; Nose: $headNose; Mouth: $headMouth; Brain: $headBrain;
+        Torso: $torso; Heart: $heart; Left lung: $leftLung; Right lung: $rightLung
+        //TOTAL:
+        Right Foot: $currfootHP; Right Sole: $currsoleHP;
+        Left Foot: $curlfootHP; Left Sole: $curlsoleHP;
+        Left Arm: $curlarmHP; Left Wrist: $curlwristHP;
+        Right Arm: $currarmHP; Right Wrist: $currwristHP;
+        Head: $curHead; Left Eye: $curLeftEye; Right Eye: $curRightEye; Nose: $curNose; Mouth: $curMouth; Brain: $curBrain;
+        Torso: $curTorso; Heart: $curHeart; Left lung: $curleftLung; Right lung: $currightLung';
+    }
+
+
 
 
 
@@ -289,9 +371,8 @@ class EntityHealthPointsSystem{
         var leftLegHP:Int = this._calculateTotalHealthPointsBodyPart( "leftLeg" );
         var rightLegHP:Int = this._calculateTotalHealthPointsBodyPart( "rightLeg" );
         var torsoHP:Int = this._calculateTotalHealthPointsBodyPart( "torso" );
-
         this.totalHP = HealthPoint( headHP + leftHandHP + rightHandHP + leftLegHP + rightLegHP + torsoHP );
-        trace( totalHP );
+        //trace( 'Total: Head: $headHP; Left hand: $leftHandHP; Right hand: $rightHandHP; Left leg: $leftLegHP; Right leg: $rightLegHP; Torso: $torsoHP');
     }
 
     private function _updateCurrentTotalHP():Void{
@@ -301,14 +382,13 @@ class EntityHealthPointsSystem{
         var leftLegHP:Int = this._calculateCurrentTotalHealthPointsBodyPart( "leftLeg" );
         var rightLegHP:Int = this._calculateCurrentTotalHealthPointsBodyPart( "rightLeg" );
         var torsoHP:Int = this._calculateCurrentTotalHealthPointsBodyPart( "torso" );
-
         this.currentHP = HealthPoint( headHP + leftHandHP + rightHandHP + leftLegHP + rightLegHP + torsoHP );
-        trace( currentHP );
+        //trace( 'Current: Head: $headHP; Left hand: $leftHandHP; Right hand: $rightHandHP; Left leg: $leftLegHP; Right leg: $rightLegHP; Torso: $torsoHP');
     }
 
     private function _calculatePartTypeDependencies( place:String, oldPartType:String ):Void {
         //TODO!!!!;
-        var msg:String = this._errMsg + '_calculateStatusDependencies';
+        var msg:String = this._errMsg + '_calculatePartTypeDependencies';
         if( oldPartType == "n/a" )
             throw '$msg old part type is N/A!';
 
@@ -359,7 +439,7 @@ class EntityHealthPointsSystem{
     private function _checkAndChangeBodyPartsStatusDependense( place:String ):Void{
         var status:String = this._getBodyPartStatus( place );
         var newPlace:String = "n/a";
-        if( status != "disrupted" || status != "removed" )
+        if( status != "disrupted" && status != "removed" )
             return;
 
         switch( place ){
@@ -369,11 +449,8 @@ class EntityHealthPointsSystem{
             case "rightFoot": newPlace = "rightSole";
             default: return;
         }
-
-        var oldStatus:String = this._getBodyPartStatus( newPlace );
-        this._changeStatusInBodyPart( newPlace, status );
         this._setHealthPointsToBodyPart( newPlace, "current", 0 );
-        this._calculateStatusDependencies( newPlace, oldStatus );
+        this._changeStatusInBodyPart( newPlace, status );
     }
 
     private function _checkForDeath( place ):Bool{
@@ -595,7 +672,8 @@ class EntityHealthPointsSystem{
                 var headNose:Int = this._calculateCurrentHealthPointsChildBodyPart( "nose" );
                 var headMouth:Int = this._calculateCurrentHealthPointsChildBodyPart( "mouth" );
                 var headBrain:Int = this._calculateCurrentHealthPointsChildBodyPart( "brain" );
-                return headLeftEye + headRightEye + headNose + headMouth + headBrain;
+                var head:Int = this._calculateCurrentHealthPointsChildBodyPart( "head" );
+                return head + headLeftEye + headRightEye + headNose + headMouth + headBrain;
             };
             case "leftLeg":{
                 var footHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftFoot" );
@@ -634,7 +712,10 @@ class EntityHealthPointsSystem{
     private inline function _calculateCurrentHealthPointsChildBodyPart( place:String ):Int{
         var container:BodyPart = this._getBodyPartContainer( place );
         if( container != null )
-            return this._getHealthPointsFromBodyPart( place, "base" ) + this._getHealthPointsFromBodyPart( place, "modifier" );
+            if( this._getBodyPartStatus( place ) != "removed" )
+                return this._getHealthPointsFromBodyPart( place, "base" ) + this._getHealthPointsFromBodyPart( place, "modifier" );
+            else 
+                return 0;
         else
             return 0;
     }
@@ -649,7 +730,7 @@ class EntityHealthPointsSystem{
             this._calculateStatusDependencies( place, oldStatus );
         }else{
             var msg:String = this._errMsg + "_changeStatusInBodyPart.";
-            throw '$msg . "$status" is not valid.';
+            throw '$msg "$status" is not valid.';
         }
     }
 

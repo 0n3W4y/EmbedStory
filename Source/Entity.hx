@@ -141,6 +141,6 @@ class Entity{
         var entitySubType:String = this.entitySubType;
         var entityDeployId:EntityDeployID = this.entityDeployID;
         var entityID:EntityID = this._ID;
-        return 'Error in EntityHealthPointSystem. "$entityType", "$entitySubType", "$entityID", "$entityDeployId".';
+        return '"$entityType", "$entitySubType", "$entityID", "$entityDeployId".Error in ';
     }
 }

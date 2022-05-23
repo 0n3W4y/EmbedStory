@@ -82,12 +82,10 @@ class EntityRequirementSystem{
                 this.empty = true;
                 this.currentHunger = Hunger( 0 );
                 //degrade some skills;
-                var stats:EntityStatsSystem = this._parent.stats;
-                if( stats != null ){
-                    //убираем силу из-за голода.
-                   this._decreaseStatsIfHungry();
-                    //можно использовать нокдаун, как обессилен - отправить в ближайший госпиталь и снять круглую сумму. 
-                }
+                //убираем силу из-за голода.
+                this._decreaseStatsIfHungry();
+                //можно использовать нокдаун, как обессилен - отправить в ближайший госпиталь и снять круглую сумму. 
+                this.eat( 400 );
             }
             
             this._canEat();
@@ -164,17 +162,23 @@ class EntityRequirementSystem{
 
     private function _decreaseStatsIfHungry():Void{
         var stats:EntityStatsSystem = this._parent.stats;
-        stats.changeStatModifierValue( "strength", -3 );
-        stats.changeStatModifierValue( "intellect", -1 );
-        stats.changeStatModifierValue( "dexterity", -2 );
-        stats.changeStatModifierValue( "endurance", -1 );
+        if( stats != null ){
+            stats.changeStatModifierValue( "strength", -3 );
+            stats.changeStatModifierValue( "intellect", -1 );
+            stats.changeStatModifierValue( "dexterity", -2 );
+            stats.changeStatModifierValue( "endurance", -1 );
+            stats.traceStats();
+        }        
     }
 
     private function _increaseStatsIfNotHungry():Void{
         var stats:EntityStatsSystem = this._parent.stats;
-        stats.changeStatModifierValue( "strength", 3 );
-        stats.changeStatModifierValue( "intellect", 1 );
-        stats.changeStatModifierValue( "dexterity", 2 );
-        stats.changeStatModifierValue( "endurance", 1 );
+        if( stats != null ){
+            stats.changeStatModifierValue( "strength", 3 );
+            stats.changeStatModifierValue( "intellect", 1 );
+            stats.changeStatModifierValue( "dexterity", 2 );
+            stats.changeStatModifierValue( "endurance", 1 );
+            stats.traceStats();
+        }        
     }
 }

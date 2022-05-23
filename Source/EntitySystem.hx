@@ -228,7 +228,7 @@ class EntitySystem{
         return {
             Torso: Reflect.getProperty( config, "torso" ),
             LeftHand: Reflect.getProperty( config, "leftHand" ),
-            LeftLeg: Reflect.getProperty( config, "lefLeg" ),
+            LeftLeg: Reflect.getProperty( config, "leftLeg" ),
             RightHand: Reflect.getProperty( config, "rightHand" ),
             RightLeg: Reflect.getProperty( config, "rightLeg" ),
             Head: Reflect.getProperty( config, "head" )

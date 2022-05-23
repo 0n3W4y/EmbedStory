@@ -3,7 +3,6 @@ package;
 import haxe.Timer;
 import openfl.system.System;
 import openfl.display.Sprite;
-import openfl.events.Event;
 
 import Deploy;
 
@@ -57,11 +56,40 @@ class Game {
         this.stage.changeSceneTo( scene );
         //scene.traceScene();
         var rabbit:Entity = this.entitySystem.createEntity( "animal", "rabbit" );
+        rabbit.init();
         rabbit.stats.traceStats();
-        var lynx:Entity = this.entitySystem.createEntity( "animal", "lynx" );
-        lynx.stats.traceStats();
+        //var lynx:Entity = this.entitySystem.createEntity( "animal", "lynx" );
+        //lynx.init();
+        //lynx.stats.traceStats();
         scene.addEntity( rabbit );
-        scene.addEntity( lynx);
+        //scene.addEntity( lynx);
+        //trace( "change Right Foot hp -500");
+        //rabbit.healthPoints.changeBodyPartHP( "rightFoot", "current", -500 );
+        //rabbit.stats.traceStats();
+        //trace( rabbit.healthPoints.showTotalHP());
+        //trace( rabbit.healthPoints.showCurrentTotalHP());
+        //rabbit.healthPoints.changeBodyPartHP( "rightFoot", "current", 25 );
+        //trace( "change Right Foot hp +25");
+        //rabbit.stats.traceStats();
+        //trace( rabbit.healthPoints.showTotalHP());
+        //trace( rabbit.healthPoints.showCurrentTotalHP());
+        trace( 'Remove body part "Right foot"');
+        rabbit.healthPoints.removeBodyPart( "rightFoot" );
+        rabbit.stats.traceStats();
+        trace( rabbit.healthPoints.traceInfo());
+        trace( "Right Foot Status: ");
+        trace( rabbit.healthPoints.rightLeg.Foot.Status );
+        trace( "right Sole Status: ");
+        trace( rabbit.healthPoints.rightLeg.Sole.Status );
+        trace( "add body part  Right Foot" ); 
+        rabbit.healthPoints.addBodyPart( "rightFoot", { "baseHP": 100, "partType": "cybernetic", "status": "n/a", "currentHP": 0 });              
+        rabbit.stats.traceStats();
+        trace( rabbit.healthPoints.traceInfo());
+        trace( "Right Foot Status: ");
+        trace( rabbit.healthPoints.rightLeg.Foot.Status );
+        trace( "right Sole Status: ");
+        trace( rabbit.healthPoints.rightLeg.Sole.Status );
+
     }
 
     public function stopGame():Void{

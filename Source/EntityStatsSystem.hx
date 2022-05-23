@@ -275,7 +275,7 @@ class EntityStatsSystem {
         if( fiRes < -this._resistanceMaxValue || Math.isNaN( fiRes ) || fiRes > this._resistanceMaxValue )
             throw '$msg Fire Res "$fiRes" not valid';
 
-        var elRes:Int = this.getStatValueInt( "electricResisnatce", "base" );
+        var elRes:Int = this.getStatValueInt( "electricResistance", "base" );
         if( elRes < -this._resistanceMaxValue || Math.isNaN( elRes ) || elRes > this._resistanceMaxValue )
             throw '$msg Electric Res "$elRes" not valid';
 
@@ -327,9 +327,15 @@ class EntityStatsSystem {
         var int = this._getStatValue( "intellect", "current" );
         var dex = this._getStatValue( "dexterity", "current" );
         var mAtk:Int = this._getStatValue( "meleeDamage", "current" );
+        var rAtk:Int = this._getStatValue( "rangedDamage", "current" );
         var evadeMD:Int = this._getStatValue( "evadeMeleeDamage", "current" );
+        var evadeRD:Int = this._getStatValue( "evadeRangedDamage", "current" );
         var kiRes:Int = this._getStatValue( "kineticResistance", "current" );
-        trace( 'STR: $str; DEX: $dex; END: $end; INT: $int; MDMG: $mAtk; Evade Melee: $evadeMD; Kinetic Resistance: $kiRes ');
+        var poRes:Int = this._getStatValue( "poisonResistance", "current" );
+        var knRes:Int = this._getStatValue( "knockdownResistance", "current" );
+        var diRes:Int = this._getStatValue( "diseaseResistance", "current" );
+        var paRes:Int = this._getStatValue( "painResistance", "current" );
+        trace( 'STR: $str; DEX: $dex; END: $end; INT: $int; MDMG: $mAtk; RDMG: $rAtk; Evade Melee: $evadeMD; Evade Ranged: $evadeRD; Kinetic: $kiRes; Poison: $poRes; Knockdown: $knRes; Disease: $diRes; Pain: $paRes;');
         var currentHP:Int = switch( this._parent.healthPoints.currentHP ){ case HealthPoint( v ): v; };
         var totalHP:Int = switch( this._parent.healthPoints.totalHP ){ case HealthPoint( v ): v; };
         trace( 'Current HP: $currentHP; Total HP: $totalHP' );
@@ -471,8 +477,8 @@ class EntityStatsSystem {
             };
             case "endurance": {
                 list = [ "poisonResistance", "diseaseResistance", "bleedingResistance", "painResistance" ];
-                var modifier:Int = this.getModifierForBodyPart();
-                hp.changeHPModifierForAllBodyParts( modifier ); // увеличиваем или уменьшаем модифер для ХП системы.
+                var modifier:Int = ( this.getStatValueInt( "endurance", "current" ) - value ) * 2 - this.getModifierForBodyPart() ;// old stat value - current stat value;
+                hp.changeHPModifierForAllBodyParts( -modifier ); // увеличиваем или уменьшаем модифер для ХП системы.
             };
             for( i in 0...list.length ){
                 this._setValueToStat( list[ i ], "current", this._calculateCurrentStatValue( list[ i ] ));
@@ -499,6 +505,8 @@ class EntityStatsSystem {
                 value += strValue + Math.ceil( strValue / 4 );
                 if( value <= 0 )
                     value = 1;
+
+                trace( 'Melee Damage : $value' );
             };
             case "rangedDamage":{
                 value += Math.ceil( dexValue / 2 + intValue / 2 );
