@@ -297,63 +297,137 @@ class EntityHealthPointsSystem{
         return result;
     }
 
-    public function traceInfo():String{
+    public function traceInfo():Void{
         var curLeftEye:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftEye" );
-        var curRightEye:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightEye" );
-        var curNose:Int = this._calculateCurrentHealthPointsChildBodyPart( "nose" );
-        var curMouth:Int = this._calculateCurrentHealthPointsChildBodyPart( "mouth" );
-        var curBrain:Int = this._calculateCurrentHealthPointsChildBodyPart( "brain" );
-        var curHead:Int = this._calculateCurrentHealthPointsChildBodyPart( "head" );
-        var curlfootHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftFoot" );
-        var curlsoleHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftSole" );
-        var currfootHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightFoot" );
-        var currsoleHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightSole" );
-        var curleftLung:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftLung" );
-        var currightLung:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightLung" );
-        var curHeart:Int = this._calculateCurrentHealthPointsChildBodyPart( "heart" );
-        var curTorso:Int = this._calculateCurrentHealthPointsChildBodyPart( "torso" );
-        var curlarmHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftArm" );
-        var curlwristHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftWrist" );
-        var currarmHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightArm" );
-        var currwristHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightWrist" );
-
         var headLeftEye:Int = this._getHealthPointsFromBodyPart( "leftEye", "current" );
+        var modLeftEye:Int = this._getHealthPointsFromBodyPart( "leftEye", "modifier" );
+        var staLeftEye:String = this._getBodyPartStatus( "leftEye" );
+        var ptLeftEye:String = this._getPartTypeBodyPart( "leftEye" );
+
+        var curRightEye:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightEye" );
         var headRightEye:Int = this._getHealthPointsFromBodyPart( "rightEye", "current" );
+        var modRightEye:Int = this._getHealthPointsFromBodyPart( "rightEye", "modifier" );
+        var staRightEye:String = this._getBodyPartStatus( "rightEye" );
+        var ptRightEye:String = this._getPartTypeBodyPart( "rightEye" );
+
+        var curNose:Int = this._calculateCurrentHealthPointsChildBodyPart( "nose" );
         var headNose:Int = this._getHealthPointsFromBodyPart( "nose", "current" );
+        var modNose:Int = this._getHealthPointsFromBodyPart( "nose", "modifier" );
+        var staNose:String = this._getBodyPartStatus( "nose" );
+        var ptNose:String = this._getPartTypeBodyPart( "nose" );
+
+        var curMouth:Int = this._calculateCurrentHealthPointsChildBodyPart( "mouth" );
         var headMouth:Int = this._getHealthPointsFromBodyPart( "mouth", "current" );
+        var modMouth:Int = this._getHealthPointsFromBodyPart( "mouth", "modifier" );
+        var staMouth:String = this._getBodyPartStatus( "mouth" );
+        var ptMouth:String = this._getPartTypeBodyPart( "mouth" );
+
+        var curBrain:Int = this._calculateCurrentHealthPointsChildBodyPart( "brain" );
         var headBrain:Int = this._getHealthPointsFromBodyPart( "brain", "current" );
+        var modBrain:Int = this._getHealthPointsFromBodyPart( "brain", "modifier" );
+        var staBrain:String = this._getBodyPartStatus( "brain" );
+        var ptBrain:String = this._getPartTypeBodyPart( "brain" );
+
+        var curHead:Int = this._calculateCurrentHealthPointsChildBodyPart( "head" );
         var head:Int = this._getHealthPointsFromBodyPart( "head", "current" );
+        var modHead:Int = this._getHealthPointsFromBodyPart( "head", "modifier" );
+        var staHead:String = this._getBodyPartStatus( "head" );
+        var ptHead:String = this._getPartTypeBodyPart( "head" );
+
+        var curlfootHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftFoot" );
         var lfootHP:Int = this._getHealthPointsFromBodyPart( "leftFoot", "current" );
+        var modlfoot:Int = this._getHealthPointsFromBodyPart( "leftFoot", "modifier" );
+        var stalfoot:String = this._getBodyPartStatus( "leftFoot" );
+        var ptlfoot:String = this._getPartTypeBodyPart( "leftFoot" );
+
+        var curlsoleHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftSole" );
         var lsoleHP:Int = this._getHealthPointsFromBodyPart( "leftSole", "current" );
+        var modlsole:Int = this._getHealthPointsFromBodyPart( "leftSole", "modifier" );
+        var stalsole:String = this._getBodyPartStatus( "leftSole" );
+        var ptlsole:String = this._getPartTypeBodyPart( "leftSole" );
+
+        var currfootHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightFoot" );
         var rfootHP:Int = this._getHealthPointsFromBodyPart( "rightFoot", "current" );
+        var modrfoot:Int = this._getHealthPointsFromBodyPart( "rightFoot", "modifier" );
+        var starfoot:String = this._getBodyPartStatus( "rightFoot" );
+        var ptrfoot:String = this._getPartTypeBodyPart( "rightFoot" );
+
+        var currsoleHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightSole" );
         var rsoleHP:Int = this._getHealthPointsFromBodyPart( "rightSole", "current" );
+        var modrsole:Int = this._getHealthPointsFromBodyPart( "rightSole", "modifier" );
+        var starsole:String = this._getBodyPartStatus( "rightSole" );
+        var ptrsole:String = this._getPartTypeBodyPart( "rightSole" );
+
+        var curleftLung:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftLung" );
         var leftLung = this._getHealthPointsFromBodyPart( "leftLung", "current" );
+        var modLeftLung:Int = this._getHealthPointsFromBodyPart( "leftLung", "modifier" );
+        var staLeftLung:String = this._getBodyPartStatus( "leftLung" );
+        var ptLeftLung:String = this._getPartTypeBodyPart( "leftLung" );
+
+        var currightLung:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightLung" );
         var rightLung = this._getHealthPointsFromBodyPart( "rightLung", "current" );
+        var modRightLung:Int = this._getHealthPointsFromBodyPart( "rightLung", "modifier" );
+        var staRightLung:String = this._getBodyPartStatus( "rightLung" );
+        var ptRightLung:String = this._getPartTypeBodyPart( "rightLung" );
+
+        var curHeart:Int = this._calculateCurrentHealthPointsChildBodyPart( "heart" );
         var heart = this._getHealthPointsFromBodyPart( "heart", "current" );
+        var modHeart:Int = this._getHealthPointsFromBodyPart( "heart", "modifier" );
+        var staHeart:String = this._getBodyPartStatus( "heart" );
+        var ptHeart:String = this._getPartTypeBodyPart( "heart" );
+
+        var curTorso:Int = this._calculateCurrentHealthPointsChildBodyPart( "torso" );
         var torso:Int = this._getHealthPointsFromBodyPart( "torso", "current" );
+        var modTorso:Int = this._getHealthPointsFromBodyPart( "torso", "modifier" );
+        var staTorso:String = this._getBodyPartStatus( "torso" );
+        var ptTorso:String = this._getPartTypeBodyPart( "torso" );
+
+        var curlarmHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftArm" );
         var larmHP:Int = this._getHealthPointsFromBodyPart( "leftArm", "current" );
+        var modlarm:Int = this._getHealthPointsFromBodyPart( "leftArm", "modifier" );
+        var stalarm:String = this._getBodyPartStatus( "leftArm" );
+        var ptlarm:String = this._getPartTypeBodyPart( "leftArm" );
+
+        var curlwristHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "leftWrist" );
         var lwristHP:Int = this._getHealthPointsFromBodyPart( "leftWrist", "current" );
+        var modlwrist:Int = this._getHealthPointsFromBodyPart( "leftWrist", "modifier" );
+        var stalwrist:String = this._getBodyPartStatus( "leftWrist" );
+        var ptlwrist:String = this._getPartTypeBodyPart( "leftWrist" );
+
+        var currarmHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightArm" );
         var rarmHP:Int = this._getHealthPointsFromBodyPart( "rightArm", "current" );
+        var modrarm:Int = this._getHealthPointsFromBodyPart( "rightArm", "modifier" );
+        var stararm:String = this._getBodyPartStatus( "rightArm" );
+        var ptrarm:String = this._getPartTypeBodyPart( "rightArm" );
+
+        var currwristHP:Int = this._calculateCurrentHealthPointsChildBodyPart( "rightWrist" );
         var rwristHP:Int = this._getHealthPointsFromBodyPart( "rightWrist", "current" );
+        var modrwrist:Int = this._getHealthPointsFromBodyPart( "rightWrist", "modifier" );
+        var starwrist:String = this._getBodyPartStatus( "rightWrist" );
+        var ptrwrist:String = this._getPartTypeBodyPart( "rightWrist" );
+        
+        var total:Int =  switch( this.totalHP ){ case HealthPoint( v ): v;};
+        var curtotal:Int = switch( this.currentHP ){ case HealthPoint( v ): v;};
 
-        var total:Int =  headLeftEye+headRightEye+headNose+headMouth+headBrain+head+rarmHP+rwristHP+larmHP+lwristHP+leftLung+rightLung+heart+torso+rfootHP+rsoleHP+lfootHP+lsoleHP;
-        var curtotal:Int = curLeftEye+curRightEye+curNose+curMouth+curBrain+curHead+curlfootHP+curlsoleHP+currfootHP+currsoleHP+curleftLung+currightLung+curHeart+curTorso+curlarmHP+curlwristHP+currarmHP+currwristHP;
-
-        return 'Current: $total; Total: $curtotal;
-        //CURRENT:
-        Right Foot: $rfootHP; Right Sole: $rsoleHP;
-        Left Foot: $lfootHP; Left Sole: $lsoleHP;
-        Left Arm: $larmHP; Left Wrist: $lwristHP;
-        Right Arm: $rarmHP; Right Wrist: $rwristHP;
-        Head: $head; Left Eye: $headLeftEye; Right Eye: $headRightEye; Nose: $headNose; Mouth: $headMouth; Brain: $headBrain;
-        Torso: $torso; Heart: $heart; Left lung: $leftLung; Right lung: $rightLung
-        //TOTAL:
-        Right Foot: $currfootHP; Right Sole: $currsoleHP;
-        Left Foot: $curlfootHP; Left Sole: $curlsoleHP;
-        Left Arm: $curlarmHP; Left Wrist: $curlwristHP;
-        Right Arm: $currarmHP; Right Wrist: $currwristHP;
-        Head: $curHead; Left Eye: $curLeftEye; Right Eye: $curRightEye; Nose: $curNose; Mouth: $curMouth; Brain: $curBrain;
-        Torso: $curTorso; Heart: $curHeart; Left lung: $curleftLung; Right lung: $currightLung';
+        trace( 'HP: $total / $curtotal;
+        Right Foot: $rfootHP / $currfootHP | $modrfoot; "$starfoot", "$ptrfoot"
+        Right Sole: $rsoleHP / $currsoleHP | $modrsole; "$starsole", "$ptrsole"
+        Left Foot: $lfootHP / $curlfootHP | $modlfoot; "$stalfoot", "$ptlfoot" 
+        Left Sole: $lsoleHP / $curlsoleHP | $modlsole; "$stalsole", "$ptlsole"
+        Left Arm: $larmHP / $curlarmHP | $modlarm; "$stalarm", "$ptlarm" 
+        Left Wrist: $lwristHP / $curlwristHP | $modlwrist; "$stalwrist", "$ptlwrist"
+        Right Arm: $rarmHP / $currarmHP | $modrarm; "$stararm", "$ptrarm" 
+        Right Wrist: $rwristHP / $currwristHP | $modrwrist; "$starwrist", "$ptrwrist"
+        Head: $head / $curHead | $modHead; "$staHead", "$ptHead"
+        Left Eye: $headLeftEye / $curLeftEye | $modLeftEye; "$staLeftEye", "$ptLeftEye" 
+        Right Eye: $headRightEye / $curRightEye | $modRightEye; "$staRightEye", "$ptRightEye"
+        Nose: $headNose / $curNose | $modNose; "$staNose", "$ptNose" 
+        Mouth: $headMouth / $curMouth | $modMouth; "$staMouth", "$ptMouth" 
+        Brain: $headBrain / $curBrain | $modBrain; "$staBrain", "$ptBrain"
+        Torso: $torso / $curTorso | $modTorso; "$staTorso", "$ptTorso"
+        Heart: $heart / $curHeart | $modHeart; "$staHeart", "$ptHeart" 
+        Left lung: $leftLung / $curleftLung | $modLeftLung; "$staLeftLung", "$ptLeftLung" 
+        Right lung: $rightLung / $currightLung | $modRightLung; "$staRightLung", "$ptRightLung"');
     }
 
 
@@ -754,7 +828,7 @@ class EntityHealthPointsSystem{
         if( container == null )
             throw '$msg "$place" does not exist.';
 
-        return container.Status;
+        return container.PartType;
     }
 
     private function _setPartTypeToBodyPart( place:String, partType:String ):Void{

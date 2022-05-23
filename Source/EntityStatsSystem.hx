@@ -323,22 +323,112 @@ class EntityStatsSystem {
 
     public function traceStats():Void{
         var str = this._getStatValue( "strength", "current" );
+        var strMod:Int = this._getStatValue( "strength", "modifier" );
+
         var end = this._getStatValue( "endurance", "current" );
+        var endMod:Int = this._getStatValue( "endurance", "modifier" );
+
         var int = this._getStatValue( "intellect", "current" );
+        var intMod:Int = this._getStatValue( "intellect", "modifier" );
+
         var dex = this._getStatValue( "dexterity", "current" );
+        var dexMod:Int = this._getStatValue( "dexterity", "modifier" );
+
         var mAtk:Int = this._getStatValue( "meleeDamage", "current" );
+        var mAtkMod:Int = this._getStatValue( "meleeDamage", "modifier" );
+
         var rAtk:Int = this._getStatValue( "rangedDamage", "current" );
+        var rAtkMod:Int = this._getStatValue( "rangedDamage", "modifier" );
+
         var evadeMD:Int = this._getStatValue( "evadeMeleeDamage", "current" );
+        var evadeMDMod:Int = this._getStatValue( "evadeMeleeDamage", "modifier" );
+
+        var blockMD:Int = this._getStatValue( "evadeMeleeDamage", "current" );
+        var blockMDMod:Int = this._getStatValue( "evadeMeleeDamage", "modifier" );
+
         var evadeRD:Int = this._getStatValue( "evadeRangedDamage", "current" );
+        var evadeRDMod:Int = this._getStatValue( "evadeRangedDamage", "modifier" );
+
+        var blockRD:Int = this._getStatValue( "evadeRangedDamage", "current" );
+        var blockRDMod:Int = this._getStatValue( "evadeRangedDamage", "modifier" );
+
         var kiRes:Int = this._getStatValue( "kineticResistance", "current" );
+        var kiResMod:Int = this._getStatValue( "kineticResistance", "modifier" );
+
+        var fiRes:Int = this._getStatValue( "fireResistance", "current" );
+        var fiResMod:Int = this._getStatValue( "fireResistance", "modifier" );
+
+        var elRes:Int = this._getStatValue( "electricResistance", "current" );
+        var elResMod:Int = this._getStatValue( "electricResistance", "modifier" );
+
+        var laRes:Int = this._getStatValue( "laserResistance", "current" );
+        var laResMod:Int = this._getStatValue( "laserResistance", "modifier" );
+
+        var plRes:Int = this._getStatValue( "plasmaResistance", "current" );
+        var plResMod:Int = this._getStatValue( "plasmaResistance", "modifier" );
+
         var poRes:Int = this._getStatValue( "poisonResistance", "current" );
+        var poResMod:Int = this._getStatValue( "poisonResistance", "modifier" );
+
         var knRes:Int = this._getStatValue( "knockdownResistance", "current" );
+        var knResMod:Int = this._getStatValue( "knockdownResistance", "modifier" );
+
         var diRes:Int = this._getStatValue( "diseaseResistance", "current" );
+        var diResMod:Int = this._getStatValue( "diseaseResistance", "modifier" );
+
         var paRes:Int = this._getStatValue( "painResistance", "current" );
-        trace( 'STR: $str; DEX: $dex; END: $end; INT: $int; MDMG: $mAtk; RDMG: $rAtk; Evade Melee: $evadeMD; Evade Ranged: $evadeRD; Kinetic: $kiRes; Poison: $poRes; Knockdown: $knRes; Disease: $diRes; Pain: $paRes;');
-        var currentHP:Int = switch( this._parent.healthPoints.currentHP ){ case HealthPoint( v ): v; };
-        var totalHP:Int = switch( this._parent.healthPoints.totalHP ){ case HealthPoint( v ): v; };
-        trace( 'Current HP: $currentHP; Total HP: $totalHP' );
+        var paResMod:Int = this._getStatValue( "painResistance", "modifier" );
+
+        var moSPD:Int = this._getStatValue( "movementSpeed", "current" );
+        var moSPDMod:Int = this._getStatValue( "movementSpeed", "modifier" );
+
+        var banSPD:Int = this._getStatValue( "bandagingSpeed", "current" );
+        var banSPDMod:Int = this._getStatValue( "bandagingSpeed", "modifier" );
+
+        var faSPD:Int = this._getStatValue( "firstAidSpeed", "current" );
+        var faSPDMod:Int = this._getStatValue( "firstAidSpeed", "modifier" );
+
+        var docSPD:Int = this._getStatValue( "doctorSpeed", "current" );
+        var docSPDMod:Int = this._getStatValue( "doctorSpeed", "modifier" );
+
+        var eatSPD:Int = this._getStatValue( "eatingSpeed", "current" );
+        var eatSPDMod:Int = this._getStatValue( "eatingSpeed", "modifier" );
+
+        var eiSPD:Int = this._getStatValue( "equipItemSpeed", "current" );
+        var eiSPDMod:Int = this._getStatValue( "equipItemSpeed", "modifier" );
+
+       var cwSPD:Int = this._getStatValue( "changeWeaponSpeed", "current" );
+       var cwSPDMod:Int = this._getStatValue( "changeWeaponSpeed", "modifier" );
+
+       var currentPain:Int = switch( this.pain ){ case Pain( v ): v;};
+        
+        trace( 'Pain: $currentPain
+        STR: $str | $strMod
+        DEX: $dex | $dexMod
+        END: $end | $endMod
+        INT: $int | $intMod
+        MDMG: $mAtk | $mAtkMod
+        RDMG: $rAtk | $rAtkMod
+        Move: $moSPD | $moSPDMod
+        Bandaging: $banSPD | $banSPDMod
+        First Aid: $faSPD | $faSPDMod
+        Doctor: $docSPD | $docSPDMod
+        Eating: $eatSPD | $eatSPDMod
+        Equip: $eiSPD | $eiSPDMod
+        Change Weapon: $cwSPD | $cwSPDMod
+        Evade Melee: $evadeMD | $evadeMDMod
+        Evade Ranged: $evadeRD | $evadeRDMod
+        Block Melee: $blockMD | $blockMDMod
+        Block Ranged: $blockRD | $blockRDMod
+        Kinetic: $kiRes | $kiResMod
+        Fire: $fiRes | $fiResMod
+        Electric: $elRes | $elResMod
+        Laser: $laRes | $laResMod
+        Plasma: $plRes | $plResMod
+        Poison: $poRes | $poResMod
+        Knockdown: $knRes | $knResMod
+        Disease: $diRes | $diResMod
+        Pain: $paRes | $paResMod');
     }
 
 

@@ -57,10 +57,8 @@ class Game {
         //scene.traceScene();
         var rabbit:Entity = this.entitySystem.createEntity( "animal", "rabbit" );
         rabbit.init();
-        rabbit.stats.traceStats();
         //var lynx:Entity = this.entitySystem.createEntity( "animal", "lynx" );
         //lynx.init();
-        //lynx.stats.traceStats();
         scene.addEntity( rabbit );
         //scene.addEntity( lynx);
         //trace( "change Right Foot hp -500");
@@ -76,19 +74,13 @@ class Game {
         trace( 'Remove body part "Right foot"');
         rabbit.healthPoints.removeBodyPart( "rightFoot" );
         rabbit.stats.traceStats();
-        trace( rabbit.healthPoints.traceInfo());
-        trace( "Right Foot Status: ");
-        trace( rabbit.healthPoints.rightLeg.Foot.Status );
-        trace( "right Sole Status: ");
-        trace( rabbit.healthPoints.rightLeg.Sole.Status );
+        rabbit.healthPoints.traceInfo();
+
         trace( "add body part  Right Foot" ); 
         rabbit.healthPoints.addBodyPart( "rightFoot", { "baseHP": 100, "partType": "cybernetic", "status": "n/a", "currentHP": 0 });              
         rabbit.stats.traceStats();
-        trace( rabbit.healthPoints.traceInfo());
-        trace( "Right Foot Status: ");
-        trace( rabbit.healthPoints.rightLeg.Foot.Status );
-        trace( "right Sole Status: ");
-        trace( rabbit.healthPoints.rightLeg.Sole.Status );
+        rabbit.healthPoints.traceInfo();
+
 
     }
 
