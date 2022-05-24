@@ -61,27 +61,16 @@ class Game {
         //lynx.init();
         scene.addEntity( rabbit );
         //scene.addEntity( lynx);
-        //trace( "change Right Foot hp -500");
-        //rabbit.healthPoints.changeBodyPartHP( "rightFoot", "current", -500 );
-        //rabbit.stats.traceStats();
-        //trace( rabbit.healthPoints.showTotalHP());
-        //trace( rabbit.healthPoints.showCurrentTotalHP());
-        //rabbit.healthPoints.changeBodyPartHP( "rightFoot", "current", 25 );
-        //trace( "change Right Foot hp +25");
-        //rabbit.stats.traceStats();
-        //trace( rabbit.healthPoints.showTotalHP());
-        //trace( rabbit.healthPoints.showCurrentTotalHP());
-        trace( 'Remove body part "Right foot"');
-        rabbit.healthPoints.removeBodyPart( "rightFoot" );
+        rabbit.stats.traceStats();
+        trace( 'change STR 10');
+        rabbit.stats.changeStatModifierValue( "strength", 10 );
         rabbit.stats.traceStats();
         rabbit.healthPoints.traceInfo();
 
-        trace( "add body part  Right Foot" ); 
-        rabbit.healthPoints.addBodyPart( "rightFoot", { "baseHP": 100, "partType": "cybernetic", "status": "n/a", "currentHP": 0 });              
+        trace( 'change STR -5');
+        rabbit.stats.changeStatModifierValue( "strength", -5 );
         rabbit.stats.traceStats();
         rabbit.healthPoints.traceInfo();
-
-
     }
 
     public function stopGame():Void{

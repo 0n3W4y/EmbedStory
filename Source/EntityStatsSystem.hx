@@ -113,6 +113,8 @@ class EntityStatsSystem {
     private var _resistanceMaxValue:Int = 95;
     private var _statsMaxValue:Int = 30;
     private var _painMaxValue:Int = 1000;
+    private var _painModifier:Int = 1;
+    private var _painEffectValue:Int = 200;
 
     public function new( parent:Entity, config:EntityStatsSystemConfig ){
         this._parent = parent;
@@ -505,7 +507,7 @@ class EntityStatsSystem {
 
         var currentValue:Int = switch( this.pain ){case Pain( v ): v; };
         if( currentValue == this._painMaxValue && value > 0 )
-            return;
+            return; // MB death?
 
         if( currentValue == 0 && value < 0 )
             return;
@@ -514,6 +516,9 @@ class EntityStatsSystem {
             currentValue += value - Math.round( value / 100 * this.getStatValueInt( "painResistance", "current" ));
         else
             currentValue += value;
+
+        if( Math.abs( value ) >= 200 )
+            throw 'Error PAIN VALUE > 200 || < -200 !!!!';
 
         if( currentValue > this._painMaxValue ){
             this.pain = Pain( this._painMaxValue );
@@ -524,16 +529,21 @@ class EntityStatsSystem {
             this.pain = Pain( currentValue );
 
         // Каждые 200 пунктов боли уменьшаем основные статы.
-        var statModifier = -1;
-        if( value < 0 )
-            statModifier = 1;
-
-        if( currentValue%200 == 0 ){
-            this.changeStatModifierValue( "strength", statModifier );
-            this.changeStatModifierValue( "dexterity", statModifier );
-            this.changeStatModifierValue( "intellect", statModifier );
-            this.changeStatModifierValue( "endurance", statModifier );
-        }        
+        var currentPositivePainLine:Int = this._painEffectValue * this._painModifier;
+        var currentNegativePainLine:Int = this._painEffectValue * ( this._painModifier -1 );
+        if( currentValue >= currentPositivePainLine ){
+            this._painModifier++;
+            this.changeStatModifierValue( "strength", -1 );
+            this.changeStatModifierValue( "dexterity", -1 );
+            this.changeStatModifierValue( "intellect", -1 );
+            this.changeStatModifierValue( "endurance", -1 );
+        }else if( currentValue < currentNegativePainLine ){
+            this._painModifier--;
+            this.changeStatModifierValue( "strength", 1 );
+            this.changeStatModifierValue( "dexterity", 1 );
+            this.changeStatModifierValue( "intellect", 1 );
+            this.changeStatModifierValue( "endurance", 1 );
+        }
     }
     
 
@@ -595,8 +605,6 @@ class EntityStatsSystem {
                 value += strValue + Math.ceil( strValue / 4 );
                 if( value <= 0 )
                     value = 1;
-
-                trace( 'Melee Damage : $value' );
             };
             case "rangedDamage":{
                 value += Math.ceil( dexValue / 2 + intValue / 2 );

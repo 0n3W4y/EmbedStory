@@ -446,7 +446,6 @@ class EntityHealthPointsSystem{
         var rightLegHP:Int = this._calculateTotalHealthPointsBodyPart( "rightLeg" );
         var torsoHP:Int = this._calculateTotalHealthPointsBodyPart( "torso" );
         this.totalHP = HealthPoint( headHP + leftHandHP + rightHandHP + leftLegHP + rightLegHP + torsoHP );
-        //trace( 'Total: Head: $headHP; Left hand: $leftHandHP; Right hand: $rightHandHP; Left leg: $leftLegHP; Right leg: $rightLegHP; Torso: $torsoHP');
     }
 
     private function _updateCurrentTotalHP():Void{
@@ -457,7 +456,6 @@ class EntityHealthPointsSystem{
         var rightLegHP:Int = this._calculateCurrentTotalHealthPointsBodyPart( "rightLeg" );
         var torsoHP:Int = this._calculateCurrentTotalHealthPointsBodyPart( "torso" );
         this.currentHP = HealthPoint( headHP + leftHandHP + rightHandHP + leftLegHP + rightLegHP + torsoHP );
-        //trace( 'Current: Head: $headHP; Left hand: $leftHandHP; Right hand: $rightHandHP; Left leg: $leftLegHP; Right leg: $rightLegHP; Torso: $torsoHP');
     }
 
     private function _calculatePartTypeDependencies( place:String, oldPartType:String ):Void {
@@ -467,20 +465,21 @@ class EntityHealthPointsSystem{
             throw '$msg old part type is N/A!';
 
         var partType:String = _getPartTypeBodyPart( place );
-        var stats:EntityStatsSystem = this._parent.stats;
         switch( place ){
-            case "mouth":{
-                switch( partType ){
-                    case "natural":{
-                        switch( oldPartType ){
-                            case "wood":{};
-                            case "steel":{};
-                            case "carbon":{};
-                            case "cybernetic":{};
-                        }
-                    }
-                }
-            }
+            case "mouth": this._calculatePartTypeDependenciesForMouth( partType, oldPartType );
+            case "nose": this._calculatePartTypeDependenciesForNose( status, oldStatus );
+            case "leftEye": this._calculatePartTypeDependenciesForEye( status, oldStatus );
+            case "rightEye": this._calculatePartTypeDependenciesForEye( status, oldStatus );
+            case "leftLung": this._calculatePartTypeDependenciesForLung( status, oldStatus );
+            case "rightLung": this._calculatePartTypeDependenciesForLung( status, oldStatus );
+            case "leftWrist": this._calculatePartTypeDependenciesForWrist( status, oldStatus );
+            case "leftArm": this._calculatePartTypeDependenciesForArm( status, oldStatus );
+            case "rightWrist":this._calculatePartTypeDependenciesForWrist( status, oldStatus );
+            case "rightArm": this._calculatePartTypeDependenciesForArm( status, oldStatus );
+            case "leftFoot": this._calculatePartTypeDependenciesForFoot( status, oldStatus );
+            case "leftSole": this._calculatePartTypeDependenciesForSole( status, oldStatus );
+            case "rightFoot": this._calculatePartTypeDependenciesForFoot( status, oldStatus );
+            case "rightSole": this._calculatePartTypeDependenciesForSole( status, oldStatus );
         }
 
     }
@@ -1233,6 +1232,51 @@ class EntityHealthPointsSystem{
                 }
             };
             case "healthy":{};
+        }
+    }
+
+    private function _calculatePartTypeDependenciesForMouth( partType:String, oldPartType:String ):Void{
+        switch( partType ){
+            case "natural":{
+                switch( oldPartType ){
+                    case "wood":{};
+                    case "steel":{};
+                    case "carbon":{};
+                    case "cybernetic":{};
+                }
+            }
+            case "wood":{
+                switch( oldPartType ){
+                    case "natural":{};
+                    case "steel":{};
+                    case "carbon":{};
+                    case "cybernetic":{};
+                }
+            }
+            case "steel":{
+                switch( oldPartType ){
+                    case "wood":{};
+                    case "natural":{};
+                    case "carbon":{};
+                    case "cybernetic":{};
+                }
+            }
+            case "carbon":{
+                switch( oldPartType ){
+                    case "wood":{};
+                    case "steel":{};
+                    case "natural":{};
+                    case "cybernetic":{};
+                }
+            }
+            case "cybernetic":{
+                switch( oldPartType ){
+                    case "wood":{};
+                    case "steel":{};
+                    case "carbon":{};
+                    case "natural":{};
+                }
+            }
         }
     }
 
